@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function SignupForm() {
   const router = useRouter();
@@ -65,7 +66,15 @@ export function SignupForm() {
 
   return (
     <Card className="w-full max-w-md">
-      <CardHeader>
+      <CardHeader className="flex flex-col items-center">
+        {/* Logo de la empresa */}
+        <Image
+          src="/geeks5g.jpg" // Asegúrate de colocar tu logo en la carpeta public/
+          alt="Company Logo"
+          width={100} // Ajusta el tamaño según sea necesario
+          height={100}
+          className="mb-2"
+        />
         <CardTitle className="text-2xl font-bold text-center">
           Create an account
         </CardTitle>
