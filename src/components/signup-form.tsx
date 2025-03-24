@@ -18,8 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
 
 export function SignupForm() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -56,6 +58,7 @@ export function SignupForm() {
     // Simulate Google signup
     setTimeout(() => {
       setIsLoading(false);
+      router.push("/dashboard");
       // Handle Google signup logic here
     }, 1500);
   };
@@ -72,8 +75,6 @@ export function SignupForm() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center">
-          <Separator className="flex-1" />
-          <span className="mx-2 text-sm text-muted-foreground">OR</span>
           <Separator className="flex-1" />
         </div>
 
