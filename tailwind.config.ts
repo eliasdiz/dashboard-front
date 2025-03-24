@@ -53,6 +53,16 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--background))",
+          foreground: "hsl(var(--foreground))",
+          border: "hsl(var(--border))",
+          primary: "#f5870e",
+          "primary-foreground": "white",
+          accent: "hsl(var(--muted))",
+          "accent-foreground": "hsl(var(--foreground))",
+          ring: "hsl(var(--ring))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
