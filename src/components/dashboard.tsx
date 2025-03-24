@@ -5,6 +5,7 @@ import {
   BarChart3,
   Calendar,
   CreditCard,
+  Globe,
   Home,
   Menu,
   MessageSquare,
@@ -17,6 +18,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { LocationsTable } from "@/components/locations-table"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
   Sidebar,
@@ -35,6 +37,7 @@ import {
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<"overview" | "locations">("overview")
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -55,9 +58,15 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive>
+                    <SidebarMenuButton isActive={activeTab === "overview"} onClick={() => setActiveTab("overview")}>
                       <Home className="h-4 w-4" />
                       <span>Dashboard</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive={activeTab === "locations"} onClick={() => setActiveTab("locations")}>
+                      <Globe className="h-4 w-4" />
+                      <span>Locations</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
@@ -145,10 +154,25 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className="w-full justify-start bg-[#f5870e]/10 text-[#f5870e] hover:bg-[#f5870e]/20 hover:text-[#f5870e]"
+                      className={`w-full justify-start ${activeTab === "overview" ? "bg-[#f5870e]/10 text-[#f5870e]" : ""} hover:bg-[#f5870e]/20 hover:text-[#f5870e]`}
+                      onClick={() => {
+                        setActiveTab("overview")
+                        setIsMobileOpen(false)
+                      }}
                     >
                       <Home className="mr-2 h-4 w-4" />
                       Dashboard
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${activeTab === "locations" ? "bg-[#f5870e]/10 text-[#f5870e]" : ""} hover:bg-[#f5870e]/20 hover:text-[#f5870e]`}
+                      onClick={() => {
+                        setActiveTab("locations")
+                        setIsMobileOpen(false)
+                      }}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      Locations
                     </Button>
                     <Button variant="ghost" className="w-full justify-start">
                       <ShoppingCart className="mr-2 h-4 w-4" />
@@ -216,119 +240,133 @@ export function Dashboard() {
 
           {/* Dashboard Content */}
           <main className="flex-1 overflow-auto p-6 w-full">
-            <div className="flex flex-col gap-6">
-              <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+            {activeTab === "overview" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Dashboard Overview</h1>
 
-              {/* Stats Cards */}
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">$45,231.89</div>
-                    <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">New Customers</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+2,350</div>
-                    <p className="text-xs text-muted-foreground">+10.1% from last month</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
-                    <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+12,234</div>
-                    <p className="text-xs text-muted-foreground">+19% from last month</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Active Products</CardTitle>
-                    <Package className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+573</div>
-                    <p className="text-xs text-muted-foreground">+201 since last month</p>
-                  </CardContent>
-                </Card>
-              </div>
+                {/* Stats Cards */}
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">$45,231.89</div>
+                      <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">New Customers</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+2,350</div>
+                      <p className="text-xs text-muted-foreground">+10.1% from last month</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
+                      <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+12,234</div>
+                      <p className="text-xs text-muted-foreground">+19% from last month</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Active Products</CardTitle>
+                      <Package className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">+573</div>
+                      <p className="text-xs text-muted-foreground">+201 since last month</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {/* Recent Activity */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="col-span-1 md:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Recent Orders</CardTitle>
-                    <CardDescription>You have 265 orders this month</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="h-9 w-9 rounded-md bg-[#fcb908]/20 flex items-center justify-center">
-                            <Package className="h-4 w-4 text-[#fcb908]" />
+                {/* Recent Activity */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <Card className="col-span-1 md:col-span-2">
+                    <CardHeader>
+                      <CardTitle>Recent Orders</CardTitle>
+                      <CardDescription>You have 265 orders this month</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className="flex items-center gap-4">
+                            <div className="h-9 w-9 rounded-md bg-[#fcb908]/20 flex items-center justify-center">
+                              <Package className="h-4 w-4 text-[#fcb908]" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <p className="text-sm font-medium leading-none">Order #{1000 + i}</p>
+                              <p className="text-xs text-muted-foreground">New order from Customer #{2000 + i}</p>
+                            </div>
+                            <div className="text-sm text-muted-foreground">${Math.floor(Math.random() * 1000)}.00</div>
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium leading-none">Order #{1000 + i}</p>
-                            <p className="text-xs text-muted-foreground">New order from Customer #{2000 + i}</p>
+                        ))}
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        variant="outline"
+                        className="w-full text-[#f5870e] border-[#f5870e] hover:bg-[#f5870e]/10"
+                      >
+                        View All Orders
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Recent Activity</CardTitle>
+                      <CardDescription>Your recent actions</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="flex items-center gap-4">
+                            <div className="h-9 w-9 rounded-full bg-[#f68a0e]/20 flex items-center justify-center">
+                              <Users className="h-4 w-4 text-[#f68a0e]" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <p className="text-sm font-medium leading-none">
+                                {
+                                  ["Added new product", "Updated inventory", "Processed refund", "Contacted customer"][
+                                    i - 1
+                                  ]
+                                }
+                              </p>
+                              <p className="text-xs text-muted-foreground">{i * 10} minutes ago</p>
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">${Math.floor(Math.random() * 1000)}.00</div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full text-[#f5870e] border-[#f5870e] hover:bg-[#f5870e]/10">
-                      View All Orders
-                    </Button>
-                  </CardFooter>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription>Your recent actions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="h-9 w-9 rounded-full bg-[#f68a0e]/20 flex items-center justify-center">
-                            <Users className="h-4 w-4 text-[#f68a0e]" />
-                          </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium leading-none">
-                              {
-                                ["Added new product", "Updated inventory", "Processed refund", "Contacted customer"][
-                                  i - 1
-                                ]
-                              }
-                            </p>
-                            <p className="text-xs text-muted-foreground">{i * 10} minutes ago</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full text-[#f5870e] border-[#f5870e] hover:bg-[#f5870e]/10">
-                      View All Activity
-                    </Button>
-                  </CardFooter>
-                </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        variant="outline"
+                        className="w-full text-[#f5870e] border-[#f5870e] hover:bg-[#f5870e]/10"
+                      >
+                        View All Activity
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Business Locations</h1>
+                <LocationsTable />
+              </div>
+            )}
           </main>
         </div>
       </div>
     </SidebarProvider>
   )
 }
+
