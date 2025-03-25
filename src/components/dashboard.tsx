@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import Image from "next/image";
 import {
   Activity,
-  BarChart3,
   Calendar,
   CreditCard,
   FileBarChart,
@@ -13,21 +13,18 @@ import {
   MapPin,
   Menu,
   MessageSquare,
-  Package,
   PieChart,
   Search,
   Settings,
   Share2,
-  ShoppingCart,
   Star,
-  Users,
   Wrench,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { BusinessesTable } from "@/components/businesses-table"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button";
+import { BusinessesTable } from "@/components/businesses-table";
+import { PostsTable } from "@/components/posts-table";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Sidebar,
   SidebarContent,
@@ -41,23 +38,32 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { WordkeysManagement } from "@/components/wordkeys-management";
+import { ServicesManagement } from "@/components/services-management";
+import { SocialMediaManagement } from "@/components/social-media-management";
+import { DashboardContent } from "./dashboard-content";
 
 export function Dashboard() {
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"overview" | "locations">("overview")
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "locations" | "posts" | "keywords" | "services" | "social-media"
+  >("overview");
 
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-white">
         {/* Desktop Sidebar */}
         <Sidebar className="hidden md:flex border-r">
-          <SidebarHeader>
+          <SidebarHeader className="bg-primary rounded-b-[0.5rem]">
             <div className="flex items-center gap-2 px-4 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                <PieChart className="h-4 w-4 text-white" />
-              </div>
-              <div className="font-semibold text-lg">Dashboard</div>
+              <Image
+                src="/googlerank_editable.svg" // Asegúrate de colocar tu logo en la carpeta public/
+                alt="Company Logo"
+                width={300} // Ajusta el tamaño según sea necesario
+                height={300}
+                className="mb-2"
+              />
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -66,13 +72,19 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "overview"} onClick={() => setActiveTab("overview")}>
+                    <SidebarMenuButton
+                      isActive={activeTab === "overview"}
+                      onClick={() => setActiveTab("overview")}
+                    >
                       <Home className="h-4 w-4" />
                       <span>Dashboard</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "locations"} onClick={() => setActiveTab("locations")}>
+                    <SidebarMenuButton
+                      isActive={activeTab === "locations"}
+                      onClick={() => setActiveTab("locations")}
+                    >
                       <Globe className="h-4 w-4" />
                       <span>Businesses</span>
                     </SidebarMenuButton>
@@ -86,25 +98,37 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "posts"}
+                      onClick={() => setActiveTab("posts")}
+                    >
                       <FileText className="h-4 w-4" />
                       <span>Posts</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "keywords"}
+                      onClick={() => setActiveTab("keywords")}
+                    >
                       <Search className="h-4 w-4" />
                       <span>Keywords</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "services"}
+                      onClick={() => setActiveTab("services")}
+                    >
                       <Wrench className="h-4 w-4" />
                       <span>Services</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                  <SidebarMenuButton
+                      isActive={activeTab === "social-media"}
+                      onClick={() => setActiveTab("social-media")}
+                    >
                       <Share2 className="h-4 w-4" />
                       <span>Social Media</span>
                     </SidebarMenuButton>
@@ -123,12 +147,6 @@ export function Dashboard() {
               <SidebarGroupLabel>Engagement</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <MessageSquare className="h-4 w-4" />
-                      <span>Messages</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton>
                       <Star className="h-4 w-4" />
@@ -171,12 +189,6 @@ export function Dashboard() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton>
-                      <Calendar className="h-4 w-4" />
-                      <span>Calendar</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
                       <Settings className="h-4 w-4" />
                       <span>Settings</span>
                     </SidebarMenuButton>
@@ -187,7 +199,7 @@ export function Dashboard() {
           </SidebarContent>
           <SidebarFooter>
             <div className="p-4">
-              <Button className="w-full bg-destructive hover:bg-destructive/90 text-white">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                 <CreditCard className="mr-2 h-4 w-4" />
                 Upgrade Plan
               </Button>
@@ -198,7 +210,11 @@ export function Dashboard() {
         {/* Mobile Sidebar */}
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="md:hidden fixed top-4 left-4 z-40">
+            <Button
+              variant="outline"
+              size="icon"
+              className="md:hidden fixed top-4 left-4 z-40"
+            >
               <Menu className="h-4 w-4" />
               <span className="sr-only">Toggle Menu</span>
             </Button>
@@ -213,14 +229,20 @@ export function Dashboard() {
               </div>
               <div className="flex-1 overflow-auto py-2">
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">Main Menu</h3>
+                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">
+                    Main Menu
+                  </h3>
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${activeTab === "overview" ? "bg-primary/10 text-primary" : ""} hover:bg-primary/20 hover:text-primary`}
+                      className={`w-full justify-start ${
+                        activeTab === "overview"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
-                        setActiveTab("overview")
-                        setIsMobileOpen(false)
+                        setActiveTab("overview");
+                        setIsMobileOpen(false);
                       }}
                     >
                       <Home className="mr-2 h-4 w-4" />
@@ -228,50 +250,84 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${activeTab === "locations" ? "bg-primary/10 text-primary" : ""} hover:bg-primary/20 hover:text-primary`}
+                      className={`w-full justify-start ${
+                        activeTab === "locations"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
-                        setActiveTab("locations")
-                        setIsMobileOpen(false)
+                        setActiveTab("locations");
+                        setIsMobileOpen(false);
                       }}
                     >
                       <Globe className="mr-2 h-4 w-4" />
-                      Locations
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Orders
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Package className="mr-2 h-4 w-4" />
-                      Products
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Users className="mr-2 h-4 w-4" />
-                      Customers
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Analytics
+                      Businesses
                     </Button>
                   </div>
                 </div>
 
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">Automations</h3>
+                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">
+                    Automations
+                  </h3>
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "posts"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("posts");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <FileText className="mr-2 h-4 w-4" />
                       Posts
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "keywords"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("keywords");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Search className="mr-2 h-4 w-4" />
                       Keywords
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "services"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("services");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Wrench className="mr-2 h-4 w-4" />
                       Services
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "social-media"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("social-media");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Share2 className="mr-2 h-4 w-4" />
                       Social Media
                     </Button>
@@ -283,7 +339,9 @@ export function Dashboard() {
                 </div>
 
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">Engagement</h3>
+                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">
+                    Engagement
+                  </h3>
                   <div className="space-y-1">
                     <Button variant="ghost" className="w-full justify-start">
                       <MessageSquare className="mr-2 h-4 w-4" />
@@ -301,7 +359,9 @@ export function Dashboard() {
                 </div>
 
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">Analytics</h3>
+                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">
+                    Analytics
+                  </h3>
                   <div className="space-y-1">
                     <Button variant="ghost" className="w-full justify-start">
                       <Activity className="mr-2 h-4 w-4" />
@@ -315,7 +375,9 @@ export function Dashboard() {
                 </div>
 
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">General</h3>
+                  <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground">
+                    General
+                  </h3>
                   <div className="space-y-1">
                     <Button variant="ghost" className="w-full justify-start">
                       <Calendar className="mr-2 h-4 w-4" />
@@ -329,7 +391,7 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="border-t p-4">
-                <Button className="w-full bg-destructive hover:bg-destructive/90 text-white">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   <CreditCard className="mr-2 h-4 w-4" />
                   Upgrade Plan
                 </Button>
@@ -342,7 +404,8 @@ export function Dashboard() {
         <div className="flex-1 flex flex-col w-full">
           {/* Header */}
           <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-white px-6">
-            <div className="md:hidden w-8" /> {/* Spacer for mobile menu button */}
+            <div className="md:hidden w-8" />{" "}
+            {/* Spacer for mobile menu button */}
             <SidebarTrigger className="hidden md:flex" />
             <div className="ml-auto flex items-center gap-4">
               <Button
@@ -359,131 +422,41 @@ export function Dashboard() {
           {/* Dashboard Content */}
           <main className="flex-1 overflow-auto p-6 w-full">
             {activeTab === "overview" ? (
-              <div className="flex flex-col gap-6">
-                <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-
-                {/* Stats Cards */}
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                      <CreditCard className="h-4 w-4 text-primary" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">$45,231.89</div>
-                      <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium">New Customers</CardTitle>
-                      <Users className="h-4 w-4 text-destructive" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">+2,350</div>
-                      <p className="text-xs text-muted-foreground">+10.1% from last month</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
-                      <ShoppingCart className="h-4 w-4 text-muted" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">+12,234</div>
-                      <p className="text-xs text-muted-foreground">+19% from last month</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium">Active Products</CardTitle>
-                      <Package className="h-4 w-4 text-secondary" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">+573</div>
-                      <p className="text-xs text-muted-foreground">+201 since last month</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Recent Activity */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  <Card className="col-span-1 md:col-span-2">
-                    <CardHeader>
-                      <CardTitle>Recent Orders</CardTitle>
-                      <CardDescription>You have 265 orders this month</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className="flex items-center gap-4">
-                            <div className="h-9 w-9 rounded-md bg-muted/20 flex items-center justify-center">
-                              <Package className="h-4 w-4 text-muted" />
-                            </div>
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium leading-none">Order #{1000 + i}</p>
-                              <p className="text-xs text-muted-foreground">New order from Customer #{2000 + i}</p>
-                            </div>
-                            <div className="text-sm text-muted-foreground">${Math.floor(Math.random() * 1000)}.00</div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        variant="outline"
-                        className="w-full text-primary border-primary hover:bg-primary/10"
-                      >
-                        View All Orders
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Recent Activity</CardTitle>
-                      <CardDescription>Your recent actions</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className="flex items-center gap-4">
-                            <div className="h-9 w-9 rounded-full bg-secondary/20 flex items-center justify-center">
-                              <Users className="h-4 w-4 text-secondary" />
-                            </div>
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium leading-none">
-                                {
-                                  ["Added new product", "Updated inventory", "Processed refund", "Contacted customer", "AI Integration"][
-                                    i - 1
-                                  ]
-                                }
-                              </p>
-                              <p className="text-xs text-muted-foreground">{i * 10} minutes ago</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        variant="outline"
-                        className="w-full text-destructive border-destructive hover:bg-destructive/10"
-                      >
-                        View All Activity
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </div>
-              </div>
-            ) : (
+              <DashboardContent />
+            ) : activeTab === "locations" ? (
               <div className="flex flex-col gap-6">
                 <h1 className="text-2xl font-bold">Business Locations</h1>
                 <BusinessesTable />
+              </div>
+            ) : activeTab === "posts" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Posts Management</h1>
+                <PostsTable />
+              </div>
+            ) : activeTab === "keywords" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Wordkeys Management</h1>
+                <WordkeysManagement />
+              </div>
+            ) : activeTab === "services" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Services Management</h1>
+                <ServicesManagement />
+              </div>
+            ) : activeTab === "social-media" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Social Media Management</h1>
+                <SocialMediaManagement />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Wordpress Management</h1>
+                <ServicesManagement />
               </div>
             )}
           </main>
         </div>
       </div>
     </SidebarProvider>
-  )
+  );
 }
