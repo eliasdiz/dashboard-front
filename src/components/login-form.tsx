@@ -43,14 +43,14 @@ export function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-primary">
         <CardHeader className="flex flex-col items-center">
           {/* Logo de la empresa */}
           <Image
-            src="/geeks5g.jpg" // Asegúrate de colocar tu logo en la carpeta public/
+            src="/googlerank_editable.svg" // Asegúrate de colocar tu logo en la carpeta public/
             alt="Company Logo"
-            width={100} // Ajusta el tamaño según sea necesario
-            height={100}
+            width={300} // Ajusta el tamaño según sea necesario
+            height={300}
             className="mb-2"
           />
           <CardTitle className="text-2xl font-bold text-center">
@@ -69,6 +69,7 @@ export function LoginForm() {
             <div className="space-y-2">
               <Label htmlFor="email">Email or Username</Label>
               <Input
+                className="bg-white"
                 id="email"
                 type="text"
                 placeholder="Enter your email or username"
@@ -84,12 +85,13 @@ export function LoginForm() {
                 <Label htmlFor="password">Password</Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-[#f58c0d] hover:text-[#f5870e] hover:underline"
+                  className="text-sm text-primary hover:text-primary hover:underline"
                 >
                   Forgot password?
                 </Link>
               </div>
               <Input
+                className="bg-white"
                 id="password"
                 type="password"
                 placeholder="Enter your password"
@@ -106,7 +108,7 @@ export function LoginForm() {
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                 disabled={isLoading}
-                className="border-[#fcb908] data-[state=checked]:bg-[#fcb908] data-[state=checked]:text-white"
+                className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
               />
               <Label
                 htmlFor="remember"
@@ -118,7 +120,7 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full bg-[#f68a0e] hover:bg-[#f5870e] text-white"
+              className="w-full bg-white hover:bg-gray-100 text-primary"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -137,7 +139,7 @@ export function LoginForm() {
             Don&apos;t have an account?{" "}
             <Link
               href="/signup"
-              className="text-[#f58c0d] hover:text-[#f5870e] hover:underline"
+              className="text-white hover:text-gray-100 hover:underline"
             >
               Sign up
             </Link>

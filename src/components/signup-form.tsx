@@ -65,20 +65,20 @@ export function SignupForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-primary">
       <CardHeader className="flex flex-col items-center">
         {/* Logo de la empresa */}
         <Image
-          src="/geeks5g.jpg" // Asegúrate de colocar tu logo en la carpeta public/
+          src="/googlerank_editable.svg" // Asegúrate de colocar tu logo en la carpeta public/
           alt="Company Logo"
-          width={100} // Ajusta el tamaño según sea necesario
-          height={100}
+          width={300} // Ajusta el tamaño según sea necesario
+          height={300}
           className="mb-2"
         />
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-2xl font-bold text-center text-white">
           Create an account
         </CardTitle>
-        <CardDescription className="text-center">
+        <CardDescription className="text-center text-white">
           Sign up to get started
         </CardDescription>
       </CardHeader>
@@ -90,8 +90,9 @@ export function SignupForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName" className="text-white">First Name</Label>
               <Input
+                className="bg-white text-primary placeholder:text-primary/50"
                 id="firstName"
                 placeholder="Enter your first name"
                 value={formData.firstName}
@@ -102,8 +103,9 @@ export function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName" className="text-white">Last Name</Label>
               <Input
+                className="bg-white text-primary placeholder:text-primary/50"
                 id="lastName"
                 placeholder="Enter your last name"
                 value={formData.lastName}
@@ -115,8 +117,9 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="businessName">Business Name</Label>
+            <Label htmlFor="businessName" className="text-white">Business Name</Label>
             <Input
+              className="bg-white text-primary placeholder:text-primary/50"
               id="businessName"
               placeholder="Enter your business name"
               value={formData.businessName}
@@ -127,8 +130,9 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-white">Email</Label>
             <Input
+              className="bg-white text-primary placeholder:text-primary/50"
               id="email"
               type="email"
               placeholder="Enter your email address"
@@ -140,8 +144,9 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone" className="text-white">Phone</Label>
             <Input
+              className="bg-white text-primary placeholder:text-primary/50"
               id="phone"
               type="tel"
               placeholder="Enter your phone number"
@@ -153,8 +158,9 @@ export function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-white">Password</Label>
             <Input
+              className="bg-white text-primary placeholder:text-primary/50"
               id="password"
               type="password"
               placeholder="Create a password"
@@ -167,7 +173,7 @@ export function SignupForm() {
 
           <Button
             variant="outline"
-            className="w-full bg-[#f5870e] text-white hover:bg-[#f5870e]/90"
+            className="w-full bg-white text-primary hover:bg-primary/90"
             onClick={handleGoogleSignup}
             disabled={isLoading}
           >
@@ -202,7 +208,7 @@ export function SignupForm() {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-[#f58c0d] hover:text-[#f5870e] hover:underline"
+            className="text-white hover:text-gray-300 hover:underline"
           >
             Sign in
           </Link>
