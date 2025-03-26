@@ -175,7 +175,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
       <DialogTrigger asChild>
         <Button variant={variant}>{business ? "Edit Business" : "Add Business"}</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent title="Hello" className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{business ? "Edit Business" : "Add New Business"}</DialogTitle>
           <DialogDescription>

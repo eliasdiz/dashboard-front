@@ -80,55 +80,62 @@ const existingBusiness: BusinessFormValues = {
 };
 
 // Sample data - we'll expand the provided single entry
-// const sampleBusinesses: ILocations[] = [
-//   {
-//     location: "Location",
-//     locationId: "910490211122741230",
-//     name: "All Seasons Roofing & Restoration",
-//     website: "http://myallseasonsnebraska.com/"
-//   },
-//   {
-//     location: "Location",
-//     locationId: "823456789012345678",
-//     name: "Sunshine Home Services",
-//     website: "http://sunshinehomeservices.com/"
-//   },
-//   {
-//     location: "Location",
-//     locationId: "734567890123456789",
-//     name: "Metro Plumbing Solutions",
-//     website: "http://metroplumbingsolutions.com/"
-//   },
-//   {
-//     location: "Location",
-//     locationId: "645678901234567890",
-//     name: "Green Valley Landscaping",
-//     website: "http://greenvalleylandscaping.com/",
-//   },
-//   {
-//     location: "Location",
-//     locationId: "556789012345678901",
-//     name: "Elite Electrical Contractors",
-//     website: "http://eliteelectricalcontractors.com/"
-//   },
-//   {
-//     location: "Location",
-//     locationId: "467890123456789012",
-//     name: "Precision Painting Pros",
-//     website: "http://precisionpaintingpros.com/"
-//   },
-//   {
-//     location: "Location2",
-//     locationId: "378901234567890123",
-//     name: "Comfort Heating & Cooling",
-//     website: "http://comfortheatingcooling.com/"
-//   },
-// ];
+const sampleBusinesses: ILocations[] = [
+  {
+    location: "Location",
+    locationId: "910490211122741230",
+    name: "All Seasons Roofing & Restoration",
+    tag: false,
+    website: "http://myallseasonsnebraska.com/"
+  },
+  {
+    location: "Location",
+    locationId: "823456789012345678",
+    name: "Sunshine Home Services",
+    tag: false,
+    website: "http://sunshinehomeservices.com/"
+  },
+  {
+    location: "Location",
+    locationId: "734567890123456789",
+    name: "Metro Plumbing Solutions",
+    tag: false,
+    website: "http://metroplumbingsolutions.com/"
+  },
+  {
+    location: "Location",
+    locationId: "645678901234567890",
+    name: "Green Valley Landscaping",
+    tag: false,
+    website: "http://greenvalleylandscaping.com/",
+  },
+  {
+    location: "Location",
+    locationId: "556789012345678901",
+    name: "Elite Electrical Contractors",
+    tag: false,
+    website: "http://eliteelectricalcontractors.com/"
+  },
+  {
+    location: "Location",
+    locationId: "467890123456789012",
+    name: "Precision Painting Pros",
+    tag: false,
+    website: "http://precisionpaintingpros.com/"
+  },
+  {
+    location: "Location2",
+    locationId: "378901234567890123",
+    name: "Comfort Heating & Cooling",
+    tag: false,
+    website: "http://comfortheatingcooling.com/"
+  },
+];
 
 export function BusinessesTable() {
   const context = useUser();
   const [searchTerm, setSearchTerm] = useState("");
-  const [businesses, setBusinesses] = useState<ILocations[] | []>([]);
+  const [businesses, setBusinesses] = useState<ILocations[] | []>(sampleBusinesses);
   const [sortField, setSortField] = useState<
     "name" | "website" | "location"
   >("name");

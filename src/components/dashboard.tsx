@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Activity,
-  Calendar,
   CreditCard,
   FileBarChart,
   FileText,
@@ -12,12 +11,10 @@ import {
   Home,
   MapPin,
   Menu,
-  MessageSquare,
   PieChart,
   Search,
   Settings,
   Share2,
-  Star,
   Wrench,
 } from "lucide-react";
 
@@ -42,12 +39,29 @@ import {
 import { WordkeysManagement } from "@/components/wordkeys-management";
 import { ServicesManagement } from "@/components/services-management";
 import { SocialMediaManagement } from "@/components/social-media-management";
-import { DashboardContent } from "./dashboard-content";
+import { DashboardContent } from "@/components/dashboard-content";
+import WordPressExamplePage from "@/components/wordpress-content";
+import MarketingReviewsExample from "@/components/marketing-reviews-section";
+import CitationsExample from "./citations-section";
+import HeatmapExample from "./heatmap-section";
+import ReportExample from "./report-section";
+import SettingsPage from "./settings-section";
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "locations" | "posts" | "keywords" | "services" | "social-media"
+    | "overview"
+    | "locations"
+    | "posts"
+    | "keywords"
+    | "services"
+    | "social-media"
+    | "wordpress"
+    | "reviews"
+    | "citations"
+    | "heatmaps"
+    | "reports"
+    | "settings"
   >("overview");
 
   return (
@@ -125,7 +139,7 @@ export function Dashboard() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                  <SidebarMenuButton
+                    <SidebarMenuButton
                       isActive={activeTab === "social-media"}
                       onClick={() => setActiveTab("social-media")}
                     >
@@ -134,7 +148,10 @@ export function Dashboard() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "wordpress"}
+                      onClick={() => setActiveTab("wordpress")}
+                    >
                       <Globe className="h-4 w-4" />
                       <span>WordPress</span>
                     </SidebarMenuButton>
@@ -148,13 +165,19 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <Star className="h-4 w-4" />
+                    <SidebarMenuButton
+                      isActive={activeTab === "reviews"}
+                      onClick={() => setActiveTab("reviews")}
+                    >
+                      <Globe className="h-4 w-4" />
                       <span>Reviews</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "citations"}
+                      onClick={() => setActiveTab("citations")}
+                    >
                       <MapPin className="h-4 w-4" />
                       <span>Citations</span>
                     </SidebarMenuButton>
@@ -168,13 +191,19 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "heatmaps"}
+                      onClick={() => setActiveTab("heatmaps")}
+                    >
                       <Activity className="h-4 w-4" />
                       <span>Heatmaps</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "reports"}
+                      onClick={() => setActiveTab("reports")}
+                    >
                       <FileBarChart className="h-4 w-4" />
                       <span>Reports</span>
                     </SidebarMenuButton>
@@ -188,7 +217,10 @@ export function Dashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton
+                      isActive={activeTab === "settings"}
+                      onClick={() => setActiveTab("settings")}
+                    >
                       <Settings className="h-4 w-4" />
                       <span>Settings</span>
                     </SidebarMenuButton>
@@ -331,7 +363,18 @@ export function Dashboard() {
                       <Share2 className="mr-2 h-4 w-4" />
                       Social Media
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "wordpress"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("wordpress");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Globe className="mr-2 h-4 w-4" />
                       WordPress
                     </Button>
@@ -343,15 +386,33 @@ export function Dashboard() {
                     Engagement
                   </h3>
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Messages
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "reviews"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("reviews");
+                        setIsMobileOpen(false);
+                      }}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      reviews
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Star className="mr-2 h-4 w-4" />
-                      Reviews
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "citations"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("citations");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <MapPin className="mr-2 h-4 w-4" />
                       Citations
                     </Button>
@@ -363,11 +424,33 @@ export function Dashboard() {
                     Analytics
                   </h3>
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "heatmaps"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("heatmaps");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Activity className="mr-2 h-4 w-4" />
                       Heatmaps
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "reports"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("reports");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <FileBarChart className="mr-2 h-4 w-4" />
                       Reports
                     </Button>
@@ -379,11 +462,18 @@ export function Dashboard() {
                     General
                   </h3>
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Calendar
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "settings"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("settings");
+                        setIsMobileOpen(false);
+                      }}
+                    >
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </Button>
@@ -448,12 +538,37 @@ export function Dashboard() {
                 <h1 className="text-2xl font-bold">Social Media Management</h1>
                 <SocialMediaManagement />
               </div>
-            ) : (
+            ) : activeTab === "wordpress" ? (
               <div className="flex flex-col gap-6">
                 <h1 className="text-2xl font-bold">Wordpress Management</h1>
-                <ServicesManagement />
+                <WordPressExamplePage />
               </div>
-            )}
+            ) : activeTab === "reviews" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Reviews Management</h1>
+                <MarketingReviewsExample />
+              </div>
+            ) : activeTab === "citations" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Citations Management</h1>
+                <CitationsExample />
+              </div>
+            ) : activeTab === "heatmaps" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Heatmaps Management</h1>
+                <HeatmapExample />
+              </div>
+            ) : activeTab === "reports" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Reports Management</h1>
+                <ReportExample />
+              </div>
+            ) : activeTab === "settings" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Settings Management</h1>
+                <SettingsPage />
+              </div>
+            ) : null}
           </main>
         </div>
       </div>
