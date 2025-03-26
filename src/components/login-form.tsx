@@ -20,14 +20,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
+import { useUser } from "@/context/UserContext";
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const auth = useAuth()
+  const auth = useUser()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

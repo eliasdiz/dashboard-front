@@ -1,6 +1,4 @@
 "use client";
-
-// import axios from "axios";
 import { useEffect, useState } from "react";
 import {
   ChevronDown,
@@ -35,16 +33,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import {
   BusinessFormDialog,
   BusinessFormValues,
 } from "@/components/business-form-dialog";
-import dotenv from "dotenv"
-import { useAuth } from "@/context/AuthContext";
+import dotenv from "dotenv";
+import { useUser } from "@/context/UserContext";
+import { Switch } from "@/components/ui/switch";
 import axios from "axios";
 
-dotenv.config()
+dotenv.config();
 
 // interface IBusiness {
 //   locations: {
@@ -56,12 +54,12 @@ dotenv.config()
 //   }[]
 // }
 
-interface ILocations {
+export interface ILocations {
   location: string;
   locationId: string;
   name: string;
   website: string;
-  tag: string;
+  tag: boolean
 }
 
 // Example of pre-filled data for editing
@@ -82,64 +80,58 @@ const existingBusiness: BusinessFormValues = {
 };
 
 // Sample data - we'll expand the provided single entry
-const sampleBusinesses: ILocations[] = [
-  {
-    location: "Location",
-    locationId: "910490211122741230",
-    name: "All Seasons Roofing & Restoration",
-    website: "http://myallseasonsnebraska.com/",
-    tag: "Roofing",
-  },
-  {
-    location: "Location",
-    locationId: "823456789012345678",
-    name: "Sunshine Home Services",
-    website: "http://sunshinehomeservices.com/",
-    tag: "Roofing",
-  },
-  {
-    location: "Location",
-    locationId: "734567890123456789",
-    name: "Metro Plumbing Solutions",
-    website: "http://metroplumbingsolutions.com/",
-    tag: "Roofing",
-  },
-  {
-    location: "Location",
-    locationId: "645678901234567890",
-    name: "Green Valley Landscaping",
-    website: "http://greenvalleylandscaping.com/",
-    tag: "Travel",
-  },
-  {
-    location: "Location",
-    locationId: "556789012345678901",
-    name: "Elite Electrical Contractors",
-    website: "http://eliteelectricalcontractors.com/",
-    tag: "Travel",
-  },
-  {
-    location: "Location",
-    locationId: "467890123456789012",
-    name: "Precision Painting Pros",
-    website: "http://precisionpaintingpros.com/",
-    tag: "Roofing",
-  },
-  {
-    location: "Location2",
-    locationId: "378901234567890123",
-    name: "Comfort Heating & Cooling",
-    website: "http://comfortheatingcooling.com/",
-    tag: "Roofing",
-  },
-];
-
+// const sampleBusinesses: ILocations[] = [
+//   {
+//     location: "Location",
+//     locationId: "910490211122741230",
+//     name: "All Seasons Roofing & Restoration",
+//     website: "http://myallseasonsnebraska.com/"
+//   },
+//   {
+//     location: "Location",
+//     locationId: "823456789012345678",
+//     name: "Sunshine Home Services",
+//     website: "http://sunshinehomeservices.com/"
+//   },
+//   {
+//     location: "Location",
+//     locationId: "734567890123456789",
+//     name: "Metro Plumbing Solutions",
+//     website: "http://metroplumbingsolutions.com/"
+//   },
+//   {
+//     location: "Location",
+//     locationId: "645678901234567890",
+//     name: "Green Valley Landscaping",
+//     website: "http://greenvalleylandscaping.com/",
+//   },
+//   {
+//     location: "Location",
+//     locationId: "556789012345678901",
+//     name: "Elite Electrical Contractors",
+//     website: "http://eliteelectricalcontractors.com/"
+//   },
+//   {
+//     location: "Location",
+//     locationId: "467890123456789012",
+//     name: "Precision Painting Pros",
+//     website: "http://precisionpaintingpros.com/"
+//   },
+//   {
+//     location: "Location2",
+//     locationId: "378901234567890123",
+//     name: "Comfort Heating & Cooling",
+//     website: "http://comfortheatingcooling.com/"
+//   },
+// ];
 
 export function BusinessesTable() {
-  const auth = useAuth()
+  const context = useUser();
   const [searchTerm, setSearchTerm] = useState("");
-  const [businesses, setBusinesses] = useState<ILocations[]>(sampleBusinesses)
-  const [sortField, setSortField] = useState<"name" | "website" | "location" | "tag">("name");
+  const [businesses, setBusinesses] = useState<ILocations[] | []>([]);
+  const [sortField, setSortField] = useState<
+    "name" | "website" | "location"
+  >("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Example of handling the save event
@@ -168,7 +160,7 @@ export function BusinessesTable() {
   });
 
   // Handle sort click
-  const handleSort = (field: "name" | "website" | "location" | "tag") => {
+  const handleSort = (field: "name" | "website" | "location") => {
     if (field === sortField) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -177,18 +169,25 @@ export function BusinessesTable() {
     }
   };
 
+  const handleTagChange = (locationId: string, checked: boolean) => {
+    setBusinesses((prevBusinesses) =>
+      prevBusinesses.map((business) =>
+        business.locationId === locationId
+          ? { ...business, tag: checked }
+          : business
+      )
+    );
+  };
+
   useEffect(() => {
     try {
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${auth?.user?.user?.userId}`)
-      .then((response) => {
-        console.log(response.data.locations)
-        setBusinesses(response.data?.locations)
-      })
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${context?.user?.user.userId}`)
+      .then(response => setBusinesses(response.data.locations))
       .catch((err) => console.error(err))
     } catch (err) {
       console.error(err)
     }
-  }, [auth?.user?.user?.userId])
+  }, [context?.user?.user?.userId]);
 
   return (
     <Card>
@@ -258,18 +257,9 @@ export function BusinessesTable() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("tag")}
-                >
+                <TableHead>
                   <div className="flex items-center">
-                    Tag
-                    {sortField === "tag" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
+                    Add
                   </div>
                 </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -285,7 +275,7 @@ export function BusinessesTable() {
                     <TableCell className="font-medium">
                       {business.location}
                     </TableCell>
-                    <TableCell>{business.name.slice(0,30)}</TableCell>
+                    <TableCell>{business.name.slice(0, 30)}</TableCell>
                     <TableCell>
                       <a
                         href={business.website}
@@ -293,21 +283,21 @@ export function BusinessesTable() {
                         rel="noopener noreferrer"
                         className="flex items-center text-primary hover:text-primary hover:underline"
                       >
-                        {business.website?.replace(/(^\w+:|^)\/\//, "")?.replace(/\/$/, "").slice(0,30)}...
+                        {business.website
+                          ?.replace(/(^\w+:|^)\/\//, "")
+                          ?.replace(/\/$/, "")
+                          .slice(0, 30)}
+                        ...
                         <ExternalLink className="ml-1 h-3 w-3" />
                       </a>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`${
-                          business.tag?.includes("T")
-                            ? "bg-primary/20 text-primary"
-                            : "bg-secondary/20 text-secondary"
-                        }`}
-                      >
-                        Tag
-                      </Badge>
+                      <Switch
+                        checked={!!business.tag}
+                        onCheckedChange={(checked: boolean) =>
+                          handleTagChange(business.locationId, checked)
+                        }
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

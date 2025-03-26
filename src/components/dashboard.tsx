@@ -55,7 +55,7 @@ export function Dashboard() {
       <div className="flex min-h-screen w-full bg-white">
         {/* Desktop Sidebar */}
         <Sidebar className="hidden md:flex border-r">
-          <SidebarHeader className="bg-primary rounded-b-[0.5rem]">
+          <SidebarHeader className="bg-primary">
             <div className="flex items-center gap-2 px-4 py-2">
               <Image
                 src="/googlerank_editable.svg" // Asegúrate de colocar tu logo en la carpeta public/
