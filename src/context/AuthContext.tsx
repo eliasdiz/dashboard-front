@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 interface User {
   email: string;
@@ -17,7 +14,27 @@ interface User {
 }
 
 export interface AuthContextType {
-  user: null;
+  user: {
+    user: {
+      businessNamestring: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      password: string;
+      phone: string;
+      token: {
+        client_id: string;
+        client_secret: string;
+        expiry: string;
+        refresh_token: string;
+        scopes: string[];
+        token: string;
+        token_uri: string;
+        universe_domain: string;
+      };
+      userId: string;
+    };
+  } | null;
   login: (formData: {
     email: string;
     password: string;
@@ -32,18 +49,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
   const login = async (credentials: User) => {
     try {
-      const { data } = await axios.post("/api/auth/login", credentials);
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,
+        credentials
+      );
       setUser(data);
-      localStorage.setItem("user", JSON.stringify(data));
       router.push("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
@@ -52,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
     router.push("/login");
   };
 

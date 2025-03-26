@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+// import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -35,63 +36,123 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  BusinessFormDialog,
+  BusinessFormValues,
+} from "@/components/business-form-dialog";
+import dotenv from "dotenv"
+import { useAuth } from "@/context/AuthContext";
+import axios from "axios";
+
+dotenv.config()
+
+// interface IBusiness {
+//   locations: {
+//     location: string;
+//     locationId: string;
+//     name: string;
+//     website: string;
+//     tag: string;
+//   }[]
+// }
+
+interface ILocations {
+  location: string;
+  locationId: string;
+  name: string;
+  website: string;
+  tag: string;
+}
+
+// Example of pre-filled data for editing
+const existingBusiness: BusinessFormValues = {
+  name: "Acme Corporation",
+  location: "123 Main St, Anytown, USA",
+  phones: [{ number: "+1 (555) 123-4567" }],
+  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
+  keywords: [{ text: "web design" }, { text: "digital marketing" }],
+  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+  website: "https://acme-example.com",
+  coordinates: {
+    latitude: "40.7128",
+    longitude: "-74.0060",
+  },
+  cid: "12345678901234567890",
+  imagePrompt: "A modern office building with the Acme logo",
+};
 
 // Sample data - we'll expand the provided single entry
-const sampleBusinesses = [
+const sampleBusinesses: ILocations[] = [
   {
-    name: "businesss/910490211122741230",
-    title: "All Seasons Roofing & Restoration",
+    location: "Location",
+    locationId: "910490211122741230",
+    name: "All Seasons Roofing & Restoration",
+    website: "http://myallseasonsnebraska.com/",
     tag: "Roofing",
-    websiteUri: "http://myallseasonsnebraska.com/",
   },
   {
-    name: "businesss/823456789012345678",
-    title: "Sunshine Home Services",
+    location: "Location",
+    locationId: "823456789012345678",
+    name: "Sunshine Home Services",
+    website: "http://sunshinehomeservices.com/",
     tag: "Roofing",
-    websiteUri: "http://sunshinehomeservices.com/",
   },
   {
-    name: "businesss/734567890123456789",
-    title: "Metro Plumbing Solutions",
+    location: "Location",
+    locationId: "734567890123456789",
+    name: "Metro Plumbing Solutions",
+    website: "http://metroplumbingsolutions.com/",
     tag: "Roofing",
-    websiteUri: "http://metroplumbingsolutions.com/",
   },
   {
-    name: "businesss/645678901234567890",
-    title: "Green Valley Landscaping",
+    location: "Location",
+    locationId: "645678901234567890",
+    name: "Green Valley Landscaping",
+    website: "http://greenvalleylandscaping.com/",
     tag: "Travel",
-    websiteUri: "http://greenvalleylandscaping.com/",
   },
   {
-    name: "businesss/556789012345678901",
-    title: "Elite Electrical Contractors",
+    location: "Location",
+    locationId: "556789012345678901",
+    name: "Elite Electrical Contractors",
+    website: "http://eliteelectricalcontractors.com/",
     tag: "Travel",
-    websiteUri: "http://eliteelectricalcontractors.com/",
   },
   {
-    name: "businesss/467890123456789012",
-    title: "Precision Painting Pros",
+    location: "Location",
+    locationId: "467890123456789012",
+    name: "Precision Painting Pros",
+    website: "http://precisionpaintingpros.com/",
     tag: "Roofing",
-    websiteUri: "http://precisionpaintingpros.com/",
   },
   {
-    name: "businesss/378901234567890123",
-    title: "Comfort Heating & Cooling",
+    location: "Location2",
+    locationId: "378901234567890123",
+    name: "Comfort Heating & Cooling",
+    website: "http://comfortheatingcooling.com/",
     tag: "Roofing",
-    websiteUri: "http://comfortheatingcooling.com/",
   },
 ];
 
+
 export function BusinessesTable() {
+  const auth = useAuth()
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<"title" | "websiteUri">("title");
+  const [businesses, setBusinesses] = useState<ILocations[]>(sampleBusinesses)
+  const [sortField, setSortField] = useState<"name" | "website" | "location" | "tag">("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  // Example of handling the save event
+  const handleSaveBusiness = (data: BusinessFormValues) => {
+    console.log("Business data saved:", data);
+    // In a real app, you would send this data to your backend
+  };
+
   // Filter businesss based on search term
-  const filteredBusinesses = sampleBusinesses.filter(
+  const filteredBusinesses = businesses.filter(
     (business) =>
-      business.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.websiteUri.toLowerCase().includes(searchTerm.toLowerCase())
+      business.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      business.website?.toLowerCase().includes(searchTerm?.toLowerCase())
   );
 
   // Sort businesss based on sort field and direction
@@ -107,7 +168,7 @@ export function BusinessesTable() {
   });
 
   // Handle sort click
-  const handleSort = (field: "title" | "websiteUri") => {
+  const handleSort = (field: "name" | "website" | "location" | "tag") => {
     if (field === sortField) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -116,10 +177,18 @@ export function BusinessesTable() {
     }
   };
 
-  // Extract business ID from the name string
-  const getBusinessId = (name: string) => {
-    return name.split("/")[1];
-  };
+  useEffect(() => {
+    try {
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${auth?.user?.user?.userId}`)
+      .then((response) => {
+        console.log(response.data.locations)
+        setBusinesses(response.data?.locations)
+      })
+      .catch((err) => console.error(err))
+    } catch (err) {
+      console.error(err)
+    }
+  }, [auth?.user?.user?.userId])
 
   return (
     <Card>
@@ -128,7 +197,7 @@ export function BusinessesTable() {
         <CardDescription>
           Manage your business locations and websites
         </CardDescription>
-        <div className="flex items-center mt-4">
+        <div className="flex items-center mt-4  gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -139,9 +208,6 @@ export function BusinessesTable() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button className="ml-4 bg-primary hover:bg-primary/90 text-white">
-            Add Business
-          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -149,14 +215,28 @@ export function BusinessesTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="">ID</TableHead>
+                <TableHead className="">Location ID</TableHead>
                 <TableHead
                   className="cursor-pointer"
-                  onClick={() => handleSort("title")}
+                  onClick={() => handleSort("location")}
+                >
+                  <div className="flex items-center">
+                    Location
+                    {sortField === "location" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort("name")}
                 >
                   <div className="flex items-center">
                     Business Name
-                    {sortField === "title" &&
+                    {sortField === "name" &&
                       (sortDirection === "asc" ? (
                         <ChevronUp className="ml-1 h-4 w-4" />
                       ) : (
@@ -166,11 +246,11 @@ export function BusinessesTable() {
                 </TableHead>
                 <TableHead
                   className="cursor-pointer"
-                  onClick={() => handleSort("websiteUri")}
+                  onClick={() => handleSort("website")}
                 >
                   <div className="flex items-center">
                     Website
-                    {sortField === "websiteUri" &&
+                    {sortField === "website" &&
                       (sortDirection === "asc" ? (
                         <ChevronUp className="ml-1 h-4 w-4" />
                       ) : (
@@ -178,34 +258,55 @@ export function BusinessesTable() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead className="">Tag</TableHead>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort("tag")}
+                >
+                  <div className="flex items-center">
+                    Tag
+                    {sortField === "tag" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedBusinesses.length > 0 ? (
                 sortedBusinesses.map((business) => (
-                  <TableRow key={business.name}>
+                  <TableRow key={business.locationId}>
                     <TableCell className="font-medium">
-                      {getBusinessId(business.name)}
+                      {business.locationId}
                     </TableCell>
-                    <TableCell>{business.title}</TableCell>
+                    <TableCell className="font-medium">
+                      {business.location}
+                    </TableCell>
+                    <TableCell>{business.name.slice(0,30)}</TableCell>
                     <TableCell>
                       <a
-                        href={business.websiteUri}
+                        href={business.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center text-primary hover:text-primary hover:underline"
                       >
-                        {business.websiteUri
-                          .replace(/(^\w+:|^)\/\//, "")
-                          .replace(/\/$/, "")}
+                        {business.website?.replace(/(^\w+:|^)\/\//, "")?.replace(/\/$/, "").slice(0,30)}...
                         <ExternalLink className="ml-1 h-3 w-3" />
                       </a>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`${business.tag[0] == 'T' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'}`}>
-                        {business.tag}
+                      <Badge
+                        variant="outline"
+                        className={`${
+                          business.tag?.includes("T")
+                            ? "bg-primary/20 text-primary"
+                            : "bg-secondary/20 text-secondary"
+                        }`}
+                      >
+                        Tag
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -219,8 +320,16 @@ export function BusinessesTable() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Edit business</DropdownMenuItem>
-                          <DropdownMenuItem>View details</DropdownMenuItem>
+                          <BusinessFormDialog
+                            variant="ghost"
+                            onSave={handleSaveBusiness}
+                          />
+                          <DropdownMenuSeparator />
+                          <BusinessFormDialog
+                            variant="ghost"
+                            business={existingBusiness}
+                            onSave={handleSaveBusiness}
+                          />
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600">
                             Delete business
