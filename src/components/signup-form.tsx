@@ -18,11 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import axios from "axios";
 
 export function SignupForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -53,13 +52,19 @@ export function SignupForm() {
     }, 1500);
   };
 
-  const handleGoogleSignup = () => {
+  const handleGoogleSignup = async () => {
     setIsLoading(true);
 
+    await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/start-auth`, formData)
+    .then((response) => window.open(
+      response.data.auth_url,
+      "GoogleLogin",
+      "width=500,height=600", 
+    ))
     // Simulate Google signup
     setTimeout(() => {
       setIsLoading(false);
-      router.push("/dashboard");
+      // router.push("/dashboard");
       // Handle Google signup logic here
     }, 1500);
   };

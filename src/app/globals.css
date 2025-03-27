@@ -118,4 +118,45 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Logo glow animations */
+  @keyframes glow-light {
+    0%,
+    100% {
+      box-shadow: 0 0 15px 2px rgba(66, 133, 244, 0.2);
+    }
+    25% {
+      box-shadow: 0 0 15px 2px rgba(234, 67, 53, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 15px 2px rgba(251, 188, 5, 0.2);
+    }
+    75% {
+      box-shadow: 0 0 15px 2px rgba(52, 168, 83, 0.2);
+    }
+  }
+
+  @keyframes glow-dark {
+    0%,
+    100% {
+      box-shadow: 0 0 20px 3px rgba(66, 133, 244, 0.4);
+    }
+    25% {
+      box-shadow: 0 0 20px 3px rgba(234, 67, 53, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px 3px rgba(251, 188, 5, 0.4);
+    }
+    75% {
+      box-shadow: 0 0 20px 3px rgba(52, 168, 83, 0.4);
+    }
+  }
+
+  .animate-glow-light {
+    animation: glow-light 8s infinite;
+  }
+
+  .animate-glow-dark {
+    animation: glow-dark 8s infinite;
+  }
 }

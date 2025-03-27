@@ -82,49 +82,49 @@ const existingBusiness: BusinessFormValues = {
 // Sample data - we'll expand the provided single entry
 const sampleBusinesses: ILocations[] = [
   {
-    location: "Location",
+    location: "United States Of America",
     locationId: "910490211122741230",
     name: "All Seasons Roofing & Restoration",
     tag: false,
     website: "http://myallseasonsnebraska.com/"
   },
   {
-    location: "Location",
+    location: "United States Of America",
     locationId: "823456789012345678",
     name: "Sunshine Home Services",
     tag: false,
     website: "http://sunshinehomeservices.com/"
   },
   {
-    location: "Location",
+    location: "United States Of America",
     locationId: "734567890123456789",
     name: "Metro Plumbing Solutions",
     tag: false,
     website: "http://metroplumbingsolutions.com/"
   },
   {
-    location: "Location",
+    location: "United States Of America",
     locationId: "645678901234567890",
     name: "Green Valley Landscaping",
     tag: false,
     website: "http://greenvalleylandscaping.com/",
   },
   {
-    location: "Location",
+    location: "Colombia",
     locationId: "556789012345678901",
     name: "Elite Electrical Contractors",
     tag: false,
     website: "http://eliteelectricalcontractors.com/"
   },
   {
-    location: "Location",
+    location: "Colombia",
     locationId: "467890123456789012",
     name: "Precision Painting Pros",
     tag: false,
     website: "http://precisionpaintingpros.com/"
   },
   {
-    location: "Location2",
+    location: "Perú",
     locationId: "378901234567890123",
     name: "Comfort Heating & Cooling",
     tag: false,

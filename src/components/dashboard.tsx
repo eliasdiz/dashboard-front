@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Activity,
-  CreditCard,
+  User,
   FileBarChart,
   FileText,
   Globe,
@@ -37,6 +37,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { WordkeysManagement } from "@/components/wordkeys-management";
 import { ServicesManagement } from "@/components/services-management";
 import { SocialMediaManagement } from "@/components/social-media-management";
@@ -106,13 +115,13 @@ export function Dashboard() {
                       <span>Businesses</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={activeTab === "users"}
-                      onClick={() => setActiveTab("users")}
-                    >
-                      <Users className="h-4 w-4" />
-                      <span>Users</span>
-                    </SidebarMenuButton>
+                  <SidebarMenuButton
+                    isActive={activeTab === "users"}
+                    onClick={() => setActiveTab("users")}
+                  >
+                    <Users className="h-4 w-4" />
+                    <span>Users</span>
+                  </SidebarMenuButton>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -242,8 +251,8 @@ export function Dashboard() {
           <SidebarFooter>
             <div className="p-4">
               <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Upgrade Plan
+                <User className="mr-2 h-4 w-4" />
+                Alejandro Uribe
               </Button>
             </div>
           </SidebarFooter>
@@ -507,8 +516,8 @@ export function Dashboard() {
               </div>
               <div className="border-t p-4">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Upgrade Plan
+                  <User className="mr-2 h-4 w-4" />
+                  Alejandro Uribe
                 </Button>
               </div>
             </div>
@@ -521,7 +530,7 @@ export function Dashboard() {
           <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-white px-6">
             <div className="md:hidden w-8" />{" "}
             {/* Spacer for mobile menu button */}
-            <SidebarTrigger className="hidden md:flex" />
+            <SidebarTrigger className="hidden" />
             <div className="ml-auto flex items-center gap-4">
               <Button
                 variant="outline"
@@ -530,7 +539,26 @@ export function Dashboard() {
               >
                 View Website
               </Button>
-              <div className="h-8 w-8 rounded-full bg-muted" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full bg-primary/80 text-white">
+                      AU
+                      <span className="sr-only">Open menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive">
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
             </div>
           </header>
 
