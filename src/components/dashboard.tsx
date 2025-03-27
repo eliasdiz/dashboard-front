@@ -15,6 +15,7 @@ import {
   Search,
   Settings,
   Share2,
+  Users,
   Wrench,
 } from "lucide-react";
 
@@ -46,12 +47,14 @@ import CitationsExample from "./citations-section";
 import HeatmapExample from "./heatmap-section";
 import ReportExample from "./report-section";
 import SettingsPage from "./settings-section";
+import { UserManagement } from "./user-management/user-management";
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     | "overview"
     | "locations"
+    | "users"
     | "posts"
     | "keywords"
     | "services"
@@ -103,6 +106,13 @@ export function Dashboard() {
                       <span>Businesses</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeTab === "users"}
+                      onClick={() => setActiveTab("users")}
+                    >
+                      <Users className="h-4 w-4" />
+                      <span>Users</span>
+                    </SidebarMenuButton>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -294,6 +304,21 @@ export function Dashboard() {
                     >
                       <Globe className="mr-2 h-4 w-4" />
                       Businesses
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${
+                        activeTab === "users"
+                          ? "bg-primary/10 text-primary"
+                          : ""
+                      } hover:bg-primary/20 hover:text-primary`}
+                      onClick={() => {
+                        setActiveTab("users");
+                        setIsMobileOpen(false);
+                      }}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      Users
                     </Button>
                   </div>
                 </div>
@@ -517,6 +542,11 @@ export function Dashboard() {
               <div className="flex flex-col gap-6">
                 <h1 className="text-2xl font-bold">Business Locations</h1>
                 <BusinessesTable />
+              </div>
+            ) : activeTab === "users" ? (
+              <div className="flex flex-col gap-6">
+                <h1 className="text-2xl font-bold">Users Management</h1>
+                <UserManagement />
               </div>
             ) : activeTab === "posts" ? (
               <div className="flex flex-col gap-6">
