@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
@@ -20,8 +20,12 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 export function SignupForm() {
+  const router = useRouter()
+  const context = useUser()
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -69,6 +73,30 @@ export function SignupForm() {
     }, 1500);
   };
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const data = event.data;
+
+      if (data?.success && data.user) {
+        const { user } = data;
+        console.log("✅ User object received:", user);
+        context?.setUser(user)
+
+        // Redirigir usando el user
+        router.push('/dashboard');
+      } else {
+        const statusElement = document.getElementById("status");
+        if (statusElement) statusElement.textContent = "OAuth failed or was cancelled.";
+      }
+    };
+
+    window.addEventListener("message", handleMessage, { once: true });
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [router, context]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <Card className="w-full max-w-md bg-primary">
@@ -100,7 +128,7 @@ export function SignupForm() {
                   First Name
                 </Label>
                 <Input
-                  className="bg-white text-primary placeholder:text-primary/50"
+                  className="bg-white text-gray-600 placeholder:text-gray-600/50"
                   id="firstName"
                   placeholder="Enter your first name"
                   value={formData.firstName}
@@ -115,7 +143,7 @@ export function SignupForm() {
                   Last Name
                 </Label>
                 <Input
-                  className="bg-white text-primary placeholder:text-primary/50"
+                  className="bg-white text-gray-600 placeholder:text-gray-600/50"
                   id="lastName"
                   placeholder="Enter your last name"
                   value={formData.lastName}
@@ -131,7 +159,7 @@ export function SignupForm() {
                 Business Name
               </Label>
               <Input
-                className="bg-white text-primary placeholder:text-primary/50"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="businessName"
                 placeholder="Enter your business name"
                 value={formData.businessName}
@@ -146,7 +174,7 @@ export function SignupForm() {
                 Email
               </Label>
               <Input
-                className="bg-white text-primary placeholder:text-primary/50"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="email"
                 type="email"
                 placeholder="Enter your email address"
@@ -162,7 +190,7 @@ export function SignupForm() {
                 Phone
               </Label>
               <Input
-                className="bg-white text-primary placeholder:text-primary/50"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="phone"
                 type="tel"
                 placeholder="Enter your phone number"
@@ -178,7 +206,7 @@ export function SignupForm() {
                 Password
               </Label>
               <Input
-                className="bg-white text-primary placeholder:text-primary/50"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="password"
                 type="password"
                 placeholder="Create a password"

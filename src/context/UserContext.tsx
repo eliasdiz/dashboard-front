@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import dotenv from "dotenv";
@@ -38,6 +38,7 @@ interface Business {
 
 export interface UserContextType {
   user: Business | null;
+  setUser: Dispatch<SetStateAction<Business | null>>;
   login: (formData: User) => Promise<void>;
   logout: () => void;
 }
@@ -68,7 +69,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );

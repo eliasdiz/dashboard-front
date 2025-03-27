@@ -72,7 +72,7 @@ export function LoginForm() {
             <div className="space-y-2">
               <Label htmlFor="email">Email or Username</Label>
               <Input
-                className="bg-white"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="email"
                 type="text"
                 placeholder="Enter your email or username"
@@ -88,13 +88,13 @@ export function LoginForm() {
                 <Label htmlFor="password">Password</Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-primary hover:text-primary hover:underline"
+                  className="text-sm text-white hover:underline"
                 >
                   Forgot password?
                 </Link>
               </div>
               <Input
-                className="bg-white"
+                className="bg-white text-gray-600 placeholder:text-gray-600/50"
                 id="password"
                 type="password"
                 placeholder="Enter your password"
@@ -111,7 +111,7 @@ export function LoginForm() {
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                 disabled={isLoading}
-                className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                className="border-gray-300 bg-white data-[state=checked]:bg-white data-[state=checked]:text-primary"
               />
               <Label
                 htmlFor="remember"
