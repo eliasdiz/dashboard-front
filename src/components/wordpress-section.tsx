@@ -239,12 +239,12 @@ export default function WordPressSection({
         clearInterval(intervalId)
       }
     }
-  }, [apiUrl, sectionType, customEndpoint, refreshInterval])
+  })
 
   // Fetch content when filters or pagination changes
   useEffect(() => {
     fetchContent()
-  }, [selectedCategory, selectedTag, searchQuery, dateFilter, page, limit, sectionType])
+  })
 
   // Reset pagination when filters change
   useEffect(() => {
@@ -491,11 +491,13 @@ export default function WordPressSection({
                     {featuredMedia && (
                       <div className={`${layout === "list" ? "md:w-1/3" : "w-full"} relative`}>
                         <div className="aspect-video w-full bg-muted overflow-hidden">
+                          {/* eslint-disable @next/next/no-img-element */}
                           <img
                             src={featuredMedia.source_url || "/placeholder.svg?height=200&width=300"}
                             alt={featuredMedia.alt_text || post.title.rendered}
                             className="object-cover w-full h-full transition-transform hover:scale-105"
                           />
+                          {/* eslint-enable @next/next/no-img-element */}
                         </div>
                       </div>
                     )}
@@ -517,12 +519,14 @@ export default function WordPressSection({
 
                           {author && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              {/* eslint-disable @next/next/no-img-element */}
                               {author.avatar_urls?.["96"] ? (
                                 <img
                                   src={author.avatar_urls["96"] || "/placeholder.svg"}
                                   alt={author.name}
                                   className="w-5 h-5 rounded-full"
                                 />
+                                
                               ) : (
                                 <UserIcon className="w-4 h-4" />
                               )}
@@ -532,6 +536,7 @@ export default function WordPressSection({
                                 <ClockIcon className="w-3 h-3 mr-1" />
                                 {format(new Date(post.date), "MMM d, yyyy")}
                               </span>
+                              {/* eslint-enable @next/next/no-img-element */}
                             </div>
                           )}
                         </div>

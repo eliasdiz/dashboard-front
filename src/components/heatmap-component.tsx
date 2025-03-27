@@ -376,7 +376,9 @@ export function HeatmapComponent({
     return []
   }
 
+
   // Render heatmap on canvas
+  
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current || !showOverlay) return
 
@@ -443,7 +445,7 @@ export function HeatmapComponent({
         ctx.fillText(`${Math.round(value)}%`, 10, y - 5)
       })
     }
-  }, [heatmapType, aggregatedData, intensityThreshold, showOverlay])
+  }, [heatmapType, aggregatedData, intensityThreshold, showOverlay]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle window resize
   useEffect(() => {

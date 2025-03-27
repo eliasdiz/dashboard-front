@@ -43,6 +43,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import Image from "next/image"
 
 // Types
 interface Citation {
@@ -469,10 +470,12 @@ export function CitationsComponent({
                   <div className="flex justify-between items-start">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-md overflow-hidden mr-3 border border-border flex items-center justify-center bg-muted">
-                        <img
+                        <Image
                           src={citation.sourceIcon || "/placeholder.svg"}
                           alt={citation.source}
                           className="h-full w-full object-cover"
+                          width={200}
+                          height={200}
                         />
                       </div>
                       <div>
@@ -663,7 +666,7 @@ export function CitationsComponent({
                   <TableCell>
                     <div className="flex items-center">
                       <div className="h-8 w-8 rounded-md overflow-hidden mr-2 border border-border flex items-center justify-center bg-muted">
-                        <img
+                        <Image
                           src={citation.sourceIcon || "/placeholder.svg"}
                           alt={citation.source}
                           className="h-full w-full object-cover"

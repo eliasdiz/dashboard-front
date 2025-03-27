@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Plus, Trash2, MapPin, Phone, Tag, Briefcase, Target, Globe, Image } from "lucide-react"
+import { Plus, Trash2, MapPin, Phone, Tag, Briefcase, Target, Globe, ImageUpscale } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -475,7 +475,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center">
-                          <Image className="h-4 w-4 mr-2" />
+                          <ImageUpscale className="h-4 w-4 mr-2" />
                           Image Generation Prompt
                         </FormLabel>
                         <FormControl>

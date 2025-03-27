@@ -397,11 +397,13 @@ export function MarketingReviews({
             <div className="flex items-center">
               {review.avatar ? (
                 <div className="h-10 w-10 rounded-full overflow-hidden mr-3 border border-border">
+                  {/* eslint-disable @next/next/no-img-element */}
                   <img
                     src={review.avatar || "/placeholder.svg"}
                     alt={review.name}
                     className="h-full w-full object-cover"
-                  />
+                  /> 
+                  {/* eslint-enable @next/next/no-img-element */}
                 </div>
               ) : (
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary font-medium">
