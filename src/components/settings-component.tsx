@@ -50,9 +50,6 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-// Environment types
-type Environment = "development" | "production" | "staging"
-
 // Define schemas for each settings section
 const apiIntegrationsSchema = z.object({
   wordpressUrl: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
@@ -126,7 +123,7 @@ const settingsSchema = z.object({
   marketingPreferences: marketingPreferencesSchema,
 })
 
-type SettingsValues = z.infer<typeof settingsSchema>
+export type SettingsValues = z.infer<typeof settingsSchema>
 
 // Default values for the form
 const defaultValues: SettingsValues = {
@@ -188,7 +185,7 @@ const defaultValues: SettingsValues = {
 
 interface SettingsComponentProps {
   initialValues?: Partial<SettingsValues>
-  environment?: Environment
+  environment?: string
   onSave?: (values: SettingsValues) => Promise<void>
   className?: string
 }

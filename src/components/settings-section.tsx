@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Info, RefreshCw } from "lucide-react"
+import type { SettingsValues } from "@/components/settings-component"
 
 export default function SettingsPage() {
-  const [environment, setEnvironment] = useState<"development" | "production" | "staging">("development")
+  const [environment, setEnvironment] = useState<string>("development")
 
   // Example initial values
   const initialValues = {
@@ -27,11 +28,19 @@ export default function SettingsPage() {
       contactPhone: "+1 (555) 123-4567",
       address: "123 Business Ave, Suite 100\nTech City, CA 94043",
       website: "https://acmecorp.com",
+      timezone: "America/New_York",
+      defaultLocale: "en-US",      
+      businessHours: {             
+        mondayToFriday: "9am - 5pm",
+        saturday: "10am - 2pm",
+        sunday: "Closed",
+      },
+      logoUrl: "https://mybusiness.com/logo.png", // Opcional
     },
   }
 
   // Mock save function
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: SettingsValues) => {
     console.log("Saving settings:", values)
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1500))
@@ -47,7 +56,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Tabs value={environment} onValueChange={(value: any) => setEnvironment(value)}>
+          <Tabs value={environment} onValueChange={(value: string) => setEnvironment(value)}>
             <TabsList>
               <TabsTrigger value="development">Development</TabsTrigger>
               <TabsTrigger value="staging">Staging</TabsTrigger>
