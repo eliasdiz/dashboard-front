@@ -17,6 +17,7 @@ import {
   Share2,
   Users,
   Wrench,
+  ShoppingCart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -533,32 +534,35 @@ export function Dashboard() {
             <SidebarTrigger className="hidden" />
             <div className="ml-auto flex items-center gap-4">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="text-primary border-primary hover:bg-primary/10 hover:text-primary"
+                className="relative text-primary border-primary hover:bg-primary/10 hover:text-primary"
               >
-                View Website
+                <ShoppingCart />
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-xs font-bold text-white bg-destructive rounded-full">
+                  3
+                </span>
               </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full bg-primary/80 text-white">
-                      AU
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full bg-primary/80 text-white"
+                  >
+                    AU
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive">
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
