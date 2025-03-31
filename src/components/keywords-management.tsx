@@ -47,7 +47,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface IWordKey {
+interface IKeyword {
   id: string;
   text: string;
   searchVolume: number;
@@ -61,8 +61,8 @@ interface IWordKey {
   rankingHistory: number[];
 }
 
-// Sample data for wordkeys
-const sampleWordkeys: IWordKey[] = [
+// Sample data for keywords
+const sampleKeywords: IKeyword[] = [
   {
     id: "wk1",
     text: "local seo services",
@@ -235,18 +235,18 @@ const categories = [
   "Email",
 ];
 
-export function WordkeysManagement() {
+export function KeywordsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("ranking");
-  const [selectedWordkey, setSelectedWordkey] = useState<IWordKey | null>(null);
+  const [selectedKeyword, setSelectedKeyword] = useState<IKeyword | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filteredWordkeys, setFilteredWordkeys] = useState(sampleWordkeys);
+  const [filteredKeywords, setFilteredKeywords] = useState(sampleKeywords);
 
-  // Filter and sort wordkeys
+  // Filter and sort keywords
   useEffect(() => {
-    let result = [...sampleWordkeys];
+    let result = [...sampleKeywords];
 
     // Apply search filter
     if (searchTerm) {
@@ -275,12 +275,12 @@ export function WordkeysManagement() {
       }
     });
 
-    setFilteredWordkeys(result);
+    setFilteredKeywords(result);
   }, [searchTerm, selectedCategory, sortBy]);
 
   // Handle wordkey selection
-  const handleWordkeyClick = (wordkey: IWordKey) => {
-    setSelectedWordkey(wordkey);
+  const handleKeywordClick = (wordkey: IKeyword) => {
+    setSelectedKeyword(wordkey);
     setIsSheetOpen(true);
   };
 
@@ -309,11 +309,8 @@ export function WordkeysManagement() {
   };
 
   // Get difficulty color
-  const getDifficultyColor = (difficulty: number) => {
-    if (difficulty < 50) return "bg-success";
-    if (difficulty < 70) return "bg-accent";
-    if (difficulty < 85) return "bg-warning";
-    return "bg-destructive";
+  const getDifficultyColor = () => {
+    return "bg-secondary";
   };
 
   return (
@@ -326,7 +323,7 @@ export function WordkeysManagement() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search wordkeys..."
+                placeholder="Search keywords..."
                 className="pl-8 w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -379,12 +376,12 @@ export function WordkeysManagement() {
               </Button>
             </div>
             <Button className="bg-primary hover:bg-primary/90">
-              <Plus className="mr-2 h-4 w-4" /> Add WordKey
+              <Plus className="mr-2 h-4 w-4" /> Add Keyword
             </Button>
           </div>
         </div>
 
-        {/* WordKeys Display */}
+        {/* Keywords Display */}
         <div
           className={`grid gap-4 ${
             viewMode === "grid"
@@ -393,7 +390,7 @@ export function WordkeysManagement() {
           }`}
         >
           <AnimatePresence>
-            {filteredWordkeys.map((wordkey) => (
+            {filteredKeywords.map((wordkey) => (
               <motion.div
                 key={wordkey.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -406,7 +403,7 @@ export function WordkeysManagement() {
                   className={`overflow-hidden hover:shadow-md transition-all cursor-pointer ${
                     viewMode === "list" ? "flex flex-row items-center" : ""
                   }`}
-                  onClick={() => handleWordkeyClick(wordkey)}
+                  onClick={() => handleKeywordClick(wordkey)}
                 >
                   <CardContent
                     className={`p-0 ${
@@ -450,7 +447,7 @@ export function WordkeysManagement() {
                             <div className="flex items-center space-x-8">
                               <div className="flex flex-col">
                                 <span className="text-xs text-muted-foreground">
-                                  Search Volume
+                                  Interactions
                                 </span>
                                 <span className="font-medium">
                                   {wordkey.searchVolume.toLocaleString()}
@@ -458,7 +455,7 @@ export function WordkeysManagement() {
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-xs text-muted-foreground">
-                                  CTR
+                                  Score
                                 </span>
                                 <span className="font-medium">
                                   {wordkey.ctr}%
@@ -504,7 +501,7 @@ export function WordkeysManagement() {
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex flex-col">
                               <span className="text-xs text-muted-foreground">
-                                Search Volume
+                                Interactions
                               </span>
                               <span className="font-medium">
                                 {wordkey.searchVolume.toLocaleString()}
@@ -512,7 +509,7 @@ export function WordkeysManagement() {
                             </div>
                             <div className="flex flex-col items-end">
                               <span className="text-xs text-muted-foreground">
-                                CTR
+                                Score
                               </span>
                               <span className="font-medium">
                                 {wordkey.ctr}%
@@ -561,14 +558,16 @@ export function WordkeysManagement() {
                                 {wordkey.difficulty}%
                               </span>
                             </div>
-                            <div className="w-full bg-muted rounded-full h-1.5">
+                            <div className="w-full bg-destructive rounded-full h-1.5">
                               <div
-                                className={`h-1.5 rounded-full ${getDifficultyColor(
-                                  wordkey.difficulty
-                                )}`}
+                                className={`h-1.5 rounded-full ${getDifficultyColor()}`}
                                 style={{ width: `${wordkey.difficulty}%` }}
                               ></div>
                             </div>
+                              <div className="flex justify-center gap-[1rem] my-[1rem]">
+                                <Button>Reports</Button>
+                                <Button>Gen. Heatmap</Button>
+                              </div>
                           </div>
                         </>
                       )}
@@ -581,10 +580,10 @@ export function WordkeysManagement() {
         </div>
 
         {/* Empty State */}
-        {filteredWordkeys.length === 0 && (
+        {filteredKeywords.length === 0 && (
           <div className="flex flex-col items-center justify-center p-8 text-center">
             <Search className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No wordkeys found</h3>
+            <h3 className="text-lg font-medium">No keywords found</h3>
             <p className="text-muted-foreground mt-2">
               Try adjusting your search or filters to find what you`re looking
               for.
@@ -601,13 +600,13 @@ export function WordkeysManagement() {
           </div>
         )}
 
-        {/* Wordkey Detail Sheet */}
+        {/* Keyword Detail Sheet */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetContent className="sm:max-w-md overflow-y-auto p-[2rem]">
-            {selectedWordkey && (
+            {selectedKeyword && (
               <>
                 <SheetHeader>
-                  <SheetTitle>WordKey Details</SheetTitle>
+                  <SheetTitle>Keyword Details</SheetTitle>
                   <SheetDescription>
                     View and edit details for this wordkey.
                   </SheetDescription>
@@ -630,10 +629,10 @@ export function WordkeysManagement() {
                     <TabsContent value="overview" className="space-y-4 mt-4">
                       <div className="space-y-1">
                         <h3 className="text-lg font-medium">
-                          {selectedWordkey.text}
+                          {selectedKeyword.text}
                         </h3>
                         <Badge variant="outline">
-                          {selectedWordkey.category}
+                          {selectedKeyword.category}
                         </Badge>
                       </div>
 
@@ -641,20 +640,20 @@ export function WordkeysManagement() {
                         <Card>
                           <CardContent className="p-4">
                             <div className="text-xs text-muted-foreground">
-                              Search Volume
+                              Interactions
                             </div>
                             <div className="text-2xl font-bold">
-                              {selectedWordkey.searchVolume.toLocaleString()}
+                              {selectedKeyword.searchVolume.toLocaleString()}
                             </div>
                           </CardContent>
                         </Card>
                         <Card>
                           <CardContent className="p-4">
                             <div className="text-xs text-muted-foreground">
-                              CTR
+                              Score
                             </div>
                             <div className="text-2xl font-bold">
-                              {selectedWordkey.ctr}%
+                              {selectedKeyword.ctr}%
                             </div>
                           </CardContent>
                         </Card>
@@ -665,27 +664,27 @@ export function WordkeysManagement() {
                             </div>
                             <div className="flex items-center">
                               <div className="text-2xl font-bold mr-2">
-                                #{selectedWordkey.ranking}
+                                #{selectedKeyword.ranking}
                               </div>
                               <div
                                 className={`flex items-center ${
                                   getRankingChange(
-                                    selectedWordkey.ranking,
-                                    selectedWordkey.previousRanking
+                                    selectedKeyword.ranking,
+                                    selectedKeyword.previousRanking
                                   ).color
                                 }`}
                               >
                                 {
                                   getRankingChange(
-                                    selectedWordkey.ranking,
-                                    selectedWordkey.previousRanking
+                                    selectedKeyword.ranking,
+                                    selectedKeyword.previousRanking
                                   ).icon
                                 }
                                 <span className="text-sm">
                                   {
                                     getRankingChange(
-                                      selectedWordkey.ranking,
-                                      selectedWordkey.previousRanking
+                                      selectedKeyword.ranking,
+                                      selectedKeyword.previousRanking
                                     ).text
                                   }
                                 </span>
@@ -699,15 +698,13 @@ export function WordkeysManagement() {
                               Difficulty
                             </div>
                             <div className="text-2xl font-bold">
-                              {selectedWordkey.difficulty}%
+                              {selectedKeyword.difficulty}%
                             </div>
-                            <div className="w-full bg-muted rounded-full h-2 mt-2">
+                            <div className="w-full bg-destructive rounded-full h-2 mt-2">
                               <div
-                                className={`h-2 rounded-full ${getDifficultyColor(
-                                  selectedWordkey.difficulty
-                                )}`}
+                                className={`h-2 rounded-full ${getDifficultyColor()}`}
                                 style={{
-                                  width: `${selectedWordkey.difficulty}%`,
+                                  width: `${selectedKeyword.difficulty}%`,
                                 }}
                               ></div>
                             </div>
@@ -721,7 +718,7 @@ export function WordkeysManagement() {
                             Ranking History
                           </h4>
                           <div className="h-40 flex items-end space-x-2">
-                            {selectedWordkey.rankingHistory.map(
+                            {selectedKeyword.rankingHistory.map(
                               (rank: number, index: number) => (
                                 <TooltipProvider key={index}>
                                   <Tooltip>
@@ -771,7 +768,7 @@ export function WordkeysManagement() {
                             Search Volume Trend
                           </h4>
                           <div className="h-40 flex items-end space-x-2">
-                            {selectedWordkey.trend.map(
+                            {selectedKeyword.trend.map(
                               (volume: number, index: number) => (
                                 <TooltipProvider key={index}>
                                   <Tooltip>
@@ -782,7 +779,7 @@ export function WordkeysManagement() {
                                           height: `${
                                             (volume /
                                               Math.max(
-                                                ...selectedWordkey.trend
+                                                ...selectedKeyword.trend
                                               )) *
                                             100
                                           }%`,
@@ -827,8 +824,8 @@ export function WordkeysManagement() {
                             </h4>
                             <div className="text-2xl font-bold">
                               {Math.round(
-                                selectedWordkey.searchVolume *
-                                  (selectedWordkey.ctr / 100)
+                                selectedKeyword.searchVolume *
+                                  (selectedKeyword.ctr / 100)
                               ).toLocaleString()}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -843,13 +840,13 @@ export function WordkeysManagement() {
                             </h4>
                             <div className="flex items-center">
                               <div className="text-2xl font-bold mr-2">
-                                {selectedWordkey.ranking <= 3
+                                {selectedKeyword.ranking <= 3
                                   ? "High"
-                                  : selectedWordkey.ranking <= 10
+                                  : selectedKeyword.ranking <= 10
                                   ? "Medium"
                                   : "Low"}
                               </div>
-                              {selectedWordkey.ranking <= 3 ? (
+                              {selectedKeyword.ranking <= 3 ? (
                                 <TrendingUp className="h-5 w-5 text-success" />
                               ) : null}
                             </div>
@@ -911,16 +908,16 @@ export function WordkeysManagement() {
                       <Card>
                         <CardContent className="p-4 space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="wordkey-text">WordKey Text</Label>
+                            <Label htmlFor="wordkey-text">Keyword Text</Label>
                             <Input
                               id="wordkey-text"
-                              defaultValue={selectedWordkey.text}
+                              defaultValue={selectedKeyword.text}
                             />
                           </div>
 
                           <div className="space-y-2">
                             <Label htmlFor="wordkey-category">Category</Label>
-                            <Select defaultValue={selectedWordkey.category}>
+                            <Select defaultValue={selectedKeyword.category}>
                               <SelectTrigger id="wordkey-category">
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
@@ -941,7 +938,7 @@ export function WordkeysManagement() {
                               </Label>
                               <Switch
                                 id="wordkey-status"
-                                checked={selectedWordkey.status === "active"}
+                                checked={selectedKeyword.status === "active"}
                               />
                             </div>
                             <p className="text-xs text-muted-foreground">
@@ -956,9 +953,9 @@ export function WordkeysManagement() {
                               <span className="text-xs">Low</span>
                               <Slider
                                 defaultValue={[
-                                  selectedWordkey.ranking <= 3
+                                  selectedKeyword.ranking <= 3
                                     ? 80
-                                    : selectedWordkey.ranking <= 10
+                                    : selectedKeyword.ranking <= 10
                                     ? 50
                                     : 30,
                                 ]}
@@ -1011,7 +1008,7 @@ export function WordkeysManagement() {
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Delete WordKey
+                          Delete Keyword
                         </Button>
                         <Button>
                           <Check className="h-4 w-4 mr-2" />

@@ -113,18 +113,32 @@ export function BusinessesTable() {
   };
 
   useEffect(() => {
-    try {
+    const userId = context?.user?.user?.userId;
+    if (!userId) return;
+
+    const storedBusinesses = localStorage.getItem(`businesses_${userId}`);
+
+    if (storedBusinesses) {
+      setBusinesses(JSON.parse(storedBusinesses));
+    } else {
       axios
         .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${context?.user?.user?.userId}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${userId}`
         )
-        .then((response) => setBusinesses(response.data.locations.map((business: ILocations) => ({
-          ...business,
-          isAdded: false
-        }))))
+        .then((response) => {
+          const formattedBusinesses = response.data.locations.map(
+            (business: ILocations) => ({
+              ...business,
+              isAdded: false,
+            })
+          );
+          setBusinesses(formattedBusinesses);
+          localStorage.setItem(
+            `businesses_${userId}`,
+            JSON.stringify(formattedBusinesses)
+          );
+        })
         .catch((err) => console.error(err));
-    } catch (err) {
-      console.error(err);
     }
   }, [context?.user?.user?.userId]);
 
@@ -198,6 +212,8 @@ export function BusinessesTable() {
                 </TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead>Actions</TableHead>
+                <TableHead>Audits</TableHead>
+                <TableHead>Reports</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -246,19 +262,46 @@ export function BusinessesTable() {
                         onSave={handleSaveBusiness}
                       /> */}
                       <Button
+                        variant="outline"
+                        className="border-primary text-primary"
                         onClick={() => {
-                          business.isAdded = true
+                          setBusinesses((prevBusinesses) => {
+                            const updatedBusinesses = prevBusinesses.map((b) =>
+                              b.locationId === business.locationId
+                                ? { ...b, isAdded: true }
+                                : b
+                            );
+
+                            // Guardar en localStorage
+                            const userId = context?.user?.user?.userId;
+                            if (userId) {
+                              localStorage.setItem(
+                                `businesses_${userId}`,
+                                JSON.stringify(updatedBusinesses)
+                              );
+                            }
+
+                            return updatedBusinesses;
+                          });
+
+                          console.log(business);
+
                           addItem({
                             id: business.locationId,
                             name: business.name,
                             location: business.location,
-                            price: 500.0,
-                          })
-                        }
-                        }
+                            price: 150.0,
+                          });
+                        }}
                       >
-                        { business.isAdded ? 'Added' : 'Add business'}
+                        {business.isAdded ? "Added" : "Add business"}
                       </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" className="border-destructive text-destructive">Start</Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" className="border-secondary text-secondary">View</Button>
                     </TableCell>
                   </TableRow>
                 ))
