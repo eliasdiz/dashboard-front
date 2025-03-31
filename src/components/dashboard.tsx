@@ -256,7 +256,7 @@ export function Dashboard() {
             <div className="p-4">
               <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                 <User className="mr-2 h-4 w-4" />
-                Alejandro Uribe
+                {`${auth?.user?.user?.firstName} ${auth?.user?.user?.lastName}` || ""}                
               </Button>
             </div>
           </SidebarFooter>
@@ -521,7 +521,7 @@ export function Dashboard() {
               <div className="border-t p-4">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   <User className="mr-2 h-4 w-4" />
-                  Alejandro Uribe
+                  {auth?.user?.user?.firstName}
                 </Button>
               </div>
             </div>
@@ -547,7 +547,7 @@ export function Dashboard() {
                     size="icon"
                     className="rounded-full bg-primary/80 text-white"
                   >
-                    AU
+                    {`${auth?.user?.user?.firstName[0].toLocaleUpperCase()}${auth?.user?.user?.lastName[0].toUpperCase()}` || ""}                
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
