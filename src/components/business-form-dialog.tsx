@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Plus, Trash2, MapPin, Phone, Tag, Briefcase, Target, Globe, ImageUpscale } from "lucide-react"
+import { Plus, Trash2, MapPin, Phone, Tag, Briefcase, Target, Globe } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
@@ -173,11 +172,11 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant}>{business ? "Edit Business" : "Add Business"}</Button>
+        <Button variant={variant} className="bg-primary text-white">Add Business</Button>
       </DialogTrigger>
       <DialogContent title="Hello" className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{business ? "Edit Business" : "Add New Business"}</DialogTitle>
+          <DialogTitle>Add Business</DialogTitle>
           <DialogDescription>
             {business
               ? "Update the business information in the form below."
@@ -204,7 +203,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                         <FormItem>
                           <FormLabel>Business Name*</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter business name" {...field} />
+                            <Input disabled placeholder="Enter business name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -220,7 +219,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                           <FormControl>
                             <div className="flex items-center space-x-2">
                               <MapPin className="h-4 w-4 text-muted-foreground" />
-                              <Input placeholder="Enter business address" {...field} />
+                              <Input disabled placeholder="Enter business address" {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -237,7 +236,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                           <FormControl>
                             <div className="flex items-center space-x-2">
                               <Globe className="h-4 w-4 text-muted-foreground" />
-                              <Input placeholder="https://example.com" {...field} />
+                              <Input disabled placeholder="https://example.com" {...field} />
                             </div>
                           </FormControl>
                           <FormDescription>Enter the full URL including https://</FormDescription>
@@ -415,83 +414,6 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                   </div>
 
                   <Separator className="my-4" />
-
-                  {/* Coordinates */}
-                  <div className="space-y-2">
-                    <FormLabel>Coordinates</FormLabel>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="coordinates.latitude"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input placeholder="Latitude" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="coordinates.longitude"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input placeholder="Longitude" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <FormDescription>
-                      Optional: Enter the exact coordinates for precise location mapping.
-                    </FormDescription>
-                  </div>
-
-                  {/* CID */}
-                  <FormField
-                    control={form.control}
-                    name="cid"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Google CID</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter Google CID" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Optional: The unique identifier for your Google Business Profile.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Image Prompt */}
-                  <FormField
-                    control={form.control}
-                    name="imagePrompt"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center">
-                          <ImageUpscale className="h-4 w-4 mr-2" />
-                          Image Generation Prompt
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Describe the image you want to generate for this business"
-                            className="min-h-[80px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Optional: Provide a detailed description to generate an image for this business.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </TabsContent>
               </ScrollArea>
             </Tabs>
@@ -500,7 +422,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Save Business</Button>
+              <Button type="submit">Add Business</Button>
             </DialogFooter>
           </form>
         </Form>

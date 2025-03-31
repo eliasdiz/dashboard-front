@@ -1,14 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  MoreHorizontal,
-  Search,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,14 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -33,14 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  BusinessFormDialog,
-  BusinessFormValues,
-} from "@/components/business-form-dialog";
+// import {
+//   BusinessFormDialog,
+//   BusinessFormValues,
+// } from "@/components/business-form-dialog";
 import dotenv from "dotenv";
 import { useUser } from "@/context/UserContext";
-import { Switch } from "@/components/ui/switch";
 import axios from "axios";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { useCart } from "@/context/CartContext";
 
 dotenv.config();
 
@@ -50,7 +37,7 @@ dotenv.config();
 //     locationId: string;
 //     name: string;
 //     website: string;
-//     tag: string;
+//     isAdded: string;
 //   }[]
 // }
 
@@ -59,93 +46,42 @@ export interface ILocations {
   locationId: string;
   name: string;
   website: string;
-  tag: boolean
+  isAdded: boolean;
+  tags: string[];
 }
 
 // Example of pre-filled data for editing
-const existingBusiness: BusinessFormValues = {
-  name: "Acme Corporation",
-  location: "123 Main St, Anytown, USA",
-  phones: [{ number: "+1 (555) 123-4567" }],
-  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
-  keywords: [{ text: "web design" }, { text: "digital marketing" }],
-  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
-  website: "https://acme-example.com",
-  coordinates: {
-    latitude: "40.7128",
-    longitude: "-74.0060",
-  },
-  cid: "12345678901234567890",
-  imagePrompt: "A modern office building with the Acme logo",
-};
-
-// Sample data - we'll expand the provided single entry
-const sampleBusinesses: ILocations[] = [
-  {
-    location: "United States Of America",
-    locationId: "910490211122741230",
-    name: "All Seasons Roofing & Restoration",
-    tag: false,
-    website: "http://myallseasonsnebraska.com/"
-  },
-  {
-    location: "United States Of America",
-    locationId: "823456789012345678",
-    name: "Sunshine Home Services",
-    tag: false,
-    website: "http://sunshinehomeservices.com/"
-  },
-  {
-    location: "United States Of America",
-    locationId: "734567890123456789",
-    name: "Metro Plumbing Solutions",
-    tag: false,
-    website: "http://metroplumbingsolutions.com/"
-  },
-  {
-    location: "United States Of America",
-    locationId: "645678901234567890",
-    name: "Green Valley Landscaping",
-    tag: false,
-    website: "http://greenvalleylandscaping.com/",
-  },
-  {
-    location: "Colombia",
-    locationId: "556789012345678901",
-    name: "Elite Electrical Contractors",
-    tag: false,
-    website: "http://eliteelectricalcontractors.com/"
-  },
-  {
-    location: "Colombia",
-    locationId: "467890123456789012",
-    name: "Precision Painting Pros",
-    tag: false,
-    website: "http://precisionpaintingpros.com/"
-  },
-  {
-    location: "Perú",
-    locationId: "378901234567890123",
-    name: "Comfort Heating & Cooling",
-    tag: false,
-    website: "http://comfortheatingcooling.com/"
-  },
-];
+// const existingBusiness: BusinessFormValues = {
+//   name: "Acme Corporation",
+//   location: "123 Main St, Anytown, USA",
+//   phones: [{ number: "+1 (555) 123-4567" }],
+//   services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
+//   keywords: [{ text: "web design" }, { text: "digital marketing" }],
+//   targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+//   website: "https://acme-example.com",
+//   coordinates: {
+//     latitude: "40.7128",
+//     longitude: "-74.0060",
+//   },
+//   cid: "12345678901234567890",
+//   imagePrompt: "A modern office building with the Acme logo",
+// };
 
 export function BusinessesTable() {
   const context = useUser();
   const [searchTerm, setSearchTerm] = useState("");
-  const [businesses, setBusinesses] = useState<ILocations[] | []>(sampleBusinesses);
-  const [sortField, setSortField] = useState<
-    "name" | "website" | "location"
-  >("name");
+  const [businesses, setBusinesses] = useState<ILocations[] | []>([]);
+  const [sortField, setSortField] = useState<"name" | "website" | "location">(
+    "name"
+  );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const { addItem } = useCart();
 
   // Example of handling the save event
-  const handleSaveBusiness = (data: BusinessFormValues) => {
-    console.log("Business data saved:", data);
-    // In a real app, you would send this data to your backend
-  };
+  // const handleSaveBusiness = (data: BusinessFormValues) => {
+  //   console.log("Business data saved:", data);
+  //   // In a real app, you would send this data to your backend
+  // };
 
   // Filter businesss based on search term
   const filteredBusinesses = businesses.filter(
@@ -156,8 +92,8 @@ export function BusinessesTable() {
 
   // Sort businesss based on sort field and direction
   const sortedBusinesses = [...filteredBusinesses].sort((a, b) => {
-    const aValue = a[sortField].toLowerCase();
-    const bValue = b[sortField].toLowerCase();
+    const aValue = a[sortField]?.toLowerCase();
+    const bValue = b[sortField]?.toLowerCase();
 
     if (sortDirection === "asc") {
       return aValue > bValue ? 1 : -1;
@@ -176,23 +112,19 @@ export function BusinessesTable() {
     }
   };
 
-  const handleTagChange = (locationId: string, checked: boolean) => {
-    setBusinesses((prevBusinesses) =>
-      prevBusinesses.map((business) =>
-        business.locationId === locationId
-          ? { ...business, tag: checked }
-          : business
-      )
-    );
-  };
-
   useEffect(() => {
     try {
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${context?.user?.user.userId}`)
-      .then(response => setBusinesses(response.data.locations))
-      .catch((err) => console.error(err))
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${context?.user?.user?.userId}`
+        )
+        .then((response) => setBusinesses(response.data.locations.map((business: ILocations) => ({
+          ...business,
+          isAdded: false
+        }))))
+        .catch((err) => console.error(err));
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   }, [context?.user?.user?.userId]);
 
@@ -264,12 +196,8 @@ export function BusinessesTable() {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead>
-                  <div className="flex items-center">
-                    Add
-                  </div>
-                </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Tags</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -299,40 +227,38 @@ export function BusinessesTable() {
                       </a>
                     </TableCell>
                     <TableCell>
-                      <Switch
-                        checked={!!business.tag}
-                        onCheckedChange={(checked: boolean) =>
-                          handleTagChange(business.locationId, checked)
-                        }
-                      />
+                      {["Tag1", "Tag2"].map((tagsito, id) => (
+                        <Badge
+                          key={id}
+                          variant="outline"
+                          className={`bg-${
+                            id == 1 ? "primary" : "muted"
+                          }/40 mx-1`}
+                        >
+                          {tagsito}
+                        </Badge>
+                      ))}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <BusinessFormDialog
-                            variant="ghost"
-                            onSave={handleSaveBusiness}
-                          />
-                          <DropdownMenuSeparator />
-                          <BusinessFormDialog
-                            variant="ghost"
-                            business={existingBusiness}
-                            onSave={handleSaveBusiness}
-                          />
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
-                            Delete business
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell>
+                      {/* <BusinessFormDialog
+                        variant="ghost"
+                        business={existingBusiness}
+                        onSave={handleSaveBusiness}
+                      /> */}
+                      <Button
+                        onClick={() => {
+                          business.isAdded = true
+                          addItem({
+                            id: business.locationId,
+                            name: business.name,
+                            location: business.location,
+                            price: 500.0,
+                          })
+                        }
+                        }
+                      >
+                        { business.isAdded ? 'Added' : 'Add business'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

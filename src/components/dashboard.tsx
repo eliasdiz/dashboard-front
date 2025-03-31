@@ -52,11 +52,14 @@ import { SocialMediaManagement } from "@/components/social-media-management";
 import { DashboardContent } from "@/components/dashboard-content";
 import WordPressExamplePage from "@/components/wordpress-content";
 import MarketingReviewsExample from "@/components/marketing-reviews-section";
-import CitationsExample from "./citations-section";
-import HeatmapExample from "./heatmap-section";
-import ReportExample from "./report-section";
-import SettingsPage from "./settings-section";
-import { UserManagement } from "./user-management/user-management";
+import CitationsExample from "@/components/citations-section";
+import HeatmapExample from "@/components/heatmap-section";
+import ReportExample from "@/components/report-section";
+import SettingsPage from "@/components/settings-section";
+import { UserManagement } from "@/components/user-management/user-management";
+import CartButton from "@/components/cart/cart-button";
+import CartModal from "@/components/cart/cart-modal";
+import { useUser } from "@/context/UserContext";
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -75,7 +78,8 @@ export function Dashboard() {
     | "reports"
     | "settings"
   >("overview");
-
+    const auth = useUser()
+  
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-white">
@@ -433,7 +437,7 @@ export function Dashboard() {
                       }}
                     >
                       <Globe className="mr-2 h-4 w-4" />
-                      reviews
+                      Reviews
                     </Button>
                     <Button
                       variant="ghost"
@@ -532,33 +536,30 @@ export function Dashboard() {
             {/* Spacer for mobile menu button */}
             <SidebarTrigger className="hidden" />
             <div className="ml-auto flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-primary border-primary hover:bg-primary/10 hover:text-primary"
-              >
-                View Website
-              </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full bg-primary/80 text-white">
-                      AU
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <>
+                <CartButton />
+                <CartModal />
+              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full bg-primary/80 text-white"
+                  >
+                    AU
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive" onClick={() => auth?.logout()}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
