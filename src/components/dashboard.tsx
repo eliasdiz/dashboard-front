@@ -46,7 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { WordkeysManagement } from "@/components/wordkeys-management";
+import { KeywordsManagement } from "@/components/keywords-management";
 import { ServicesManagement } from "@/components/services-management";
 import { SocialMediaManagement } from "@/components/social-media-management";
 import { DashboardContent } from "@/components/dashboard-content";
@@ -584,8 +584,8 @@ export function Dashboard() {
               </div>
             ) : activeTab === "keywords" ? (
               <div className="flex flex-col gap-6">
-                <h1 className="text-2xl font-bold">Wordkeys Management</h1>
-                <WordkeysManagement />
+                <h1 className="text-2xl font-bold">Keywords Management</h1>
+                <KeywordsManagement />
               </div>
             ) : activeTab === "services" ? (
               <div className="flex flex-col gap-6">
