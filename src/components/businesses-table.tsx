@@ -286,16 +286,16 @@ export function BusinessesTable() {
                           });
                         }}>
                         <BusinessFormDialog
-                          variant="ghost"
+                          variant="outline"
                           business={existingBusiness}
                           onSave={handleSaveBusiness}
                         />
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-destructive text-destructive">Start</Button>
+                      <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive">Start</Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-secondary text-secondary">View</Button>
+                      <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary">View</Button>
                     </TableCell>
                   </TableRow>
                 ))

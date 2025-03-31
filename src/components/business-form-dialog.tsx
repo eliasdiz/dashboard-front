@@ -111,7 +111,7 @@ const defaultValues: Partial<BusinessFormValues> = {
 interface BusinessFormDialogProps {
   business?: BusinessFormValues
   onSave?: (data: BusinessFormValues) => void
-  variant?: "ghost" | "default"
+  variant?: "outline" | "ghost" | "default"
 }
 
 export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDialogProps) {
@@ -190,7 +190,7 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} className="bg-primary text-white">Add Business</Button>
+        <Button variant={variant} className="border-primary hover:bg-primary text-primary hover:text-white">Add Business</Button>
       </DialogTrigger>
       <DialogContent title="Hello" className="sm:max-w-[600px]">
         <DialogHeader>
