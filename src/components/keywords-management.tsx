@@ -51,7 +51,7 @@ interface IKeyword {
   id: string;
   text: string;
   searchVolume: number;
-  ctr: number;
+  score: number;
   ranking: number;
   previousRanking: number;
   difficulty: number;
@@ -67,7 +67,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk1",
     text: "local seo services",
     searchVolume: 2400,
-    ctr: 3.2,
+    score: 3.2,
     ranking: 4,
     previousRanking: 7,
     difficulty: 65,
@@ -80,7 +80,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk2",
     text: "digital marketing agency",
     searchVolume: 5600,
-    ctr: 2.8,
+    score: 2.8,
     ranking: 6,
     previousRanking: 5,
     difficulty: 78,
@@ -93,7 +93,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk3",
     text: "best seo tools",
     searchVolume: 3800,
-    ctr: 4.1,
+    score: 4.1,
     ranking: 2,
     previousRanking: 4,
     difficulty: 72,
@@ -106,7 +106,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk4",
     text: "google business profile optimization",
     searchVolume: 1900,
-    ctr: 3.5,
+    score: 3.5,
     ranking: 3,
     previousRanking: 8,
     difficulty: 58,
@@ -119,7 +119,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk5",
     text: "social media management",
     searchVolume: 7200,
-    ctr: 2.4,
+    score: 2.4,
     ranking: 9,
     previousRanking: 12,
     difficulty: 82,
@@ -132,7 +132,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk6",
     text: "content marketing strategy",
     searchVolume: 4100,
-    ctr: 3.0,
+    score: 3.0,
     ranking: 7,
     previousRanking: 9,
     difficulty: 75,
@@ -145,7 +145,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk7",
     text: "website audit services",
     searchVolume: 2800,
-    ctr: 3.7,
+    score: 3.7,
     ranking: 5,
     previousRanking: 6,
     difficulty: 68,
@@ -158,7 +158,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk8",
     text: "local business listings",
     searchVolume: 3200,
-    ctr: 3.3,
+    score: 3.3,
     ranking: 8,
     previousRanking: 11,
     difficulty: 62,
@@ -171,7 +171,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk9",
     text: "ppc management services",
     searchVolume: 3600,
-    ctr: 2.9,
+    score: 2.9,
     ranking: 10,
     previousRanking: 8,
     difficulty: 70,
@@ -184,7 +184,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk10",
     text: "seo consultant near me",
     searchVolume: 1800,
-    ctr: 4.5,
+    score: 4.5,
     ranking: 1,
     previousRanking: 2,
     difficulty: 60,
@@ -197,7 +197,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk11",
     text: "email marketing platform",
     searchVolume: 4800,
-    ctr: 2.6,
+    score: 2.6,
     ranking: 11,
     previousRanking: 14,
     difficulty: 73,
@@ -210,7 +210,7 @@ const sampleKeywords: IKeyword[] = [
     id: "wk12",
     text: "voice search optimization",
     searchVolume: 1500,
-    ctr: 2.2,
+    score: 2.2,
     ranking: 15,
     previousRanking: 20,
     difficulty: 85,
@@ -268,8 +268,8 @@ export function KeywordsManagement() {
         return a.ranking - b.ranking;
       } else if (sortBy === "volume") {
         return b.searchVolume - a.searchVolume;
-      } else if (sortBy === "ctr") {
-        return b.ctr - a.ctr;
+      } else if (sortBy === "score") {
+        return b.score - a.score;
       } else {
         return a.text.localeCompare(b.text);
       }
@@ -353,7 +353,7 @@ export function KeywordsManagement() {
               <SelectContent>
                 <SelectItem value="ranking">Ranking</SelectItem>
                 <SelectItem value="volume">Search Volume</SelectItem>
-                <SelectItem value="ctr">CTR</SelectItem>
+                <SelectItem value="score">score</SelectItem>
                 <SelectItem value="name">Name</SelectItem>
               </SelectContent>
             </Select>
@@ -458,7 +458,7 @@ export function KeywordsManagement() {
                                   Score
                                 </span>
                                 <span className="font-medium">
-                                  {wordkey.ctr}%
+                                  {wordkey.score}%
                                 </span>
                               </div>
                               <div className="flex flex-col">
@@ -512,7 +512,7 @@ export function KeywordsManagement() {
                                 Score
                               </span>
                               <span className="font-medium">
-                                {wordkey.ctr}%
+                                {wordkey.score}%
                               </span>
                             </div>
                           </div>
@@ -653,7 +653,7 @@ export function KeywordsManagement() {
                               Score
                             </div>
                             <div className="text-2xl font-bold">
-                              {selectedKeyword.ctr}%
+                              {selectedKeyword.score}%
                             </div>
                           </CardContent>
                         </Card>
@@ -825,7 +825,7 @@ export function KeywordsManagement() {
                             <div className="text-2xl font-bold">
                               {Math.round(
                                 selectedKeyword.searchVolume *
-                                  (selectedKeyword.ctr / 100)
+                                  (selectedKeyword.score / 100)
                               ).toLocaleString()}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
