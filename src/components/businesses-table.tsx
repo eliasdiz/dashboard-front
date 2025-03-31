@@ -25,9 +25,9 @@ import {
 import dotenv from "dotenv";
 import { useUser } from "@/context/UserContext";
 import axios from "axios";
-import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useCart } from "@/context/CartContext";
+import EditableBadgeButton from "./edit-tags";
 
 dotenv.config();
 
@@ -58,7 +58,6 @@ const existingBusiness: BusinessFormValues = {
   services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
   keywords: [{ text: "web design" }, { text: "digital marketing" }],
   targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
-  tags: [{ name: "business" }, { name: "agency" }],
   website: "https://acme-example.com",
   coordinates: {
     latitude: "40.7128",
@@ -127,10 +126,11 @@ export function BusinessesTable() {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${userId}`
         )
         .then((response) => {
-          const formattedBusinesses = response.data.locations.map(
+          const formattedBusinesses = response.data?.locations?.map(
             (business: ILocations) => ({
               ...business,
               isAdded: false,
+              tags: []
             })
           );
           setBusinesses(formattedBusinesses);
@@ -244,58 +244,60 @@ export function BusinessesTable() {
                       </a>
                     </TableCell>
                     <TableCell>
-                      {["No Tags"].map((tagsito, id) => (
-                        <Badge
-                          key={id}
-                          variant="outline"
-                          className={`bg-${
-                            id == 1 ? "primary" : "muted"
-                          }/40 mx-1`}
-                        >
-                          {tagsito}
-                        </Badge>
-                      ))}
+                      <EditableBadgeButton />
                     </TableCell>
-                    <TableCell onClick={() => {
-                          setBusinesses((prevBusinesses) => {
-                            const updatedBusinesses = prevBusinesses.map((b) =>
-                              b.locationId === business.locationId
-                                ? { ...b, isAdded: true }
-                                : b
+                    <TableCell
+                      onClick={() => {
+                        setBusinesses((prevBusinesses) => {
+                          const updatedBusinesses = prevBusinesses.map((b) =>
+                            b.locationId === business.locationId
+                              ? { ...b, isAdded: true }
+                              : b
+                          );
+
+                          // Guardar en localStorage
+                          const userId = context?.user?.user?.userId;
+                          if (userId) {
+                            localStorage.setItem(
+                              `businesses_${userId}`,
+                              JSON.stringify(updatedBusinesses)
                             );
+                          }
 
-                            // Guardar en localStorage
-                            const userId = context?.user?.user?.userId;
-                            if (userId) {
-                              localStorage.setItem(
-                                `businesses_${userId}`,
-                                JSON.stringify(updatedBusinesses)
-                              );
-                            }
+                          return updatedBusinesses;
+                        });
 
-                            return updatedBusinesses;
-                          });
+                        console.log(business);
 
-                          console.log(business);
-
-                          addItem({
-                            id: business.locationId,
-                            name: business.name,
-                            location: business.location,
-                            price: 150.0,
-                          });
-                        }}>
-                        <BusinessFormDialog
-                          variant="outline"
-                          business={existingBusiness}
-                          onSave={handleSaveBusiness}
-                        />
+                        addItem({
+                          id: business.locationId,
+                          name: business.name,
+                          location: business.location,
+                          price: 150.0,
+                        });
+                      }}
+                    >
+                      <BusinessFormDialog
+                        variant="outline"
+                        business={existingBusiness}
+                        onSave={handleSaveBusiness}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive">Start</Button>
+                      <Button
+                        variant="outline"
+                        className="border-destructive text-destructive hover:bg-destructive"
+                      >
+                        Start
+                      </Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary">View</Button>
+                      <Button
+                        variant="outline"
+                        className="border-secondary text-secondary hover:bg-secondary"
+                      >
+                        View
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

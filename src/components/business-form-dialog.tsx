@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Plus, Trash2, MapPin, Phone, Briefcase, Target, Globe, TagIcon, KeyRound } from "lucide-react"
+import { Plus, Trash2, MapPin, Phone, Briefcase, Target, Globe, KeyRound } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -59,14 +59,6 @@ const businessFormSchema = z.object({
     )
     .optional()
     .default([]),
-  tags: z
-    .array(
-      z.object({
-        name: z.string().min(1, { message: "Tags are required." }),
-      }),
-    )
-    .optional()
-    .default([]),
   website: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
   coordinates: z
     .object({
@@ -98,7 +90,6 @@ const defaultValues: Partial<BusinessFormValues> = {
   services: [{ name: "" }],
   keywords: [{ text: "" }],
   targetLocations: [{ name: "" }],
-  tags: [{ name: "" }],
   website: "",
   coordinates: {
     latitude: "",
@@ -159,15 +150,6 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
   } = useFieldArray({
     control: form.control,
     name: "targetLocations",
-  })
-
-  const {
-    fields: tagFields,
-    append: appendTag,
-    remove: removeTag,
-  } = useFieldArray({
-    control: form.control,
-    name: "tags",
   })
 
   // Form submission handler
@@ -430,51 +412,6 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                       </div>
                     ))}
                   </div>
-                  {/* Tags */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Tags</FormLabel>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => appendTag({ name: "" })}
-                      >
-                        <Plus className="h-3.5 w-3.5 mr-1" />
-                        Add Tags
-                      </Button>
-                    </div>
-
-                    {tagFields.map((field, index) => (
-                      <div key={field.id} className="flex items-center space-x-2">
-                        <TagIcon className="h-4 w-4 text-muted-foreground" />
-                        <FormField
-                          control={form.control}
-                          name={`tags.${index}.name`}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormControl>
-                                <Input placeholder="Enter tag" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {index > 0 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeTag(index)}
-                            className="h-8 w-8 p-0 text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
                   <Separator className="my-4" />
                 </TabsContent>
               </ScrollArea>

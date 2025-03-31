@@ -130,8 +130,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Action creators
   const addItem = (item: CartItem) => {
     dispatch({ type: "ADD_ITEM", payload: item })
-    
-    console.log("Items in cart after adding:", state.items.length)
   }
 
   const removeItem = (id: string) => {
