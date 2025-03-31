@@ -1,10 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import dotenv from "dotenv";
-// import { ILocations } from "@/components/businesses-table";
 
 dotenv.config();
 
@@ -16,7 +15,7 @@ interface User {
 
 interface Business {
   user: {
-    businessName: string; // ✅ Corregido
+    businessName: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -46,9 +45,25 @@ export interface UserContextType {
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  // const [businesses, setBusinesses] = useState<Business | null>(null)
-  const [user, setUser] = useState<Business | null>(null);
   const router = useRouter();
+  
+  // Estado inicial verificando localStorage
+  const [user, setUser] = useState<Business | null>(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    }
+    return null;
+  });
+
+  // Efecto para sincronizar cambios en el usuario con localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   const login = async (credentials: User) => {
     try {
@@ -65,6 +80,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("user");
     router.push("/login");
   };
 

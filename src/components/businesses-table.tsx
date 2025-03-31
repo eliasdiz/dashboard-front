@@ -1,11 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  Search,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Search } from "lucide-react";
 
 import {
   Card,
@@ -23,14 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  BusinessFormDialog,
-  BusinessFormValues,
-} from "@/components/business-form-dialog";
+// import {
+//   BusinessFormDialog,
+//   BusinessFormValues,
+// } from "@/components/business-form-dialog";
 import dotenv from "dotenv";
 import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { useCart } from "@/context/CartContext";
 
 dotenv.config();
 
@@ -54,21 +51,21 @@ export interface ILocations {
 }
 
 // Example of pre-filled data for editing
-const existingBusiness: BusinessFormValues = {
-  name: "Acme Corporation",
-  location: "123 Main St, Anytown, USA",
-  phones: [{ number: "+1 (555) 123-4567" }],
-  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
-  keywords: [{ text: "web design" }, { text: "digital marketing" }],
-  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
-  website: "https://acme-example.com",
-  coordinates: {
-    latitude: "40.7128",
-    longitude: "-74.0060",
-  },
-  cid: "12345678901234567890",
-  imagePrompt: "A modern office building with the Acme logo",
-};
+// const existingBusiness: BusinessFormValues = {
+//   name: "Acme Corporation",
+//   location: "123 Main St, Anytown, USA",
+//   phones: [{ number: "+1 (555) 123-4567" }],
+//   services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
+//   keywords: [{ text: "web design" }, { text: "digital marketing" }],
+//   targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+//   website: "https://acme-example.com",
+//   coordinates: {
+//     latitude: "40.7128",
+//     longitude: "-74.0060",
+//   },
+//   cid: "12345678901234567890",
+//   imagePrompt: "A modern office building with the Acme logo",
+// };
 
 export function BusinessesTable() {
   const context = useUser();
@@ -78,12 +75,13 @@ export function BusinessesTable() {
     "name"
   );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const { addItem } = useCart();
 
   // Example of handling the save event
-  const handleSaveBusiness = (data: BusinessFormValues) => {
-    console.log("Business data saved:", data);
-    // In a real app, you would send this data to your backend
-  };
+  // const handleSaveBusiness = (data: BusinessFormValues) => {
+  //   console.log("Business data saved:", data);
+  //   // In a real app, you would send this data to your backend
+  // };
 
   // Filter businesss based on search term
   const filteredBusinesses = businesses.filter(
@@ -120,7 +118,10 @@ export function BusinessesTable() {
         .get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${context?.user?.user?.userId}`
         )
-        .then((response) => setBusinesses(response.data.locations))
+        .then((response) => setBusinesses(response.data.locations.map((business: ILocations) => ({
+          ...business,
+          isAdded: false
+        }))))
         .catch((err) => console.error(err));
     } catch (err) {
       console.error(err);
@@ -230,18 +231,34 @@ export function BusinessesTable() {
                         <Badge
                           key={id}
                           variant="outline"
-                          className={`bg-${id == 1 ? "primary" : "muted"}/40 mx-1`}
+                          className={`bg-${
+                            id == 1 ? "primary" : "muted"
+                          }/40 mx-1`}
                         >
                           {tagsito}
                         </Badge>
                       ))}
                     </TableCell>
                     <TableCell>
-                      <BusinessFormDialog
+                      {/* <BusinessFormDialog
                         variant="ghost"
                         business={existingBusiness}
                         onSave={handleSaveBusiness}
-                      />
+                      /> */}
+                      <Button
+                        onClick={() => {
+                          business.isAdded = true
+                          addItem({
+                            id: business.locationId,
+                            name: business.name,
+                            location: business.location,
+                            price: 500.0,
+                          })
+                        }
+                        }
+                      >
+                        { business.isAdded ? 'Added' : 'Add business'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

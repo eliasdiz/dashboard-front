@@ -17,7 +17,6 @@ import {
   Share2,
   Users,
   Wrench,
-  ShoppingCart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,11 +52,14 @@ import { SocialMediaManagement } from "@/components/social-media-management";
 import { DashboardContent } from "@/components/dashboard-content";
 import WordPressExamplePage from "@/components/wordpress-content";
 import MarketingReviewsExample from "@/components/marketing-reviews-section";
-import CitationsExample from "./citations-section";
-import HeatmapExample from "./heatmap-section";
-import ReportExample from "./report-section";
-import SettingsPage from "./settings-section";
-import { UserManagement } from "./user-management/user-management";
+import CitationsExample from "@/components/citations-section";
+import HeatmapExample from "@/components/heatmap-section";
+import ReportExample from "@/components/report-section";
+import SettingsPage from "@/components/settings-section";
+import { UserManagement } from "@/components/user-management/user-management";
+import CartButton from "@/components/cart/cart-button";
+import CartModal from "@/components/cart/cart-modal";
+import { useUser } from "@/context/UserContext";
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -76,7 +78,8 @@ export function Dashboard() {
     | "reports"
     | "settings"
   >("overview");
-
+    const auth = useUser()
+  
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-white">
@@ -434,7 +437,7 @@ export function Dashboard() {
                       }}
                     >
                       <Globe className="mr-2 h-4 w-4" />
-                      reviews
+                      Reviews
                     </Button>
                     <Button
                       variant="ghost"
@@ -533,16 +536,10 @@ export function Dashboard() {
             {/* Spacer for mobile menu button */}
             <SidebarTrigger className="hidden" />
             <div className="ml-auto flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative text-primary border-primary hover:bg-primary/10 hover:text-primary"
-              >
-                <ShoppingCart />
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-xs font-bold text-white bg-destructive rounded-full">
-                  3
-                </span>
-              </Button>
+              <>
+                <CartButton />
+                <CartModal />
+              </>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -558,7 +555,7 @@ export function Dashboard() {
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" onClick={() => auth?.logout()}>
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
