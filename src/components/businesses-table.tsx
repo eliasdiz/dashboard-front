@@ -18,10 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import {
-//   BusinessFormDialog,
-//   BusinessFormValues,
-// } from "@/components/business-form-dialog";
+import {
+  BusinessFormDialog,
+  BusinessFormValues,
+} from "@/components/business-form-dialog";
 import dotenv from "dotenv";
 import { useUser } from "@/context/UserContext";
 import axios from "axios";
@@ -51,21 +51,22 @@ export interface ILocations {
 }
 
 // Example of pre-filled data for editing
-// const existingBusiness: BusinessFormValues = {
-//   name: "Acme Corporation",
-//   location: "123 Main St, Anytown, USA",
-//   phones: [{ number: "+1 (555) 123-4567" }],
-//   services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
-//   keywords: [{ text: "web design" }, { text: "digital marketing" }],
-//   targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
-//   website: "https://acme-example.com",
-//   coordinates: {
-//     latitude: "40.7128",
-//     longitude: "-74.0060",
-//   },
-//   cid: "12345678901234567890",
-//   imagePrompt: "A modern office building with the Acme logo",
-// };
+const existingBusiness: BusinessFormValues = {
+  name: "Acme Corporation",
+  location: "123 Main St, Anytown, USA",
+  phones: [{ number: "+1 (555) 123-4567" }],
+  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
+  keywords: [{ text: "web design" }, { text: "digital marketing" }],
+  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+  tags: [{ name: "business" }, { name: "agency" }],
+  website: "https://acme-example.com",
+  coordinates: {
+    latitude: "40.7128",
+    longitude: "-74.0060",
+  },
+  cid: "12345678901234567890",
+  imagePrompt: "A modern office building with the Acme logo",
+};
 
 export function BusinessesTable() {
   const context = useUser();
@@ -78,10 +79,10 @@ export function BusinessesTable() {
   const { addItem } = useCart();
 
   // Example of handling the save event
-  // const handleSaveBusiness = (data: BusinessFormValues) => {
-  //   console.log("Business data saved:", data);
-  //   // In a real app, you would send this data to your backend
-  // };
+  const handleSaveBusiness = (data: BusinessFormValues) => {
+    console.log("Business data saved:", data);
+    // In a real app, you would send this data to your backend
+  };
 
   // Filter businesss based on search term
   const filteredBusinesses = businesses.filter(
@@ -243,7 +244,7 @@ export function BusinessesTable() {
                       </a>
                     </TableCell>
                     <TableCell>
-                      {["Tag1", "Tag2"].map((tagsito, id) => (
+                      {["No Tags"].map((tagsito, id) => (
                         <Badge
                           key={id}
                           variant="outline"
@@ -255,16 +256,7 @@ export function BusinessesTable() {
                         </Badge>
                       ))}
                     </TableCell>
-                    <TableCell>
-                      {/* <BusinessFormDialog
-                        variant="ghost"
-                        business={existingBusiness}
-                        onSave={handleSaveBusiness}
-                      /> */}
-                      <Button
-                        variant="outline"
-                        className="border-primary text-primary"
-                        onClick={() => {
+                    <TableCell onClick={() => {
                           setBusinesses((prevBusinesses) => {
                             const updatedBusinesses = prevBusinesses.map((b) =>
                               b.locationId === business.locationId
@@ -292,16 +284,18 @@ export function BusinessesTable() {
                             location: business.location,
                             price: 150.0,
                           });
-                        }}
-                      >
-                        {business.isAdded ? "Added" : "Add business"}
-                      </Button>
+                        }}>
+                        <BusinessFormDialog
+                          variant="outline"
+                          business={existingBusiness}
+                          onSave={handleSaveBusiness}
+                        />
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-destructive text-destructive">Start</Button>
+                      <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive">Start</Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" className="border-secondary text-secondary">View</Button>
+                      <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary">View</Button>
                     </TableCell>
                   </TableRow>
                 ))
