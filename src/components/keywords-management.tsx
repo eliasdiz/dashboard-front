@@ -47,218 +47,50 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface IKeyword {
-  id: string;
-  text: string;
-  searchVolume: number;
-  score: number;
-  ranking: number;
-  previousRanking: number;
-  difficulty: number;
-  category: string;
-  status: string;
-  trend: number[];
-  rankingHistory: number[];
+export type CartItem = {
+  id: string
+  name: string
+  location: string
+  price: number
+  website: string
+  tags?: string[]
+  image?: string
+  searchVolume: number,
+  score: number,
+  ranking: number,
+  previousRanking: number,
+  difficulty: number,
+  category: string,
+  status: string,
+  trend: number[],
+  rankingHistory: number[],
 }
-
-// Sample data for keywords
-const sampleKeywords: IKeyword[] = [
-  {
-    id: "wk1",
-    text: "local seo services",
-    searchVolume: 2400,
-    score: 3.2,
-    ranking: 4,
-    previousRanking: 7,
-    difficulty: 65,
-    category: "SEO",
-    status: "active",
-    trend: [1200, 1350, 1500, 1750, 2100, 2400],
-    rankingHistory: [12, 10, 8, 7, 5, 4],
-  },
-  {
-    id: "wk2",
-    text: "digital marketing agency",
-    searchVolume: 5600,
-    score: 2.8,
-    ranking: 6,
-    previousRanking: 5,
-    difficulty: 78,
-    category: "Marketing",
-    status: "active",
-    trend: [4800, 5000, 5200, 5400, 5500, 5600],
-    rankingHistory: [8, 7, 6, 6, 5, 6],
-  },
-  {
-    id: "wk3",
-    text: "best seo tools",
-    searchVolume: 3800,
-    score: 4.1,
-    ranking: 2,
-    previousRanking: 4,
-    difficulty: 72,
-    category: "Tools",
-    status: "active",
-    trend: [3200, 3300, 3500, 3600, 3700, 3800],
-    rankingHistory: [6, 5, 4, 3, 3, 2],
-  },
-  {
-    id: "wk4",
-    text: "google business profile optimization",
-    searchVolume: 1900,
-    score: 3.5,
-    ranking: 3,
-    previousRanking: 8,
-    difficulty: 58,
-    category: "Local SEO",
-    status: "active",
-    trend: [1200, 1400, 1500, 1600, 1800, 1900],
-    rankingHistory: [15, 12, 10, 8, 5, 3],
-  },
-  {
-    id: "wk5",
-    text: "social media management",
-    searchVolume: 7200,
-    score: 2.4,
-    ranking: 9,
-    previousRanking: 12,
-    difficulty: 82,
-    category: "Social Media",
-    status: "active",
-    trend: [6500, 6700, 6800, 7000, 7100, 7200],
-    rankingHistory: [18, 16, 14, 12, 10, 9],
-  },
-  {
-    id: "wk6",
-    text: "content marketing strategy",
-    searchVolume: 4100,
-    score: 3.0,
-    ranking: 7,
-    previousRanking: 9,
-    difficulty: 75,
-    category: "Content",
-    status: "active",
-    trend: [3800, 3900, 3950, 4000, 4050, 4100],
-    rankingHistory: [11, 10, 9, 8, 8, 7],
-  },
-  {
-    id: "wk7",
-    text: "website audit services",
-    searchVolume: 2800,
-    score: 3.7,
-    ranking: 5,
-    previousRanking: 6,
-    difficulty: 68,
-    category: "Technical SEO",
-    status: "active",
-    trend: [2400, 2500, 2600, 2650, 2750, 2800],
-    rankingHistory: [9, 8, 7, 6, 6, 5],
-  },
-  {
-    id: "wk8",
-    text: "local business listings",
-    searchVolume: 3200,
-    score: 3.3,
-    ranking: 8,
-    previousRanking: 11,
-    difficulty: 62,
-    category: "Local SEO",
-    status: "active",
-    trend: [2800, 2900, 3000, 3100, 3150, 3200],
-    rankingHistory: [14, 13, 12, 10, 9, 8],
-  },
-  {
-    id: "wk9",
-    text: "ppc management services",
-    searchVolume: 3600,
-    score: 2.9,
-    ranking: 10,
-    previousRanking: 8,
-    difficulty: 70,
-    category: "PPC",
-    status: "paused",
-    trend: [3400, 3450, 3500, 3550, 3580, 3600],
-    rankingHistory: [7, 7, 8, 9, 9, 10],
-  },
-  {
-    id: "wk10",
-    text: "seo consultant near me",
-    searchVolume: 1800,
-    score: 4.5,
-    ranking: 1,
-    previousRanking: 2,
-    difficulty: 60,
-    category: "Local SEO",
-    status: "active",
-    trend: [1500, 1550, 1600, 1650, 1750, 1800],
-    rankingHistory: [4, 3, 3, 2, 2, 1],
-  },
-  {
-    id: "wk11",
-    text: "email marketing platform",
-    searchVolume: 4800,
-    score: 2.6,
-    ranking: 11,
-    previousRanking: 14,
-    difficulty: 73,
-    category: "Email",
-    status: "active",
-    trend: [4200, 4300, 4400, 4500, 4700, 4800],
-    rankingHistory: [18, 17, 15, 14, 12, 11],
-  },
-  {
-    id: "wk12",
-    text: "voice search optimization",
-    searchVolume: 1500,
-    score: 2.2,
-    ranking: 15,
-    previousRanking: 20,
-    difficulty: 85,
-    category: "Technical SEO",
-    status: "paused",
-    trend: [1100, 1200, 1250, 1300, 1400, 1500],
-    rankingHistory: [25, 23, 22, 20, 18, 15],
-  },
-];
-
-// Categories for filtering
-const categories = [
-  "All",
-  "SEO",
-  "Marketing",
-  "Tools",
-  "Local SEO",
-  "Social Media",
-  "Content",
-  "Technical SEO",
-  "PPC",
-  "Email",
-];
 
 export function KeywordsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("ranking");
-  const [selectedKeyword, setSelectedKeyword] = useState<IKeyword | null>(null);
+  const [selectedKeyword, setSelectedKeyword] = useState<CartItem | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filteredKeywords, setFilteredKeywords] = useState(sampleKeywords);
+  const [filteredKeywords, setFilteredKeywords] = useState<CartItem[]>(JSON.parse(localStorage.getItem('cart') || '[]'));
+  const [locations] = useState(["All", ...new Set(filteredKeywords.map(x => x.location).filter(Boolean))])
 
   // Filter and sort keywords
   useEffect(() => {
-    let result = [...sampleKeywords];
+    let result = [...JSON.parse(localStorage.getItem('cart') || '[]')];
 
     // Apply search filter
     if (searchTerm) {
       result = result.filter((wordkey) =>
-        wordkey.text.toLowerCase().includes(searchTerm.toLowerCase())
+        wordkey.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Apply category filter
     if (selectedCategory !== "All") {
       result = result.filter(
-        (wordkey) => wordkey.category === selectedCategory
+        (wordkey) => wordkey.location === selectedCategory
       );
     }
 
@@ -271,7 +103,7 @@ export function KeywordsManagement() {
       } else if (sortBy === "score") {
         return b.score - a.score;
       } else {
-        return a.text.localeCompare(b.text);
+        return a.name.localeCompare(b.name);
       }
     });
 
@@ -279,7 +111,7 @@ export function KeywordsManagement() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   // Handle wordkey selection
-  const handleKeywordClick = (wordkey: IKeyword) => {
+  const handleKeywordClick = (wordkey: CartItem) => {
     setSelectedKeyword(wordkey);
     setIsSheetOpen(true);
   };
@@ -323,7 +155,7 @@ export function KeywordsManagement() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search keywords..."
+                placeholder="Search businesses..."
                 className="pl-8 w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -337,7 +169,7 @@ export function KeywordsManagement() {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category) => (
+                {locations?.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
@@ -390,7 +222,7 @@ export function KeywordsManagement() {
           }`}
         >
           <AnimatePresence>
-            {filteredKeywords.map((wordkey) => (
+            {filteredKeywords?.map((wordkey) => (
               <motion.div
                 key={wordkey.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -438,7 +270,7 @@ export function KeywordsManagement() {
                             {wordkey.status === "active" ? "Active" : "Paused"}
                           </Badge>
                           <span className="font-medium truncate">
-                            {wordkey.text}
+                            {wordkey.name}
                           </span>
                         </div>
 
@@ -450,7 +282,7 @@ export function KeywordsManagement() {
                                   Interactions
                                 </span>
                                 <span className="font-medium">
-                                  {wordkey.searchVolume.toLocaleString()}
+                                  {wordkey.searchVolume?.toLocaleString()}
                                 </span>
                               </div>
                               <div className="flex flex-col">
@@ -504,7 +336,7 @@ export function KeywordsManagement() {
                                 Interactions
                               </span>
                               <span className="font-medium">
-                                {wordkey.searchVolume.toLocaleString()}
+                                {wordkey.searchVolume?.toLocaleString()}
                               </span>
                             </div>
                             <div className="flex flex-col items-end">
@@ -565,8 +397,8 @@ export function KeywordsManagement() {
                               ></div>
                             </div>
                               <div className="flex justify-center gap-[1rem] my-[1rem]">
-                                <Button>Reports</Button>
-                                <Button>Gen. Heatmap</Button>
+                                <Button className="hover:bg-muted/50 bg-muted">Reports</Button>
+                                <Button className="hover:bg-secondary/50 bg-secondary">Heatmap</Button>
                               </div>
                           </div>
                         </>
@@ -629,7 +461,7 @@ export function KeywordsManagement() {
                     <TabsContent value="overview" className="space-y-4 mt-4">
                       <div className="space-y-1">
                         <h3 className="text-lg font-medium">
-                          {selectedKeyword.text}
+                          {selectedKeyword.name}
                         </h3>
                         <Badge variant="outline">
                           {selectedKeyword.category}
@@ -643,7 +475,7 @@ export function KeywordsManagement() {
                               Interactions
                             </div>
                             <div className="text-2xl font-bold">
-                              {selectedKeyword.searchVolume.toLocaleString()}
+                              {selectedKeyword.searchVolume?.toLocaleString()}
                             </div>
                           </CardContent>
                         </Card>
@@ -718,7 +550,7 @@ export function KeywordsManagement() {
                             Ranking History
                           </h4>
                           <div className="h-40 flex items-end space-x-2">
-                            {selectedKeyword.rankingHistory.map(
+                            {selectedKeyword.rankingHistory?.map(
                               (rank: number, index: number) => (
                                 <TooltipProvider key={index}>
                                   <Tooltip>
@@ -768,7 +600,7 @@ export function KeywordsManagement() {
                             Search Volume Trend
                           </h4>
                           <div className="h-40 flex items-end space-x-2">
-                            {selectedKeyword.trend.map(
+                            {selectedKeyword.trend?.map(
                               (volume: number, index: number) => (
                                 <TooltipProvider key={index}>
                                   <Tooltip>
@@ -788,7 +620,7 @@ export function KeywordsManagement() {
                                       ></div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      <p>{volume.toLocaleString()} searches</p>
+                                      <p>{volume?.toLocaleString()} searches</p>
                                       <p className="text-xs text-muted-foreground">
                                         {new Date(
                                           Date.now() -
@@ -911,7 +743,7 @@ export function KeywordsManagement() {
                             <Label htmlFor="wordkey-text">Keyword Text</Label>
                             <Input
                               id="wordkey-text"
-                              defaultValue={selectedKeyword.text}
+                              defaultValue={selectedKeyword.name}
                             />
                           </div>
 
@@ -922,7 +754,7 @@ export function KeywordsManagement() {
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                               <SelectContent>
-                                {categories.slice(1).map((category) => (
+                                {locations.slice(1)?.map((category) => (
                                   <SelectItem key={category} value={category}>
                                     {category}
                                   </SelectItem>

@@ -81,6 +81,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("cart");
+    localStorage.removeItem(`businesses_${user?.user?.userId}`);
     router.push("/login");
   };
 

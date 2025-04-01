@@ -10,7 +10,18 @@ export type CartItem = {
   name: string
   location: string
   price: number
+  website: string
+  tags?: string[]
   image?: string
+  searchVolume: number,
+  score: number,
+  ranking: number,
+  previousRanking: number,
+  difficulty: number,
+  category: string,
+  status: string,
+  trend: number[],
+  rankingHistory: number[],
 }
 
 type CartState = {
@@ -130,8 +141,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Action creators
   const addItem = (item: CartItem) => {
     dispatch({ type: "ADD_ITEM", payload: item })
-    
-    console.log("Items in cart after adding:", state.items.length)
   }
 
   const removeItem = (id: string) => {
