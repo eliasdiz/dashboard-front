@@ -46,7 +46,7 @@ export default function EditableBadgeButton() {
           className="w-32"
         />
       ) : (
-        <Button variant="outline" size="icon" onClick={() => setEditing(true)}>
+        <Button className="hover:bg-muted" variant="outline" size="icon" onClick={() => setEditing(true)}>
           <Plus className="w-4 h-4" />
         </Button>
       )}

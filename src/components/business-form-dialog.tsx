@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Plus, Trash2, MapPin, Phone, Briefcase, Target, Globe, KeyRound } from "lucide-react"
+import { Plus, Trash2, MapPin, Phone, Briefcase, Target, Globe, KeyRound, Sparkles } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -332,12 +332,15 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <FormLabel>Keywords</FormLabel>
+                      <Button type="button" variant="outline" className="border-secondary hover:bg-secondary" size="sm" onClick={() => {}}>
+                        AI Suggestions
+                        <Sparkles className="h-3.5 w-3.5 mr-1" />
+                      </Button>
                       <Button type="button" variant="outline" size="sm" onClick={() => appendKeyword({ text: "" })}>
                         <Plus className="h-3.5 w-3.5 mr-1" />
                         Add Keyword
                       </Button>
                     </div>
-
                     {keywordFields.map((field, index) => (
                       <div key={field.id} className="flex items-center space-x-2">
                         <KeyRound className="h-4 w-4 text-muted-foreground" />
