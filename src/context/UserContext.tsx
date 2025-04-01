@@ -38,6 +38,7 @@ interface Business {
 export interface UserContextType {
   user: Business | null;
   setUser: Dispatch<SetStateAction<Business | null>>;
+  loading: boolean;
   login: (formData: User) => Promise<void>;
   logout: () => void;
 }
@@ -46,8 +47,7 @@ const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  
-  // Estado inicial verificando localStorage
+
   const [user, setUser] = useState<Business | null>(() => {
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem("user");
@@ -56,7 +56,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return null;
   });
 
-  // Efecto para sincronizar cambios en el usuario con localStorage
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -66,6 +67,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const login = async (credentials: User) => {
+    setLoading(true);
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,
@@ -75,6 +77,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       router.push("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,10 +91,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout }}>
+    <UserContext.Provider value={{ user, setUser, loading, login, logout }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+};
