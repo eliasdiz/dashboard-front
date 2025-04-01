@@ -4,7 +4,6 @@ import type React from "react";
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
+import GoogleLoader from "./google-loader";
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -126,14 +126,7 @@ export function LoginForm() {
               className="w-full bg-white hover:bg-gray-100 text-primary"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign in"
-              )}
+              { auth?.loading ? <GoogleLoader /> : "Sign in" }
             </Button>
           </form>
         </CardContent>

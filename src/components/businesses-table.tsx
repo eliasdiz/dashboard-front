@@ -28,6 +28,7 @@ import axios from "axios";
 import { Button } from "./ui/button";
 import { useCart } from "@/context/CartContext";
 import EditableBadgeButton from "./edit-tags";
+import GoogleLoader from "./google-loader";
 
 dotenv.config();
 
@@ -68,9 +69,10 @@ const existingBusiness: BusinessFormValues = {
 };
 
 export function BusinessesTable() {
-  const context = useUser();
+  const auth = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [businesses, setBusinesses] = useState<ILocations[] | []>([]);
+  const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState<"name" | "website" | "location">(
     "name"
   );
@@ -113,7 +115,7 @@ export function BusinessesTable() {
   };
 
   useEffect(() => {
-    const userId = context?.user?.user?.userId;
+    const userId = auth?.user?.user?.userId;
     if (!userId) return;
 
     const storedBusinesses = localStorage.getItem(`businesses_${userId}`);
@@ -121,6 +123,7 @@ export function BusinessesTable() {
     if (storedBusinesses) {
       setBusinesses(JSON.parse(storedBusinesses));
     } else {
+      setLoading(true);
       axios
         .get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${userId}`
@@ -130,7 +133,7 @@ export function BusinessesTable() {
             (business: ILocations) => ({
               ...business,
               isAdded: false,
-              tags: []
+              tags: [],
             })
           );
           setBusinesses(formattedBusinesses);
@@ -139,188 +142,196 @@ export function BusinessesTable() {
             JSON.stringify(formattedBusinesses)
           );
         })
-        .catch((err) => console.error(err));
+        .catch((err) => console.error(err))
+        .finally(() => setLoading(false));
     }
-  }, [context?.user?.user?.userId]);
+  }, [auth?.user?.user?.userId]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Businesses Locations</CardTitle>
-        <CardDescription>
-          Manage your business locations and websites
-        </CardDescription>
-        <div className="flex items-center mt-4  gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search businesses..."
-              className="pl-8 w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="">Location ID</TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("location")}
-                >
-                  <div className="flex items-center">
-                    Location
-                    {sortField === "location" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center">
-                    Business Name
-                    {sortField === "name" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("website")}
-                >
-                  <div className="flex items-center">
-                    Website
-                    {sortField === "website" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-                <TableHead>Tags</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead>Audits</TableHead>
-                <TableHead>Reports</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedBusinesses.length > 0 ? (
-                sortedBusinesses.map((business) => (
-                  <TableRow key={business.locationId}>
-                    <TableCell className="font-medium">
-                      {business.locationId}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {business.location}
-                    </TableCell>
-                    <TableCell>{business.name.slice(0, 30)}</TableCell>
-                    <TableCell>
-                      <a
-                        href={business.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-primary hover:text-primary hover:underline"
-                      >
-                        {business.website
-                          ?.replace(/(^\w+:|^)\/\//, "")
-                          ?.replace(/\/$/, "")
-                          .slice(0, 30)}
-                        ...
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </a>
-                    </TableCell>
-                    <TableCell>
-                      <EditableBadgeButton />
-                    </TableCell>
-                    <TableCell
-                      onClick={() => {
-                        setBusinesses((prevBusinesses) => {
-                          const updatedBusinesses = prevBusinesses.map((b) =>
-                            b.locationId === business.locationId
-                              ? { ...b, isAdded: true }
-                              : b
-                          );
-
-                          // Guardar en localStorage
-                          const userId = context?.user?.user?.userId;
-                          if (userId) {
-                            localStorage.setItem(
-                              `businesses_${userId}`,
-                              JSON.stringify(updatedBusinesses)
-                            );
-                          }
-
-                          return updatedBusinesses;
-                        });
-
-                        addItem({
-                          id: business.locationId,
-                          name: business.name,
-                          location: business.location,
-                          price: 150.0,
-                          website: business.website,
-                          tags: business.tags,
-                          searchVolume: 2400,
-                          score: 3.2,
-                          ranking: 4,
-                          previousRanking: 7,
-                          difficulty: 65,
-                          category: "SEO",
-                          status: "active",
-                          trend: [1200, 1350, 1500, 1750, 2100, 2400],
-                          rankingHistory: [12, 10, 8, 7, 5, 4],
-                        });
-                      }}
+    <>
+      {loading ? (
+        <GoogleLoader />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Businesses Locations</CardTitle>
+            <CardDescription>
+              Manage your business locations and websites
+            </CardDescription>
+            <div className="flex items-center mt-4  gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search businesses..."
+                  className="pl-8 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="">Location ID</TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => handleSort("location")}
                     >
-                      <BusinessFormDialog
-                        variant="outline"
-                        business={existingBusiness}
-                        onSave={handleSaveBusiness}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        className="border-destructive text-destructive hover:bg-destructive"
-                      >
-                        Start
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        className="border-secondary text-secondary hover:bg-secondary"
-                      >
-                        View
-                      </Button>
-                    </TableCell>
+                      <div className="flex items-center">
+                        Location
+                        {sortField === "location" &&
+                          (sortDirection === "asc" ? (
+                            <ChevronUp className="ml-1 h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="ml-1 h-4 w-4" />
+                          ))}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => handleSort("name")}
+                    >
+                      <div className="flex items-center">
+                        Business Name
+                        {sortField === "name" &&
+                          (sortDirection === "asc" ? (
+                            <ChevronUp className="ml-1 h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="ml-1 h-4 w-4" />
+                          ))}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => handleSort("website")}
+                    >
+                      <div className="flex items-center">
+                        Website
+                        {sortField === "website" &&
+                          (sortDirection === "asc" ? (
+                            <ChevronUp className="ml-1 h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="ml-1 h-4 w-4" />
+                          ))}
+                      </div>
+                    </TableHead>
+                    <TableHead>Tags</TableHead>
+                    <TableHead>Actions</TableHead>
+                    <TableHead>Audits</TableHead>
+                    <TableHead>Reports</TableHead>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
-                    No businesses found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {sortedBusinesses.length > 0 ? (
+                    sortedBusinesses.map((business) => (
+                      <TableRow key={business.locationId}>
+                        <TableCell className="font-medium">
+                          {business.locationId}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {business.location}
+                        </TableCell>
+                        <TableCell>{business.name.slice(0, 30)}</TableCell>
+                        <TableCell>
+                          <a
+                            href={business.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-primary hover:text-primary hover:underline"
+                          >
+                            {business.website
+                              ?.replace(/(^\w+:|^)\/\//, "")
+                              ?.replace(/\/$/, "")
+                              .slice(0, 30)}
+                            ...
+                            <ExternalLink className="ml-1 h-3 w-3" />
+                          </a>
+                        </TableCell>
+                        <TableCell>
+                          <EditableBadgeButton />
+                        </TableCell>
+                        <TableCell
+                          onClick={() => {
+                            setBusinesses((prevBusinesses) => {
+                              const updatedBusinesses = prevBusinesses.map(
+                                (b) =>
+                                  b.locationId === business.locationId
+                                    ? { ...b, isAdded: true }
+                                    : b
+                              );
+
+                              // Guardar en localStorage
+                              const userId = auth?.user?.user?.userId;
+                              if (userId) {
+                                localStorage.setItem(
+                                  `businesses_${userId}`,
+                                  JSON.stringify(updatedBusinesses)
+                                );
+                              }
+
+                              return updatedBusinesses;
+                            });
+
+                            addItem({
+                              id: business.locationId,
+                              name: business.name,
+                              location: business.location,
+                              price: 150.0,
+                              website: business.website,
+                              tags: business.tags,
+                              searchVolume: 2400,
+                              score: 3.2,
+                              ranking: 4,
+                              previousRanking: 7,
+                              difficulty: 65,
+                              category: "SEO",
+                              status: "active",
+                              trend: [1200, 1350, 1500, 1750, 2100, 2400],
+                              rankingHistory: [12, 10, 8, 7, 5, 4],
+                            });
+                          }}
+                        >
+                          <BusinessFormDialog
+                            variant="outline"
+                            business={existingBusiness}
+                            onSave={handleSaveBusiness}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            className="border-destructive text-destructive hover:bg-destructive"
+                          >
+                            Start
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            className="border-secondary text-secondary hover:bg-secondary"
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center">
+                        No businesses found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </>
   );
 }
