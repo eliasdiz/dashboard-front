@@ -10,7 +10,18 @@ export type CartItem = {
   name: string
   location: string
   price: number
+  website: string
+  tags?: string[]
   image?: string
+  searchVolume: number,
+  score: number,
+  ranking: number,
+  previousRanking: number,
+  difficulty: number,
+  category: string,
+  status: string,
+  trend: number[],
+  rankingHistory: number[],
 }
 
 type CartState = {

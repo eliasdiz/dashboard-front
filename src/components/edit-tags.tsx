@@ -24,9 +24,14 @@ export default function EditableBadgeButton() {
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {values.map((val, index) => (
-        <Badge key={index} className="flex items-center gap-1 cursor-pointer">
+        <Badge key={index} className="flex items-center gap-1 cursor-pointer bg-muted">
           {val}
-          <X className="w-3 h-3 cursor-pointer" onClick={() => removeValue(index)} />
+          <div
+            onClick={() => removeValue(index)}
+            className="cursor-pointer"
+          >
+            <X className="w-3 h-3 font-extrabold" />
+          </div>
         </Badge>
       ))}
       {editing ? (

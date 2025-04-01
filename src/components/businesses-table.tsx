@@ -267,13 +267,22 @@ export function BusinessesTable() {
                           return updatedBusinesses;
                         });
 
-                        console.log(business);
-
                         addItem({
                           id: business.locationId,
                           name: business.name,
                           location: business.location,
                           price: 150.0,
+                          website: business.website,
+                          tags: business.tags,
+                          searchVolume: 2400,
+                          score: 3.2,
+                          ranking: 4,
+                          previousRanking: 7,
+                          difficulty: 65,
+                          category: "SEO",
+                          status: "active",
+                          trend: [1200, 1350, 1500, 1750, 2100, 2400],
+                          rankingHistory: [12, 10, 8, 7, 5, 4],
                         });
                       }}
                     >
