@@ -26,21 +26,10 @@ import dotenv from "dotenv";
 import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { Button } from "./ui/button";
-import { useCart } from "@/context/CartContext";
 import EditableBadgeButton from "./edit-tags";
 import GoogleLoader from "./google-loader";
 
 dotenv.config();
-
-// interface IBusiness {
-//   locations: {
-//     location: string;
-//     locationId: string;
-//     name: string;
-//     website: string;
-//     isAdded: string;
-//   }[]
-// }
 
 export interface ILocations {
   location: string;
@@ -77,7 +66,6 @@ export function BusinessesTable() {
     "name"
   );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const { addItem } = useCart();
 
   // Example of handling the save event
   const handleSaveBusiness = (data: BusinessFormValues) => {
@@ -275,8 +263,11 @@ export function BusinessesTable() {
 
                               return updatedBusinesses;
                             });
-
-                            addItem({
+                          }}
+                        >
+                          <BusinessFormDialog
+                            variant="outline"
+                            element={{
                               id: business.locationId,
                               name: business.name,
                               location: business.location,
@@ -292,11 +283,7 @@ export function BusinessesTable() {
                               status: "active",
                               trend: [1200, 1350, 1500, 1750, 2100, 2400],
                               rankingHistory: [12, 10, 8, 7, 5, 4],
-                            });
-                          }}
-                        >
-                          <BusinessFormDialog
-                            variant="outline"
+                            }}
                             business={existingBusiness}
                             onSave={handleSaveBusiness}
                           />

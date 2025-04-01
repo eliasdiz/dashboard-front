@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { CartItem } from "./keywords-management"
+import { useCart } from "@/context/CartContext"
 // import { toast } from "@/components/ui/use-toast"
 
 // Define the validation schema using zod
@@ -101,13 +103,15 @@ const defaultValues: Partial<BusinessFormValues> = {
 
 interface BusinessFormDialogProps {
   business?: BusinessFormValues
+  element: CartItem
   onSave?: (data: BusinessFormValues) => void
   variant?: "outline" | "ghost" | "default"
 }
 
-export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDialogProps) {
+export function BusinessFormDialog({ element, business, onSave, variant }: BusinessFormDialogProps) {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
+  const { addItem } = useCart()
 
   // Initialize the form with react-hook-form
   const form = useForm<BusinessFormValues>({
@@ -158,6 +162,8 @@ export function BusinessFormDialog({ business, onSave, variant }: BusinessFormDi
     if (onSave) {
       onSave(data)
     }
+
+    addItem(element)
 
     // Show success toast
     // toast({
