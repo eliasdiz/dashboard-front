@@ -585,7 +585,7 @@ export function Dashboard() {
             ) : activeTab === "keywords" ? (
               <div className="flex flex-col gap-6">
                 <h1 className="text-2xl font-bold">Keywords Management</h1>
-                <KeywordsManagement />
+                <KeywordsManagement initialData={JSON.parse(localStorage.getItem('cart') || '[]')} />
               </div>
             ) : activeTab === "services" ? (
               <div className="flex flex-col gap-6">

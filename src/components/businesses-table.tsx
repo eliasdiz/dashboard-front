@@ -31,23 +31,18 @@ import GoogleLoader from "./google-loader";
 
 dotenv.config();
 
-export interface ILocations {
-  location: string;
-  locationId: string;
-  name: string;
-  website: string;
-  isAdded: boolean;
-  tags: string[];
-}
 
 // Example of pre-filled data for editing
 const existingBusiness: BusinessFormValues = {
   name: "Acme Corporation",
   location: "123 Main St, Anytown, USA",
+  locationId: "230912830912830",
+  price: 150,
   phones: [{ number: "+1 (555) 123-4567" }],
   services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
   keywords: [{ text: "web design" }, { text: "digital marketing" }],
   targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+  tags: [{ name: "Tag1" }, { name: "Tag2" }],
   website: "https://acme-example.com",
   coordinates: {
     latitude: "40.7128",
@@ -60,7 +55,7 @@ const existingBusiness: BusinessFormValues = {
 export function BusinessesTable() {
   const auth = useUser();
   const [searchTerm, setSearchTerm] = useState("");
-  const [businesses, setBusinesses] = useState<ILocations[] | []>([]);
+  const [businesses, setBusinesses] = useState<BusinessFormValues[] | []>([]);
   const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState<"name" | "website" | "location">(
     "name"
@@ -118,7 +113,7 @@ export function BusinessesTable() {
         )
         .then((response) => {
           const formattedBusinesses = response.data?.locations?.map(
-            (business: ILocations) => ({
+            (business: BusinessFormValues) => ({
               ...business,
               isAdded: false,
               tags: [],
@@ -268,21 +263,22 @@ export function BusinessesTable() {
                           <BusinessFormDialog
                             variant="outline"
                             element={{
-                              id: business.locationId,
-                              name: business.name,
+                              name: business.name ,
                               location: business.location,
-                              price: 150.0,
+                              locationId: business.locationId,
+                              price: 150,
+                              phones: [{ number: "business.phones[0].number" }],
+                              services: [{ name: "business.services[0].name" }],
+                              keywords: [{ text: "business.keywords[0].text" }],
+                              targetLocations: [{ name: "business.targetLocations[0].name" }],
+                              tags: [{ name: "business.tags[0].name" }],
                               website: business.website,
-                              tags: business.tags,
-                              searchVolume: 2400,
-                              score: 3.2,
-                              ranking: 4,
-                              previousRanking: 7,
-                              difficulty: 65,
-                              category: "SEO",
-                              status: "active",
-                              trend: [1200, 1350, 1500, 1750, 2100, 2400],
-                              rankingHistory: [12, 10, 8, 7, 5, 4],
+                              coordinates: {
+                                latitude: "business.coordinates.latitude",
+                                longitude: "business.coordinates.longitude",
+                              },
+                              cid: business.cid,
+                              imagePrompt: business.imagePrompt,
                             }}
                             business={existingBusiness}
                             onSave={handleSaveBusiness}

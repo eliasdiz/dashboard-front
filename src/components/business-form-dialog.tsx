@@ -21,7 +21,6 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { CartItem } from "./keywords-management"
 import { useCart } from "@/context/CartContext"
 // import { toast } from "@/components/ui/use-toast"
 
@@ -29,6 +28,8 @@ import { useCart } from "@/context/CartContext"
 const businessFormSchema = z.object({
   name: z.string().min(2, { message: "Business name must be at least 2 characters." }),
   location: z.string().min(3, { message: "Location is required." }),
+  locationId: z.string().min(3, { message: "Location is required." }),
+  price: z.number().int().positive({ message: "Price must be a positive integer." }),
   phones: z
     .array(
       z.object({
@@ -61,7 +62,15 @@ const businessFormSchema = z.object({
     )
     .optional()
     .default([]),
-  website: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
+  tags: z
+    .array(
+      z.object({
+        name: z.string().min(1, { message: "Target location is required." }),
+      }),
+    )
+    .optional()
+    .default([]),
+  website: z.string().url({ message: "Please enter a valid URL." }).or(z.literal("")),
   coordinates: z
     .object({
       latitude: z
@@ -88,10 +97,12 @@ export type BusinessFormValues = z.infer<typeof businessFormSchema>
 const defaultValues: Partial<BusinessFormValues> = {
   name: "",
   location: "",
+  locationId: "",
   phones: [{ number: "" }],
   services: [{ name: "" }],
   keywords: [{ text: "" }],
   targetLocations: [{ name: "" }],
+  tags: [{ name: "" }],
   website: "",
   coordinates: {
     latitude: "",
@@ -103,7 +114,7 @@ const defaultValues: Partial<BusinessFormValues> = {
 
 interface BusinessFormDialogProps {
   business?: BusinessFormValues
-  element: CartItem
+  element: BusinessFormValues
   onSave?: (data: BusinessFormValues) => void
   variant?: "outline" | "ghost" | "default"
 }
