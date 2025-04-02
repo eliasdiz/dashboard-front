@@ -28,7 +28,8 @@ import { useCart } from "@/context/CartContext"
 const businessFormSchema = z.object({
   name: z.string().min(2, { message: "Business name must be at least 2 characters." }),
   location: z.string().min(3, { message: "Location is required." }),
-  locationId: z.string().min(3, { message: "Location is required." }),
+  locationId: z.string().min(3, { message: "Location is required." }).optional(),
+  country: z.string().min(1, { message: "Location is required." }),
   price: z.number().int().positive({ message: "Price must be a positive integer." }),
   phones: z
     .array(
@@ -88,38 +89,41 @@ const businessFormSchema = z.object({
     .default({ latitude: "", longitude: "" }),
   cid: z.string().optional(),
   imagePrompt: z.string().optional(),
+  isAdded: z.boolean().default(false)
 })
 
 // Infer the type from the schema
 export type BusinessFormValues = z.infer<typeof businessFormSchema>
 
 // Default values for the form
-const defaultValues: Partial<BusinessFormValues> = {
-  name: "",
-  location: "",
-  locationId: "",
-  phones: [{ number: "" }],
-  services: [{ name: "" }],
-  keywords: [{ text: "" }],
-  targetLocations: [{ name: "" }],
-  tags: [{ name: "" }],
-  website: "",
+const existingBusiness: BusinessFormValues = {
+  name: "Acme Corporation",
+  location: "123 Main St, Anytown, USA",
+  locationId: "230912830912830",
+  country: "US",
+  price: 150,
+  phones: [{ number: "+1 (555) 123-4567" }],
+  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
+  keywords: [{ text: "web design" }, { text: "digital marketing" }],
+  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
+  tags: [{ name: "Tag1" }, { name: "Tag2" }],
+  website: "https://acme-example.com",
   coordinates: {
-    latitude: "",
-    longitude: "",
+    latitude: "40.7128",
+    longitude: "-74.0060",
   },
-  cid: "",
-  imagePrompt: "",
-}
+  cid: "12345678901234567890",
+  imagePrompt: "A modern office building with the Acme logo",
+  isAdded: false
+};
 
 interface BusinessFormDialogProps {
-  business?: BusinessFormValues
   element: BusinessFormValues
   onSave?: (data: BusinessFormValues) => void
   variant?: "outline" | "ghost" | "default"
 }
 
-export function BusinessFormDialog({ element, business, onSave, variant }: BusinessFormDialogProps) {
+export function BusinessFormDialog({ element, onSave, variant }: BusinessFormDialogProps) {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
   const { addItem } = useCart()
@@ -127,7 +131,7 @@ export function BusinessFormDialog({ element, business, onSave, variant }: Busin
   // Initialize the form with react-hook-form
   const form = useForm<BusinessFormValues>({
     resolver: zodResolver(businessFormSchema),
-    defaultValues: business || defaultValues,
+    defaultValues: existingBusiness,
   })
 
   // Set up field arrays for list fields
@@ -169,21 +173,27 @@ export function BusinessFormDialog({ element, business, onSave, variant }: Busin
 
   // Form submission handler
   function onSubmit(data: BusinessFormValues) {
-    // Call the onSave callback if provided
-    if (onSave) {
-      onSave(data)
+    try {
+
+      console.log("🟢 Check", data)
+      // Call the onSave callback if provided
+      if (onSave) {
+        onSave(data)
+      }
+  
+      addItem(existingBusiness)
+  
+      // Show success toast
+      // toast({
+      //   title: "Business saved",
+      //   description: `Successfully saved business: ${data.name}`,
+      // }) 
+  
+      // Close the dialog
+      setOpen(false)
+    } catch (err) {
+      console.error(err)
     }
-
-    addItem(element)
-
-    // Show success toast
-    // toast({
-    //   title: "Business saved",
-    //   description: `Successfully saved business: ${data.name}`,
-    // })
-
-    // Close the dialog
-    setOpen(false)
   }
 
   return (
@@ -195,7 +205,7 @@ export function BusinessFormDialog({ element, business, onSave, variant }: Busin
         <DialogHeader>
           <DialogTitle>Add Business</DialogTitle>
           <DialogDescription>
-            {business
+            {element
               ? "Update the business information in the form below."
               : "Fill in the business details to add it to your account."}
           </DialogDescription>

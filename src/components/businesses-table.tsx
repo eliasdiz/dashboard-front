@@ -31,26 +31,7 @@ import GoogleLoader from "./google-loader";
 
 dotenv.config();
 
-
 // Example of pre-filled data for editing
-const existingBusiness: BusinessFormValues = {
-  name: "Acme Corporation",
-  location: "123 Main St, Anytown, USA",
-  locationId: "230912830912830",
-  price: 150,
-  phones: [{ number: "+1 (555) 123-4567" }],
-  services: [{ name: "Web Development" }, { name: "Digital Marketing" }],
-  keywords: [{ text: "web design" }, { text: "digital marketing" }],
-  targetLocations: [{ name: "Anytown" }, { name: "Nearby City" }],
-  tags: [{ name: "Tag1" }, { name: "Tag2" }],
-  website: "https://acme-example.com",
-  coordinates: {
-    latitude: "40.7128",
-    longitude: "-74.0060",
-  },
-  cid: "12345678901234567890",
-  imagePrompt: "A modern office building with the Acme logo",
-};
 
 export function BusinessesTable() {
   const auth = useUser();
@@ -113,10 +94,16 @@ export function BusinessesTable() {
         )
         .then((response) => {
           const formattedBusinesses = response.data?.locations?.map(
+            // // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (business: BusinessFormValues) => ({
-              ...business,
+              name: business.name,
+              location: business.location,
+              locationId: business.locationId,
+              country: business.country,
+              website: business.website,
+              cid: business.cid,
+              imagePrompt: business.imagePrompt,
               isAdded: false,
-              tags: [],
             })
           );
           setBusinesses(formattedBusinesses);
@@ -159,21 +146,6 @@ export function BusinessesTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="">Location ID</TableHead>
-                    <TableHead
-                      className="cursor-pointer"
-                      onClick={() => handleSort("location")}
-                    >
-                      <div className="flex items-center">
-                        Location
-                        {sortField === "location" &&
-                          (sortDirection === "asc" ? (
-                            <ChevronUp className="ml-1 h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="ml-1 h-4 w-4" />
-                          ))}
-                      </div>
-                    </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("name")}
@@ -202,6 +174,20 @@ export function BusinessesTable() {
                           ))}
                       </div>
                     </TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => handleSort("location")}
+                    >
+                      <div className="flex items-center">
+                        Location
+                        {sortField === "location" &&
+                          (sortDirection === "asc" ? (
+                            <ChevronUp className="ml-1 h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="ml-1 h-4 w-4" />
+                          ))}
+                      </div>
+                    </TableHead>
                     <TableHead>Tags</TableHead>
                     <TableHead>Actions</TableHead>
                     <TableHead>Audits</TableHead>
@@ -210,14 +196,8 @@ export function BusinessesTable() {
                 </TableHeader>
                 <TableBody>
                   {sortedBusinesses.length > 0 ? (
-                    sortedBusinesses.map((business) => (
-                      <TableRow key={business.locationId}>
-                        <TableCell className="font-medium">
-                          {business.locationId}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {business.location}
-                        </TableCell>
+                    sortedBusinesses.map((business, index) => (
+                      <TableRow key={`${business.locationId}-${index}`}>
                         <TableCell>{business.name.slice(0, 30)}</TableCell>
                         <TableCell>
                           <a
@@ -233,6 +213,9 @@ export function BusinessesTable() {
                             ...
                             <ExternalLink className="ml-1 h-3 w-3" />
                           </a>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {business?.country}
                         </TableCell>
                         <TableCell>
                           <EditableBadgeButton />
@@ -263,24 +246,25 @@ export function BusinessesTable() {
                           <BusinessFormDialog
                             variant="outline"
                             element={{
-                              name: business.name ,
-                              location: business.location,
-                              locationId: business.locationId,
-                              price: 150,
-                              phones: [{ number: "business.phones[0].number" }],
-                              services: [{ name: "business.services[0].name" }],
-                              keywords: [{ text: "business.keywords[0].text" }],
-                              targetLocations: [{ name: "business.targetLocations[0].name" }],
-                              tags: [{ name: "business.tags[0].name" }],
-                              website: business.website,
+                              name: "business.name",
+                              location: "business.location",
+                              country: "business.country",
+                              locationId: "business.locationId",
+                              price: 25,
+                              phones: [{ number: "business.phones" }],
+                              services: [{ name: "business.services" }],
+                              keywords: [{ text: "business.keywords" }],
+                              targetLocations: [{ name: "business.targetLocations" }],
+                              tags: [{ name: "business.tags" }],
+                              website: "https://business.website",
                               coordinates: {
-                                latitude: "business.coordinates.latitude",
-                                longitude: "business.coordinates.longitude",
+                                latitude: "business.coordinates?.latitude",
+                                longitude: "business.coordinates?.longitude",
                               },
-                              cid: business.cid,
-                              imagePrompt: business.imagePrompt,
+                              cid: "business.cid",
+                              imagePrompt: "business.imagePrompt",
+                              isAdded: false,
                             }}
-                            business={existingBusiness}
                             onSave={handleSaveBusiness}
                           />
                         </TableCell>
