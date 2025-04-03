@@ -34,6 +34,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea"
 // import { toast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
+import ReportSheet from "./report-sheet"
 
 // Define the Zod schema for validation
 const phoneSchema = z.object({
@@ -101,6 +102,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   const [keywords, setKeywords] = useState<BusinessFormData[]>(initialData)
   const [filteredKeywords, setFilteredKeywords] = useState<BusinessFormData[]>(initialData)
   const [isAddingNew, setIsAddingNew] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Setup form with react-hook-form and zod validation
   const form = useForm<BusinessFormData>({
@@ -288,6 +290,9 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   // Render the component
   return (
     <div className="w-full space-y-6">
+
+      <ReportSheet isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+
       {/* Filters and Controls */}
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div className="flex flex-1 items-center space-x-2">
@@ -349,9 +354,8 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
             >
               <Card
                 className="overflow-hidden hover:shadow-md transition-all cursor-pointer"
-                onClick={() => handleKeywordClick(keyword)}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-4" onClick={() => handleKeywordClick(keyword)}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
                       <Badge variant={keyword.status === "active" ? "default" : "outline"} className="mr-2">
@@ -390,6 +394,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                     )}
                   </div>
                 </CardContent>
+                  <div className="flex justify-center gap-2">
+                    <Button onClick={() => setIsModalOpen(true)}>Report</Button>
+                    <Button>Heatmap</Button>
+                  </div>
               </Card>
             </motion.div>
           ))}
