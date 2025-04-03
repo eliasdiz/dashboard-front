@@ -1,43 +1,26 @@
 "use client"
 
+import { BusinessFormValues } from "@/components/business-form-dialog"
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect, useState } from "react"
 // import { toast } from "@/components/ui/use-toast"
 
 // Define types
-export type CartItem = {
-  id: string
-  name: string
-  location: string
-  price: number
-  website: string
-  tags?: string[]
-  image?: string
-  searchVolume: number,
-  score: number,
-  ranking: number,
-  previousRanking: number,
-  difficulty: number,
-  category: string,
-  status: string,
-  trend: number[],
-  rankingHistory: number[],
-}
 
 type CartState = {
-  items: CartItem[]
+  items: BusinessFormValues[]
   isOpen: boolean
 }
 
 type CartAction =
-  | { type: "ADD_ITEM"; payload: CartItem }
+  | { type: "ADD_ITEM"; payload: BusinessFormValues }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "CLEAR_CART" }
   | { type: "TOGGLE_CART"; payload?: boolean }
 
 type CartContextType = {
   state: CartState
-  addItem: (item: CartItem) => void
+  addItem: (item: BusinessFormValues) => void
   removeItem: (id: string) => void
   clearCart: () => void
   toggleCart: (isOpen?: boolean) => void
@@ -53,7 +36,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM":
       // Check if item already exists
-      const existingItemIndex = state.items.findIndex((item) => item.id === action.payload.id)
+      const existingItemIndex = state.items.findIndex((item) => item.locationId === action.payload.locationId)
 
       if (existingItemIndex > -1) {
         // Item already exists, don't add it again
@@ -76,7 +59,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       }
 
     case "REMOVE_ITEM":
-      const itemToRemove = state.items.find((item) => item.id === action.payload)
+      const itemToRemove = state.items.find((item) => item.locationId === action.payload)
       console.log(itemToRemove?.name)
       // toast({
       //   title: "Item removed",
@@ -84,7 +67,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       // })
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
+        items: state.items.filter((item) => item.locationId !== action.payload),
       }
 
     case "CLEAR_CART":
@@ -127,7 +110,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedCart = localStorage.getItem("cart")
     if (savedCart) {
       const parsedCart = JSON.parse(savedCart)
-      parsedCart.forEach((item: CartItem) => {
+      parsedCart.forEach((item: BusinessFormValues) => {
         dispatch({ type: "ADD_ITEM", payload: item })
       })
     }
@@ -139,7 +122,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [state.items])
 
   // Action creators
-  const addItem = (item: CartItem) => {
+  const addItem = (item: BusinessFormValues) => {
     dispatch({ type: "ADD_ITEM", payload: item })
   }
 

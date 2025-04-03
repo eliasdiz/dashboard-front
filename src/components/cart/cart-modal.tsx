@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ShoppingCart, Trash2, ArrowRight } from "lucide-react"
-import { useCart, type CartItem } from "@/context/CartContext"
-import Image from "next/image"
+import { useCart } from "@/context/CartContext"
+import { BusinessFormValues } from "../business-form-dialog"
 
 export default function CartModal() {
   const { state, removeItem, toggleCart, totalItems, totalPrice } = useCart()
@@ -37,7 +37,7 @@ export default function CartModal() {
               <AnimatePresence initial={false}>
                 <div className="space-y-4">
                   {state.items.map((item) => (
-                    <CartItemCard key={item.id} item={item} onRemove={removeItem} />
+                    <CartItemCard key={item.locationId} item={item} onRemove={removeItem} />
                   ))}
                 </div>
               </AnimatePresence>
@@ -77,7 +77,7 @@ function CartItemCard({
   item,
   onRemove,
 }: {
-  item: CartItem
+  item: BusinessFormValues
   onRemove: (id: string) => void
 }) {
   return (
@@ -90,13 +90,9 @@ function CartItemCard({
       className="flex gap-3 p-3 rounded-lg border"
     >
       <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-muted">
-        {item.image ? (
-          <Image src={item.image || "/placeholder.svg"} alt={item.name} width={100} height={100} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
-            <ShoppingCart className="h-6 w-6" />
-          </div>
-        )}
+        <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+          <ShoppingCart className="h-6 w-6" />
+        </div>
       </div>
 
       <div className="flex-1 min-w-0">
@@ -109,7 +105,7 @@ function CartItemCard({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => onRemove(item.id)}
+            onClick={() => onRemove(item.locationId)}
             aria-label={`Remove ${item.name} from cart`}
           >
             <Trash2 className="h-4 w-4" />
