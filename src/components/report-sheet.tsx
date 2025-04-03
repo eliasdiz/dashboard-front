@@ -46,7 +46,8 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
 
   const handleDownload = () => {
     console.log(form.getValues());
-    alert("Downloading report...");
+    window.open('/reports', '_blank')
+    setIsModalOpen(false)
   };
 
   return (
@@ -113,7 +114,7 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
             Cancel
           </Button>
           <Button disabled={!isDownloadEnabled} onClick={handleDownload}>
-            Download Report
+            View Report
           </Button>
         </DialogFooter>
       </DialogContent>
