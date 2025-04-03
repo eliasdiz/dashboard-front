@@ -7,6 +7,7 @@ import PerformanceChart from "./PerformanceChart";
 import GoogleReviewCard from "./GoogleReviewCard";
 import ReactMarkdown from "react-markdown";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { PerformanceData } from "@/types/types";
 
 type Reviewer = {
   displayName: string;
@@ -54,33 +55,6 @@ interface SheetData {
   [key: string]: string | number;
 }
 
-interface PerformanceData {
-  WEBSITE_CLICKS: {
-    timeSeries?: {
-      datedValues: Array<{
-        date: { year: number; month: number };
-        value: string;
-      }>;
-    };
-  };
-  CALL_CLICKS: {
-    timeSeries?: {
-      datedValues: Array<{
-        date: { year: number; month: number };
-        value: string;
-      }>;
-    };
-  };
-  BUSINESS_CONVERSATIONS: {
-    timeSeries?: {
-      datedValues: Array<{
-        date: { year: number; month: number };
-        value: string;
-      }>;
-    };
-  };
-}
-
 interface Keyword {
   searchKeyword: string;
   value: string;
@@ -109,13 +83,15 @@ interface QueryParams {
   end_year: number;
 }
 
+
 const GoogleMyBusinessDashboard: React.FC = () => {
   // State for storing fetched data
   const [posts, setPosts] = useState<Post[]>([]);
   const [sheetData, setSheetData] = useState<SheetData[]>([]);
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [performance, setPerformance] = useState<PerformanceData>({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [performance, setPerformance] = useState<any>({
     WEBSITE_CLICKS: {},
     CALL_CLICKS: {},
     BUSINESS_CONVERSATIONS: {},
@@ -491,6 +467,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                 className="bg-white z-10 rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]"
               >
                 {post.googleUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={post.googleUrl || "/placeholder.svg"}
                     alt="Post image"
@@ -536,6 +513,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             </p>
 
             <div className="rounded-xl overflow-hidden shadow-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://storage.googleapis.com/chimney_sweep/heatmap_meditech.jpeg"
                 alt="Heatmap visualization"
@@ -585,9 +563,9 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                     .slice()
                     .sort(
                       (a, b) =>
-                        a["Top Domains"]?.localeCompare(
-                          b["Top Domains"] || ""
-                        ) ?? 0
+                        String(a["Top Domains"] || "").localeCompare(
+                          String(b["Top Domains"] || "")
+                        )
                     )
                     .map((data, index) => (
                       <tr
@@ -599,13 +577,13 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 break-words">
                           <a
-                            href={data["Created Live Links"]}
+                            href={typeof data["Created Live Links"] === "string" ? data["Created Live Links"] : undefined}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 transition-colors flex items-center"
                           >
                             <span className="truncate max-w-[180px] md:max-w-[250px]">
-                              {new URL(data["Created Live Links"]).hostname}
+                              {typeof data["Created Live Links"] === "string" ? new URL(data["Created Live Links"]).hostname : ""}
                             </span>
                             <svg
                               className="w-5 h-5 ml-2"

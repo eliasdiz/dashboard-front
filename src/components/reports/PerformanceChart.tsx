@@ -7,12 +7,12 @@ interface DailyMetrics {
   BUSINESS_DIRECTION_REQUESTS?: number;
 }
 
-interface PerformanceData {
+interface PerformanceDataKey {
   [date: string]: DailyMetrics;
 }
 
 interface PerformanceChartsProps {
-  performanceData: PerformanceData;
+  performanceData: PerformanceDataKey;
   charts?: Array<{
     type: "website" | "call" | "directions";
     title: string;

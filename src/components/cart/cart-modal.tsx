@@ -105,7 +105,7 @@ function CartItemCard({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => onRemove(item.locationId)}
+            onClick={() => onRemove(item.locationId || '')}
             aria-label={`Remove ${item.name} from cart`}
           >
             <Trash2 className="h-4 w-4" />
