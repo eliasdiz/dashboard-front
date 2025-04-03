@@ -421,7 +421,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
           <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-[#EA4335] text-gray-800">
+                <tr className="bg-[#EA4335] text-white">
                   <th className="px-6 py-4 text-lg font-semibold">Date</th>
                   <th className="px-6 py-4 text-lg font-semibold">Post URL</th>
                   <th className="px-6 py-4 text-lg font-semibold">
@@ -715,7 +715,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       </section>
 
       {/* Reviews Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 py-16 overflow-hidden">
+      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
         <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
@@ -757,7 +757,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       </section>
 
       {/* AI Report Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 py-16 overflow-hidden">
+      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
         <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
@@ -778,7 +778,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       </section>
 
       {/* Thank You Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 py-16 flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] flex items-center justify-center overflow-hidden">
         <DecorativeTriangles />
 
         <div className="z-10 text-center">

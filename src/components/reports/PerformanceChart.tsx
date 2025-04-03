@@ -201,7 +201,7 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({
       </div>
 
       {/* Charts Section */}
-      <div className="flex flex-col items-center justify-center mb-12 px-4 w-full">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-[1rem] items-center justify-center mb-12 px-4 w-full">
         {charts.map((chart, index) => (
           <div key={index} className="w-full flex flex-col justify-center max-w-4xl mb-8">
             <div className="w-full mx-auto">

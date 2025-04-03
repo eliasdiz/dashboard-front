@@ -1,5 +1,6 @@
 import type React from "react"
 import { Star } from "lucide-react"
+import Image from "next/image"
 
 type Reviewer = {
   displayName: string
@@ -53,10 +54,12 @@ const GoogleReviewCard: React.FC<Props> = ({ review }) => {
     <div className="flex flex-col justify-start items-start w-full h-full border border-gray-200 shadow-md p-3 sm:p-4 md:p-5 rounded-lg bg-white transition-shadow hover:shadow-lg">
       <div className="flex items-center w-full mb-3 sm:mb-4">
         {reviewer.profilePhotoUrl ? (
-          <img
+          <Image
             src={reviewer.profilePhotoUrl || "/placeholder.svg"}
             alt={reviewer.displayName || "Reviewer"}
             loading="lazy"
+            width={50}
+            height={50}
             referrerPolicy="no-referrer"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3 object-cover flex-shrink-0"
             onError={(e) => {
