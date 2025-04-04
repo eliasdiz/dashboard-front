@@ -223,7 +223,7 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({
                 </div>
               </div>
               {notes[index] && (
-                <div className="mt-2 p-4 md:w-[70%] mx-auto bg-gray-100 border-l-4 border-blue-500 text-gray-700 italic rounded shadow-md">
+                <div className="mt-2 p-4 text-lg md:w-[80%] mx-auto bg-gray-100 border-l-4 border-blue-500 text-gray-700 italic rounded shadow-md">
                   💡 <span className="font-medium">This Month:</span>{" "}
                   {notes[index]}
                 </div>

@@ -21,6 +21,8 @@ import { Label } from "@/components/ui/label";
 interface ReportSheetProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
+  locationId: string;
+  accountId: string;
 }
 
 interface FormValues {
@@ -31,6 +33,8 @@ interface FormValues {
 const ReportSheet: React.FC<ReportSheetProps> = ({
   isModalOpen,
   setIsModalOpen,
+  accountId,
+  locationId
 }) => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -42,11 +46,15 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
     },
   });
 
+  console.log(locationId, 'locationId')
+
+  
+
   const isDownloadEnabled = Boolean(startDate && endDate);
 
   const handleDownload = () => {
-    console.log(form.getValues());
-    window.open('/reports', '_blank')
+    // console.log(form.getValues());
+    window.open(`/reports/?account_id=${accountId}&location_id=${locationId}`, '_blank')
     setIsModalOpen(false)
   };
 

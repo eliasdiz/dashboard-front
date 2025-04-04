@@ -193,6 +193,8 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         return;
       }
 
+      console.log(sheetData)
+
       try {
         const queryString = new URLSearchParams(
           Object.entries(params).map(([k, v]) => [k, v.toString()])

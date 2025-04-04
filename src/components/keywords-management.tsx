@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm, useFieldArray } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Plus,
@@ -20,47 +20,68 @@ import {
   Key,
   Locate,
   ImageDown,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 // import { toast } from "@/components/ui/use-toast"
-import { cn } from "@/lib/utils"
-import ReportSheet from "./report-sheet"
+import { cn } from "@/lib/utils";
+import ReportSheet from "./report-sheet";
 
 // Define the Zod schema for validation
 const phoneSchema = z.object({
   number: z.string().min(10, "Phone number must be at least 10 characters"),
-})
+});
 
 const serviceSchema = z.object({
   name: z.string().min(2, "Service name must be at least 2 characters"),
-})
+});
 
 const keywordSchema = z.object({
   text: z.string().min(2, "Keyword must be at least 2 characters"),
-})
+});
 
 const locationSchema = z.object({
   name: z.string().min(2, "Location name must be at least 2 characters"),
-})
+});
 
 const tagSchema = z.object({
   name: z.string().min(2, "Tag must be at least 2 characters"),
-})
+});
 
 const coordinatesSchema = z.object({
   latitude: z.string().optional(),
   longitude: z.string().optional(),
-})
+});
 
 const businessFormSchema = z.object({
   name: z.string().min(2, "Business name must be at least 2 characters"),
@@ -77,32 +98,46 @@ const businessFormSchema = z.object({
   cid: z.string().optional(),
   imagePrompt: z.string().optional(),
   status: z.enum(["active", "paused", "draft"]).default("active"),
-})
+});
 
 // Define the type from the schema
-export type BusinessFormData = z.infer<typeof businessFormSchema>
+export type BusinessFormData = z.infer<typeof businessFormSchema>;
 
 // Sample data for filtering and display
 interface KeywordsManagementProps {
-  initialData: BusinessFormData[]
-  onSave?: (data: BusinessFormData) => void
-  onDelete?: (id: string) => void
-  onUpdate?: (id: string, data: BusinessFormData) => void
+  initialData: BusinessFormData[];
+  onSave?: (data: BusinessFormData) => void;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string, data: BusinessFormData) => void;
 }
 
-export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: KeywordsManagementProps) {
+export function KeywordsManagement({
+  initialData,
+  onSave,
+  onDelete,
+  onUpdate,
+}: KeywordsManagementProps) {
   // State for the component
-  const [searchTerm, setSearchTerm] = useState("")
-  const [categories] = useState(["All", "Local SEO", "Marketing", "Social Media", "Content", "Technical SEO"])
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [sortBy, setSortBy] = useState("name")
-  const [selectedKeyword, setSelectedKeyword] = useState<BusinessFormData | null>(null)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [viewMode] = useState<"grid" | "list">("grid")
-  const [keywords, setKeywords] = useState<BusinessFormData[]>(initialData)
-  const [filteredKeywords, setFilteredKeywords] = useState<BusinessFormData[]>(initialData)
-  const [isAddingNew, setIsAddingNew] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categories] = useState([
+    "All",
+    "Local SEO",
+    "Marketing",
+    "Social Media",
+    "Content",
+    "Technical SEO",
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("name");
+  const [selectedKeyword, setSelectedKeyword] =
+    useState<BusinessFormData | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [viewMode] = useState<"grid" | "list">("grid");
+  const [keywords, setKeywords] = useState<BusinessFormData[]>(initialData);
+  const [filteredKeywords, setFilteredKeywords] =
+    useState<BusinessFormData[]>(initialData);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Setup form with react-hook-form and zod validation
   const form = useForm<BusinessFormData>({
@@ -126,7 +161,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
       imagePrompt: "",
       status: "active",
     },
-  })
+  });
 
   // Setup field arrays for dynamic lists
   const {
@@ -136,7 +171,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   } = useFieldArray({
     control: form.control,
     name: "phones",
-  })
+  });
 
   const {
     fields: serviceFields,
@@ -145,7 +180,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   } = useFieldArray({
     control: form.control,
     name: "services",
-  })
+  });
 
   const {
     fields: keywordFields,
@@ -154,7 +189,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   } = useFieldArray({
     control: form.control,
     name: "keywords",
-  })
+  });
 
   const {
     fields: targetLocationFields,
@@ -163,7 +198,7 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   } = useFieldArray({
     control: form.control,
     name: "targetLocations",
-  })
+  });
 
   const {
     fields: tagFields,
@@ -172,56 +207,56 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
   } = useFieldArray({
     control: form.control,
     name: "tags",
-  })
+  });
 
   // Filter and sort keywords
   useEffect(() => {
-    let result = [...keywords]
+    let result = [...keywords];
 
     // Apply search filter
     if (searchTerm) {
       result = result.filter(
         (keyword) =>
           keyword.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          keyword.location.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          keyword.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
     // Apply category filter
     if (selectedCategory !== "All") {
       result = result.filter((keyword) => {
-        const tags = keyword.tags?.map((tag) => tag.name) || []
-        return tags.includes(selectedCategory)
-      })
+        const tags = keyword.tags?.map((tag) => tag.name) || [];
+        return tags.includes(selectedCategory);
+      });
     }
 
     // Apply sorting
     result.sort((a, b) => {
       if (sortBy === "name") {
-        return a.name.localeCompare(b.name)
+        return a.name.localeCompare(b.name);
       } else if (sortBy === "location") {
-        return a.location.localeCompare(b.location)
+        return a.location.localeCompare(b.location);
       } else if (sortBy === "price") {
-        return a.price - b.price
+        return a.price - b.price;
       }
-      return 0
-    })
+      return 0;
+    });
 
-    setFilteredKeywords(result)
-  }, [searchTerm, selectedCategory, sortBy, keywords])
+    setFilteredKeywords(result);
+  }, [searchTerm, selectedCategory, sortBy, keywords]);
 
   // Handle keyword selection
   const handleKeywordClick = (keyword: BusinessFormData) => {
-    setSelectedKeyword(keyword)
-    setIsAddingNew(false)
-    form.reset(keyword)
-    setIsSheetOpen(true)
-  }
+    setSelectedKeyword(keyword);
+    setIsAddingNew(false);
+    form.reset(keyword);
+    setIsSheetOpen(true);
+  };
 
   // Handle adding a new keyword
   const handleAddNew = () => {
-    setSelectedKeyword(null)
-    setIsAddingNew(true)
+    setSelectedKeyword(null);
+    setIsAddingNew(true);
     form.reset({
       name: "",
       location: "",
@@ -240,9 +275,9 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
       cid: "",
       imagePrompt: "",
       status: "active",
-    })
-    setIsSheetOpen(true)
-  }
+    });
+    setIsSheetOpen(true);
+  };
 
   // Handle form submission
   const onSubmit = (data: BusinessFormData) => {
@@ -251,9 +286,9 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
       const newKeyword = {
         ...data,
         id: `wk${Date.now()}`,
-      }
-      setKeywords([...keywords, newKeyword])
-      if (onSave) onSave(newKeyword)
+      };
+      setKeywords([...keywords, newKeyword]);
+      if (onSave) onSave(newKeyword);
       // toast({
       //   title: "Keyword Added",
       //   description: `${data.name} has been added successfully.`,
@@ -261,37 +296,56 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
     } else if (selectedKeyword) {
       // Update existing keyword
       const updatedKeywords = keywords.map((wk) =>
-        wk.locationId === selectedKeyword.locationId ? { ...data, id: selectedKeyword.locationId } : wk,
-      )
-      setKeywords(updatedKeywords)
-      if (onUpdate) onUpdate(selectedKeyword.locationId, { ...data, locationId: selectedKeyword.locationId })
+        wk.locationId === selectedKeyword.locationId
+          ? { ...data, id: selectedKeyword.locationId }
+          : wk
+      );
+      setKeywords(updatedKeywords);
+      if (onUpdate)
+        onUpdate(selectedKeyword.locationId, {
+          ...data,
+          locationId: selectedKeyword.locationId,
+        });
       // toast({
       //   title: "Keyword Updated",
       //   description: `${data.name} has been updated successfully.`,
       // })
     }
-    setIsSheetOpen(false)
-  }
+    setIsSheetOpen(false);
+  };
 
   // Handle keyword deletion
   const handleDelete = () => {
     if (selectedKeyword) {
-      const updatedKeywords = keywords.filter((wk) => wk.locationId !== selectedKeyword.locationId)
-      setKeywords(updatedKeywords)
-      if (onDelete) onDelete(selectedKeyword.locationId)
+      const updatedKeywords = keywords.filter(
+        (wk) => wk.locationId !== selectedKeyword.locationId
+      );
+      setKeywords(updatedKeywords);
+      if (onDelete) onDelete(selectedKeyword.locationId);
       // toast({
       //   title: "Keyword Deleted",
       //   description: `${selectedKeyword.name} has been deleted.`,
       // })
-      setIsSheetOpen(false)
+      setIsSheetOpen(false);
     }
-  }
+  };
+
+  const handleReport = (keyword: BusinessFormData) => {
+    setIsModalOpen(true);
+    setSelectedKeyword(keyword);
+  };
 
   // Render the component
   return (
     <div className="w-full space-y-6">
-
-      <ReportSheet isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <ReportSheet
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        accountId={
+          JSON.parse(localStorage.getItem("user") || "").user.userId || ""
+        }
+        locationId={selectedKeyword?.locationId || ""}
+      />
 
       {/* Filters and Controls */}
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
@@ -330,7 +384,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
               <SelectItem value="price">Price</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="bg-primary hover:bg-primary/90" onClick={handleAddNew}>
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            onClick={handleAddNew}
+          >
             <Plus className="mr-2 h-4 w-4" /> Add Keyword
           </Button>
         </div>
@@ -339,7 +396,9 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
       {/* Keywords Display */}
       <div
         className={`grid gap-4 ${
-          viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
+          viewMode === "grid"
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            : "grid-cols-1"
         }`}
       >
         <AnimatePresence>
@@ -352,16 +411,28 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
               transition={{ duration: 0.2 }}
               layout
             >
-              <Card
-                className="overflow-hidden hover:shadow-md transition-all cursor-pointer"
-              >
-                <CardContent className="p-4" onClick={() => handleKeywordClick(keyword)}>
+              <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer">
+                <CardContent
+                  className="p-4"
+                  onClick={() => handleKeywordClick(keyword)}
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
-                      <Badge variant={keyword.status === "active" ? "default" : "outline"} className="mr-2">
-                        {keyword.status === "active" ? "Active" : keyword.status === "paused" ? "Paused" : "Draft"}
+                      <Badge
+                        variant={
+                          keyword.status === "active" ? "default" : "outline"
+                        }
+                        className="mr-2"
+                      >
+                        {keyword.status === "active"
+                          ? "Active"
+                          : keyword.status === "paused"
+                          ? "Paused"
+                          : "Draft"}
                       </Badge>
-                      <span className="font-medium truncate">{keyword.name}</span>
+                      <span className="font-medium truncate">
+                        {keyword.name}
+                      </span>
                     </div>
                   </div>
 
@@ -372,18 +443,30 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
 
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">Price</span>
-                      <span className="font-medium">${keyword.price.toLocaleString()}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Price
+                      </span>
+                      <span className="font-medium">
+                        ${keyword.price.toLocaleString()}
+                      </span>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-xs text-muted-foreground">Services</span>
-                      <span className="font-medium">{keyword.services?.length || 0}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Services
+                      </span>
+                      <span className="font-medium">
+                        {keyword.services?.length || 0}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-3">
                     {keyword.tags?.slice(0, 3).map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="text-xs"
+                      >
                         {tag.name}
                       </Badge>
                     ))}
@@ -394,10 +477,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                     )}
                   </div>
                 </CardContent>
-                  <div className="flex justify-center gap-2">
-                    <Button onClick={() => setIsModalOpen(true)}>Report</Button>
-                    <Button>Heatmap</Button>
-                  </div>
+                <div className="flex justify-center gap-2">
+                  <Button onClick={() => handleReport(keyword)}>Report</Button>
+                  <Button>Heatmap</Button>
+                </div>
               </Card>
             </motion.div>
           ))}
@@ -410,13 +493,14 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
           <Search className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium">No keywords found</h3>
           <p className="text-muted-foreground mt-2">
-            Try adjusting your search or filters to find what you`re looking for.
+            Try adjusting your search or filters to find what you`re looking
+            for.
           </p>
           <Button
             className="mt-4"
             onClick={() => {
-              setSearchTerm("")
-              setSelectedCategory("All")
+              setSearchTerm("");
+              setSelectedCategory("All");
             }}
           >
             Reset Filters
@@ -428,9 +512,13 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="sm:max-w-md overflow-y-auto p-[1rem]">
           <SheetHeader>
-            <SheetTitle>{isAddingNew ? "Add New Keyword" : "Edit Keyword"}</SheetTitle>
+            <SheetTitle>
+              {isAddingNew ? "Add New Keyword" : "Edit Keyword"}
+            </SheetTitle>
             <SheetDescription>
-              {isAddingNew ? "Add a new keyword to your collection." : "Make changes to your keyword here."}
+              {isAddingNew
+                ? "Add a new keyword to your collection."
+                : "Make changes to your keyword here."}
             </SheetDescription>
           </SheetHeader>
 
@@ -458,7 +546,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                         <FormItem>
                           <FormLabel>Business Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter business name" {...field} />
+                            <Input
+                              placeholder="Enter business name"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -487,7 +578,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                           <FormItem>
                             <FormLabel>Location ID</FormLabel>
                             <FormControl>
-                              <Input placeholder="Location identifier" {...field} />
+                              <Input
+                                placeholder="Location identifier"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -504,7 +598,11 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                           <FormControl>
                             <div className="relative">
                               <DollarSign className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                              <Input type="number" className="pl-8" {...field} />
+                              <Input
+                                type="number"
+                                className="pl-8"
+                                {...field}
+                              />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -521,7 +619,11 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                           <FormControl>
                             <div className="relative">
                               <Globe className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                              <Input placeholder="https://example.com" className="pl-8" {...field} />
+                              <Input
+                                placeholder="https://example.com"
+                                className="pl-8"
+                                {...field}
+                              />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -537,11 +639,15 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                           <div className="space-y-0.5">
                             <FormLabel>Active Status</FormLabel>
                             <FormDescription>
-                              Set whether this keyword is active, paused, or in draft mode.
+                              Set whether this keyword is active, paused, or in
+                              draft mode.
                             </FormDescription>
                           </div>
                           <FormControl>
-                            <Select value={field.value} onValueChange={field.onChange}>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
                               <SelectTrigger className="w-[120px]">
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
@@ -560,7 +666,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                       <Label className="mb-2 block">Tags</Label>
                       <div className="space-y-2">
                         {tagFields.map((field, index) => (
-                          <div key={field.id} className="flex items-center space-x-2">
+                          <div
+                            key={field.id}
+                            className="flex items-center space-x-2"
+                          >
                             <FormField
                               control={form.control}
                               name={`tags.${index}.name`}
@@ -569,14 +678,23 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                   <FormControl>
                                     <div className="relative">
                                       <Tag className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Tag name" className="pl-8" {...field} />
+                                      <Input
+                                        placeholder="Tag name"
+                                        className="pl-8"
+                                        {...field}
+                                      />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeTag(index)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeTag(index)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -599,7 +717,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                       <Label className="mb-2 block">Phone Numbers</Label>
                       <div className="space-y-2">
                         {phoneFields.map((field, index) => (
-                          <div key={field.id} className="flex items-center space-x-2">
+                          <div
+                            key={field.id}
+                            className="flex items-center space-x-2"
+                          >
                             <FormField
                               control={form.control}
                               name={`phones.${index}.number`}
@@ -608,14 +729,23 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                   <FormControl>
                                     <div className="relative">
                                       <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Phone number" className="pl-8" {...field} />
+                                      <Input
+                                        placeholder="Phone number"
+                                        className="pl-8"
+                                        {...field}
+                                      />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removePhone(index)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removePhone(index)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -636,7 +766,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                       <Label className="mb-2 block">Services</Label>
                       <div className="space-y-2">
                         {serviceFields.map((field, index) => (
-                          <div key={field.id} className="flex items-center space-x-2">
+                          <div
+                            key={field.id}
+                            className="flex items-center space-x-2"
+                          >
                             <FormField
                               control={form.control}
                               name={`services.${index}.name`}
@@ -645,14 +778,23 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                   <FormControl>
                                     <div className="relative">
                                       <Briefcase className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Service name" className="pl-8" {...field} />
+                                      <Input
+                                        placeholder="Service name"
+                                        className="pl-8"
+                                        {...field}
+                                      />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeService(index)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeService(index)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -673,7 +815,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                       <Label className="mb-2 block">Keywords</Label>
                       <div className="space-y-2">
                         {keywordFields.map((field, index) => (
-                          <div key={field.id} className="flex items-center space-x-2">
+                          <div
+                            key={field.id}
+                            className="flex items-center space-x-2"
+                          >
                             <FormField
                               control={form.control}
                               name={`keywords.${index}.text`}
@@ -682,14 +827,23 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                   <FormControl>
                                     <div className="relative">
                                       <Key className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Keyword text" className="pl-8" {...field} />
+                                      <Input
+                                        placeholder="Keyword text"
+                                        className="pl-8"
+                                        {...field}
+                                      />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeKeyword(index)}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeKeyword(index)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -710,7 +864,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                       <Label className="mb-2 block">Target Locations</Label>
                       <div className="space-y-2">
                         {targetLocationFields.map((field, index) => (
-                          <div key={field.id} className="flex items-center space-x-2">
+                          <div
+                            key={field.id}
+                            className="flex items-center space-x-2"
+                          >
                             <FormField
                               control={form.control}
                               name={`targetLocations.${index}.name`}
@@ -719,7 +876,11 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                   <FormControl>
                                     <div className="relative">
                                       <Target className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Target location" className="pl-8" {...field} />
+                                      <Input
+                                        placeholder="Target location"
+                                        className="pl-8"
+                                        {...field}
+                                      />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
@@ -759,7 +920,9 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                           <FormControl>
                             <Input placeholder="Customer ID" {...field} />
                           </FormControl>
-                          <FormDescription>Google My Business Customer ID</FormDescription>
+                          <FormDescription>
+                            Google My Business Customer ID
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -777,7 +940,11 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                               <FormControl>
                                 <div className="relative">
                                   <Locate className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input placeholder="Latitude" className="pl-8" {...field} />
+                                  <Input
+                                    placeholder="Latitude"
+                                    className="pl-8"
+                                    {...field}
+                                  />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -793,7 +960,11 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                               <FormControl>
                                 <div className="relative">
                                   <Locate className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input placeholder="Longitude" className="pl-8" {...field} />
+                                  <Input
+                                    placeholder="Longitude"
+                                    className="pl-8"
+                                    {...field}
+                                  />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -820,19 +991,26 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                                 <div className="p-4 border rounded-md bg-muted/50">
                                   <div className="flex items-center justify-between mb-2">
                                     <Label>Preview</Label>
-                                    <Badge variant="outline">AI Generated</Badge>
+                                    <Badge variant="outline">
+                                      AI Generated
+                                    </Badge>
                                   </div>
                                   <div className="flex items-center justify-center h-40 bg-background rounded-md border border-dashed">
                                     <div className="flex flex-col items-center text-muted-foreground">
                                       <ImageDown className="h-8 w-8 mb-2" />
-                                      <span className="text-sm">Image will be generated on save</span>
+                                      <span className="text-sm">
+                                        Image will be generated on save
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
                               )}
                             </div>
                           </FormControl>
-                          <FormDescription>Provide a detailed description for AI image generation</FormDescription>
+                          <FormDescription>
+                            Provide a detailed description for AI image
+                            generation
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -851,7 +1029,10 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
                         Delete Keyword
                       </Button>
                     )}
-                    <Button type="submit" className={cn(isAddingNew && "ml-auto")}>
+                    <Button
+                      type="submit"
+                      className={cn(isAddingNew && "ml-auto")}
+                    >
                       <Save className="h-4 w-4 mr-2" />
                       {isAddingNew ? "Create Keyword" : "Save Changes"}
                     </Button>
@@ -869,6 +1050,5 @@ export function KeywordsManagement({ initialData, onSave, onDelete, onUpdate }: 
         </SheetContent>
       </Sheet>
     </div>
-  )
+  );
 }
-
