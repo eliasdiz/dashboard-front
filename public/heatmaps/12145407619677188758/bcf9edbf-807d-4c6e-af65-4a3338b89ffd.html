@@ -1,0 +1,1399 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Analysis Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6av-FESCOQG9F-G4oZ0k9KVweacH3KIU"></script>
+    <style>
+        :root {
+            --primary: #f97316;
+            --secondary: #f97316;
+            --accent: #f59e0b;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            font-size: 11px;
+        }
+
+        .average-rank-card {
+            /* position: absolute; */
+            width: auto;
+            height: auto;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            overflow: auto;
+            z-index: 10;
+      }
+
+      .rank-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #4caf50;
+        background: #e8f5e9;
+        padding: 10px 20px;
+        border-radius: 8px;
+        display: inline-block;
+        transform: translateY(-10px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .chart-container {
+        display: flex;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 55% 45%;
+            grid-template-rows: auto auto 1fr;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            grid-column: 1 / 3;
+            background-color: white;
+            padding: 6px 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .map-container {
+            grid-column: 1;
+            grid-row: 2;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-container {
+            grid-column: 2;
+            grid-row: 2;
+            padding: 6px;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 6px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            border: 1px solid var(--border);
+            align-self: center;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-title::before {
+            content: "";
+            display: block;
+            width: 3px;
+            height: 12px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+
+        #map {
+            height: calc(100vh - 100px);
+            width: 100%;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-wrap: pretty;
+        }
+
+        .badge-orange {
+            background-color: #ffedd5;
+            color: #c2410c;
+            padding-left: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 4px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .summary-stat {
+            flex: 1;
+            background-color: white;
+            border-radius: 0.375rem;
+            padding: 6px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-stat::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+
+        .summary-stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .summary-stat-label {
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-top: 0.125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .metric-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 6px;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            gap: 3px;
+        }
+
+        .metric-pill-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .metric-pill-yellow {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .metric-pill-green {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .metric-pill-orange {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        .keyword-cell {
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .performance-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .performance-good {
+            background-color: #10b981;
+        }
+
+        .performance-medium {
+            background-color: #f59e0b;
+        }
+
+        .performance-poor {
+            background-color: #ef4444;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">Fort Myers Lock and Key</h1>
+            <p class="text-xs text-gray-500">
+                26.6086809, -81.87265119999999
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="metric-pill metric-pill-red">
+                <span class="inline-block w-2 h-2 rounded-full bg-red-600"></span>
+                <span data-field="low_relevance" data-text="Low count: ">Low: 37</span>
+            </div>
+            <div class="metric-pill metric-pill-yellow">
+                <span class="inline-block w-2 h-2 rounded-full bg-yellow-600"></span>
+                <span data-field="medium_relevance" data-text="Med count: ">Med: 22</span>
+            </div>
+            <div class="metric-pill metric-pill-green">
+                <span class="inline-block w-2 h-2 rounded-full bg-green-600"></span>
+                <span data-field="high_relevance" data-text="High count: ">High: 5</span>
+            </div>
+            <div class="metric-pill metric-pill-orange">
+                <span class="inline-block w-2 h-2 rounded-full bg-orange-600"></span>
+                <span data-field="avg_rank_value" data-text="Avg: ">Avg: 5.421875</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Map Section (Left Side) -->
+        <div class="map-container">
+            <div id="map" style="position: relative; overflow: hidden;"></div>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div id="avg-keyword-rank" class="summary-stat-value text-orange-700">5.4</div>
+                    <div class="summary-stat-label">Avg Keyword Rank</div>
+                </div>
+                <div class="summary-stat">
+                    <div id="avg-final-rank" class="summary-stat-value text-orange-800">5.4</div>
+                    <div class="summary-stat-label">Avg Final Rank</div>
+                </div>
+                <div class="summary-stat">
+                    <div id="avg-percentage" class="summary-stat-value text-orange-700">72.9%</div>
+                    <div class="summary-stat-label">Avg Percentage</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Section (Right Side) -->
+        <div class="data-container">
+            <div class="grid-2">
+                <!-- Relevance Distribution -->
+                <div class="card">
+                    <div class="card-title">Relevance Distribution</div>
+                    <div class="average-rank-card">
+                        <div>
+                            <div class="title">Average Rank</div>
+                            <div class="rank-number" id="rankNumber"></div>
+                        </div>
+                        <div class="chart-container">
+                          <canvas id="doughnutChart"></canvas>
+                        </div>
+                      </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Rank Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="rankDistributionChart" width="357" height="100"
+                            style="display: block; box-sizing: border-box; height: 100px; width: 357px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Performance -->
+            <div class="card">
+                <div class="card-title">Overall Performance</div>
+                <div class="chart-container">
+                    <canvas id="overallPerformanceChart" width="738" height="100"
+                        style="display: block; box-sizing: border-box; height: 100px; width: 738px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Keyword Performance -->
+            <div class="card" style="align-self: self-start;">
+                <div class="card-title">Keyword Performance Summary</div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>Avg Rank</th>
+                                <th>Avg Final</th>
+                                <th>Avg %</th>
+                                <th>Locations</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const colors = {
+            blue: {
+                fill: "#4285F4", // Vibrant blue
+                stroke: "#000", // Deep navy blue for contrast
+                // stroke: "#1E3A8A", // Deep navy blue for contrast
+                circleFill: "#1E3A8A", // Softer blue
+                circleStroke: "#1E3A8A",
+                textFill: "white" // White text for high visibility
+            },
+            lightGreen: {
+                fill: "#66BB6A", // Soft green
+                stroke: "#000", // Deep forest green
+                // stroke: "#2E7D32", // Deep forest green
+                circleFill: "#2E7D32", // Pale green for contrast
+                circleStroke: "#2E7D32",
+                textFill: "white"
+            },
+            darkGreen: {
+                fill: "#2E7D32", // Deep green
+                stroke: "#000", // Almost white green
+                // stroke: "#1B5E20", // Almost white green
+                circleFill: "#1B5E20", // Medium green for contrast
+                circleStroke: "#1B5E20",
+                textFill: "white"
+            },
+            lilaGreen: {
+                fill: "#4A8F4A", // Muted deep green
+                stroke: "#000", // Darker forest green
+                // stroke: "#2E5732", // Darker forest green
+                circleFill: "#2E5732", // Soft pastel green
+                circleStroke: "#2E5732",
+                textFill: "white"
+            },
+            neonGreen: {
+                fill: "#00E676", // Vibrant neon green
+                stroke: "#000", // Darker neon contrast
+                // stroke: "#00A152", // Darker neon contrast
+                circleFill: "#00A152", // Lighter neon for balance
+                circleStroke: "#00A152",
+                textFill: "white"
+            },
+            yellow: {
+                fill: "#FDD835", // Bright golden yellow
+                stroke: "#000", // Deep mustard yellow
+                // stroke: "#F9A825", // Deep mustard yellow
+                circleFill: "#F9A825", // Soft pastel yellow
+                circleStroke: "#F9A825",
+                textFill: "white"
+            },
+            darkYellow: {
+                fill: "#FB8C00", // Vivid orange
+                stroke: "#000", // Burnt orange
+                // stroke: "#000", // Burnt orange
+                circleFill: "#FB8C00", // Light warm orange
+                circleStroke: "#FF8C00",
+                textFill: "white"
+            },
+            red: {
+                fill: "#C62828", // Softer red for reduced harshness
+                stroke: "#000", // Muted deep red
+                // stroke: "#8E1C1C", // Muted deep red
+                circleFill: "#8E1C1C", // Soft coral red
+                circleStroke: "#8E1C1C",
+                textFill: "white"
+            },
+            darkRed: {
+                fill: "#B71C1C", // Intense dark red
+                stroke: "#000", // Almost white-red
+                // stroke: "#7F0000", // Almost white-red
+                circleFill: "#7F0000", // Muted red tone
+                circleStroke: "#7F0000",
+                textFill: "white"
+            },
+            darkYellow_: {
+                fill: "#F9A825", // Rich dark golden yellow
+                stroke: "#000", // Deep amber
+                // stroke: "#BF9000", // Deep amber
+                circleFill: "#F9A825", // Warm muted yellow
+                circleStroke: "#BF9000",
+                textFill: "white"
+            },
+            darkOrange: {
+                fill: "#E65100", // Deep orange
+                stroke: "#000", // Black for contrast
+                circleFill: "#E65100", // Strong warm orange
+                circleStroke: "#FF5722", // Bright reddish-orange
+                textFill: "white"
+                }
+
+        };
+
+        const mapStarIcon = (number, color = colors.blue) => {
+            return ``;
+        };
+
+        const mapXIcon = (number, color = colors.red) => {
+            const XIcon = `
+  
+  <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="xShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Smooth, Rounded "X" with Extended Axes -->
+  <path d="M15 15 L125 125 M125 15 L15 125"
+        stroke="#E74C3C"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#xShadow)"/>
+
+  <!-- Well-Balanced Ci7cle -->
+  <circle cx="70" cy="75" r="40" fill="#C0392B" stroke="#A93226" stroke-width="9" filter="url(#xShadow)"/>
+
+  <!-- Clearly Visible, Well-Positioned Number -->
+  <text x="70" y="78" text-anchor="middle" dominant-baseline="middle" fill="#FFF"
+        font-family="Arial, sans-serif" font-weight="bold" font-size="50">
+${number}
+  </text>
+</svg>
+  `;
+
+            const XIconPlus = `
+      <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="xShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Smooth, Rounded "X" with Extended Axes -->
+  <path d="M15 15 L125 125 M125 15 L15 125"
+        stroke="#E74C3C"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#xShadow)"/>
+
+  <!-- Well-Balanced Circle -->
+  <circle cx="70" cy="72" r="49" fill="#C0392B" stroke="#A93226" stroke-width="10" filter="url(#xShadow)"/>
+
+  <!-- Clearly Visible, Well-Positioned Number -->
+  <text x="75" y="78" text-anchor="middle" dominant-baseline="middle" fill="#FFF"
+        font-family="Arial, sans-serif" font-weight="bold" font-size="50">
+${number}+
+  </text>
+</svg>
+  `;
+
+            return number >= 20 ? XIconPlus : XIcon;
+        };
+
+        const mapFlagIcon = (number, color = colors.red) => {
+            return `
+  <svg width="160" height="120" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="flagShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+        </filter>
+    </defs>
+
+    <rect x="20" y="10" width="14" height="160" fill="#7F0000" rx="7" ry="7"/>
+    <path d="M34 10
+            Q150 5 130 45
+            Q110 80 34 70
+            Z"
+          fill="#B71C1C"
+          stroke="#7F0000"
+          stroke-width="5"
+          filter="url(#flagShadow)"/>
+
+    <rect x="45" y="15.5" width="60" height="50" rx="8" ry="8" fill="#C62828" stroke="#7F0000" stroke-width="3" opacity="0.9"/>
+
+    <text x="75" y="45" text-anchor="middle" dominant-baseline="middle" fill="#FFF" font-family="Arial, sans-serif" font-weight="bold" font-size="50">${number}</text>
+</svg>
+
+  `;
+        };
+
+        const mapMarkIcon = (number, color = colors.lilaGreen) => {
+            const twoDigit = `
+
+      <svg width="73" height="109.5" viewBox="0 0 73 109.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="markerShadow" x="-20%" y="-10%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.25" />
+          </filter>
+          <filter id="circleShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+          </filter>
+        </defs>
+
+        <!-- Map Marker Shape -->
+        <path d="M36.5 109.5
+                C25 90, 7 67, 7 43
+                C7 20 22 7 36.5 7
+                C51 7 66 20 66 43
+                C66 67 48 90 36.5 109.5
+                Z"
+              fill="${color.fill}"
+              filter="url(#markerShadow)" />
+              
+        <!-- Elegant outline -->
+        <path d="M36.5 107.5
+                C26 89, 9 66, 9 43
+                C9 22 24 9 36.5 9
+                C49 9 64 22 64 43
+                C64 66 47 89, 36.5 107.5
+                Z"
+              stroke="${color.stroke}" stroke-width="3" fill="none"/>
+
+        <!-- Adjusted Circle for Multi-Digit Numbers -->
+        <circle cx="36.5" cy="38" r="24" fill="${color.circleFill}" filter="url(#circleShadow)" stroke="${color.circleStroke}" stroke-width="2.5" />
+
+        <!-- Number inside (supports 10-99) -->
+        <text x="50%" y="40" text-anchor="middle" dominant-baseline="middle" fill="${color.textFill}" font-family="Arial, sans-serif" font-weight="bold" font-size="35">${number}</text>
+      </svg>
+  `;
+
+            const oneDigit = `
+  <svg width="73" height="109.5" viewBox="0 0 73 109.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="markerShadow" x="-20%" y="-10%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.25" />
+      </filter>
+      <filter id="circleShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+      </filter>
+    </defs>
+
+    <!-- Map Marker Shape -->
+    <path d="M36.5 109.5
+            C25 90, 7 67, 7 43
+            C7 20 22 7 36.5 7
+            C51 7 66 20 66 43
+            C66 67 48 90 36.5 109.5
+            Z"
+          fill="${color.fill}"
+          filter="url(#markerShadow)" />
+
+    <!-- Elegant outline -->
+    <path d="M36.5 107.5
+            C26 89, 9 66, 9 43
+            C9 22 24 9 36.5 9
+            C49 9 64 22 64 43
+            C64 66 47 89, 36.5 107.5
+            Z"
+          stroke="${color.stroke}" stroke-width="3" fill="none"/>
+
+    <!-- Circle for number -->
+    <circle cx="36.5" cy="38" r="22" fill="${color.circleFill}" filter="url(#circleShadow)" stroke="${color.circleStroke}" stroke-width="2.5" />
+
+    <!-- Number inside -->
+    <text x="50%" y="42" text-anchor="middle" dominant-baseline="middle" fill="${color.textFill}" font-family="Arial, sans-serif" font-weight="bold" font-size="40">${number}</text>
+  </svg>
+`;
+
+            return number > 9 ? twoDigit : oneDigit;
+        };
+
+        const SGVIcons = (rankType) => {
+            switch (rankType) {
+                case 1: {
+                    return mapMarkIcon(rankType, colors.neonGreen);
+                }
+                case 2: {
+                    return mapMarkIcon(rankType, colors.neonGreen);
+                }
+                case 3: {
+                    return mapMarkIcon(rankType, colors.lightGreen);
+                }
+                case 4: {
+                    return mapMarkIcon(rankType, colors.lilaGreen);
+                }
+                case 5:
+                case 6:
+                case 7:
+                case 8: {
+                    return mapMarkIcon(rankType, colors.yellow);
+                }
+                case 9:
+                case 10: {
+                    return mapMarkIcon(rankType, colors.darkYellow);
+                }
+                case 11:
+                case 12: {
+                    return mapMarkIcon(rankType, colors.darkOrange);
+                }
+                case 13:
+                case 14:
+                case 15: {
+                    return mapMarkIcon(rankType, colors.red);
+                }
+
+                case 16:
+                case 17:
+                case 18:
+                case 19: {
+                    return mapFlagIcon(rankType, colors.darkRed);
+                }
+
+                default:
+                    return mapXIcon(rankType, colors.darkRed);
+            }
+        };
+
+        const seoData = {'high_relevance': 71.0, 'medium_relevance': 13.0, 'low_relevance': 46.0, 'avg_rank_value': 9.992307692307692, 'average_rank_percentage': 48.784615384615385, 'main_coordinates': [26.6086809, -81.87265119999999]}
+
+        for (const k in seoData) {
+
+            const element = document?.querySelector(`[data-field='${k}']`)
+            if (element) {
+                element.innerHTML = element.dataset.text + seoData[k].toFixed(2)
+            }
+        }
+
+        let locationData = [{'data': [], 'lat': 26.6086809, 'lng': -81.87265119999999, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.85253409231265, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.624257607137956, 'lng': -81.86259264615633, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.624257607137956, 'lng': -81.88270975384366, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.89276830768733, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.593104192862043, 'lng': -81.88270975384366, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.593104192862043, 'lng': -81.86259264615633, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.83241698462533, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.626667332118373, 'lng': -81.8378073473842, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.639834314275912, 'lng': -81.85253409231265, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.64465376423675, 'lng': -81.87265119999999, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.639834314275912, 'lng': -81.89276830768733, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.626667332118373, 'lng': -81.90749505261579, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.91288541537466, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.590694467881626, 'lng': -81.90749505261579, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.577527485724087, 'lng': -81.89276830768733, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.57270803576325, 'lng': -81.87265119999999, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.577527485724087, 'lng': -81.85253409231265, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.590694467881626, 'lng': -81.8378073473842, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.81229987693798, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.62713606627313, 'lng': -81.81593950706396, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.643365267124477, 'lng': -81.82641940433346, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.65541102141387, 'lng': -81.84247553846899, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.661820433397608, 'lng': -81.86217130273049, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.661820433397608, 'lng': -81.8831310972695, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.65541102141387, 'lng': -81.902826861531, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.643365267124477, 'lng': -81.91888299566652, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.62713606627313, 'lng': -81.92936289293603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.933002523062, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.590225733726868, 'lng': -81.92936289293603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.573996532875523, 'lng': -81.91888299566652, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.56195077858613, 'lng': -81.902826861531, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.55554136660239, 'lng': -81.8831310972695, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.55554136660239, 'lng': -81.86217130273049, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.56195077858613, 'lng': -81.84247553846899, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.573996532875523, 'lng': -81.82641940433346, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.590225733726868, 'lng': -81.81593950706396, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.6086809, 'lng': -81.79218276925066, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.62657307509607, 'lng': -81.79471083297373, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.643341019028032, 'lng': -81.8021361766017, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.657931140210465, 'lng': -81.8139922384859, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.66942668767076, 'lng': -81.82953405865459, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 26.677105353884322, 'lng': -81.84778508738776, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.680484660012795, 'lng': -81.86759854542753, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.679352271823905, 'lng': -81.88772948033646, 'average_percentage': 76.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.673779341432194, 'lng': -81.90691299143779, 'average_percentage': 75.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.66411603654998, 'lng': -81.92394370817705, 'average_percentage': 73.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.650969538162162, 'lng': -81.93775152798689, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.635165889111878, 'lng': -81.94746885476705, 'average_percentage': 73.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.61769809079072, 'lng': -81.95248511313812, 'average_percentage': 77.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.599663709209278, 'lng': -81.95248511313812, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.58219591088812, 'lng': -81.94746885476705, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.566392261837837, 'lng': -81.93775152798689, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.55324576345002, 'lng': -81.92394370817705, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.543582458567805, 'lng': -81.90691299143779, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 20.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.538009528176094, 'lng': -81.88772948033646, 'average_percentage': 66.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.536877139987205, 'lng': -81.86759854542753, 'average_percentage': 71.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.540256446115677, 'lng': -81.84778508738776, 'average_percentage': 74.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.547935112329238, 'lng': -81.82953405865459, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.559430659789534, 'lng': -81.8139922384859, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.574020780971967, 'lng': -81.8021361766017, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.59078872490393, 'lng': -81.79471083297373, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.6086809, 'lng': -81.77206566156332, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.62678411083552, 'lng': -81.77412465344426, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.644146174092395, 'lng': -81.78021733371759, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.660056284860936, 'lng': -81.79009426733703, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.67386308133692, 'lng': -81.80335109147971, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.68500131165039, 'lng': -81.81944507020764, 'average_percentage': 77.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.693014975343623, 'lng': -81.83771731414072, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.697575992083454, 'lng': -81.85741975546543, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.698497633308662, 'lng': -81.877745773919, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.695742166919192, 'lng': -81.89786321991775, 'average_percentage': 74.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.68942240203279, 'lng': -81.91694848285879, 'average_percentage': 68.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.679797070566437, 'lng': -81.93422020983486, 'average_percentage': 77.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.6672602347213, 'lng': -81.94897129431425, 'average_percentage': 64.0, 'final_rank': 7}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.652325154029896, 'lng': -81.96059782516518, 'average_percentage': 71.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.635603272450524, 'lng': -81.96862381084856, 'average_percentage': 70.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.617779185779785, 'lng': -81.9727206665675, 'average_percentage': 63.0, 'final_rank': 7}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.599582614220214, 'lng': -81.9727206665675, 'average_percentage': 67.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.581758527549475, 'lng': -81.96862381084856, 'average_percentage': 74.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.565036645970103, 'lng': -81.96059782516518, 'average_percentage': 74.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.5501015652787, 'lng': -81.94897129431425, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.537564729433562, 'lng': -81.93422020983486, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.52793939796721, 'lng': -81.91694848285879, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}], 'lat': 26.521619633080807, 'lng': -81.89786321991775, 'average_percentage': 69.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.518864166691337, 'lng': -81.877745773919, 'average_percentage': 73.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.519785807916545, 'lng': -81.85741975546543, 'average_percentage': 76.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.524346824656376, 'lng': -81.83771731414072, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.53236048834961, 'lng': -81.81944507020764, 'average_percentage': 82.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.54349871866308, 'lng': -81.80335109147971, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.557305515139063, 'lng': -81.79009426733703, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 26.573215625907604, 'lng': -81.78021733371759, 'average_percentage': 68.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.59057768916448, 'lng': -81.77412465344426, 'average_percentage': 77.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.6086809, 'lng': -81.75194855387599, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.62691923069601, 'lng': -81.7536847515591, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}], 'lat': 26.644632877824343, 'lng': -81.7588433973622, 'average_percentage': 64.0, 'final_rank': 7}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.66131225200827, 'lng': -81.76727608643783, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.67647751802058, 'lng': -81.77874022567467, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.68969239876943, 'lng': -81.79290601265956, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.700576726195948, 'lng': -81.80936592349255, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.70881737801712, 'lng': -81.82764643650744, 'average_percentage': 78.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.714177285683764, 'lng': -81.84722165462803, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.716502254411072, 'lng': -81.86752843446953, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.71572539908182, 'lng': -81.88798258694834, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.711869068409413, 'lng': -81.90799568333844, 'average_percentage': 74.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.705044202006093, 'lng': -81.92699198329443, 'average_percentage': 76.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.695447138852277, 'lng': -81.94442499785305, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.683353968981578, 'lng': -81.95979321092565, 'average_percentage': 81.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.66911259087319, 'lng': -81.972654507003, 'average_percentage': 53.0, 'final_rank': 9}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.653132703046087, 'lng': -81.98263889001343, 'average_percentage': 51.0, 'final_rank': 9}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.635874017778537, 'lng': -81.98945912743625, 'average_percentage': 72.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.617833036022887, 'lng': -81.99291901345839, 'average_percentage': 73.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.599528763977112, 'lng': -81.99291901345839, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}], 'lat': 26.581487782221462, 'lng': -81.98945912743625, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.564229096953913, 'lng': -81.98263889001343, 'average_percentage': 59.0, 'final_rank': 8}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 26.54824920912681, 'lng': -81.972654507003, 'average_percentage': 73.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.53400783101842, 'lng': -81.95979321092565, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.521914661147722, 'lng': -81.94442499785305, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.512317597993906, 'lng': -81.92699198329443, 'average_percentage': 80.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 14.0, 'percentage': 30.0}, 'percentage': 30.0}], 'lat': 26.505492731590586, 'lng': -81.90799568333844, 'average_percentage': 72.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.50163640091818, 'lng': -81.88798258694834, 'average_percentage': 76.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 26.500859545588927, 'lng': -81.86752843446953, 'average_percentage': 72.0, 'final_rank': 5}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.503184514316235, 'lng': -81.84722165462803, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 26.50854442198288, 'lng': -81.82764643650744, 'average_percentage': 70.0, 'final_rank': 6}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 26.51678507380405, 'lng': -81.80936592349255, 'average_percentage': 77.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 4.0, 'percentage': 80.0}, 'percentage': 80.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 1.0, 'percentage': 95.0}, 'percentage': 95.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.52766940123057, 'lng': -81.79290601265956, 'average_percentage': 82.0, 'final_rank': 3}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 6.0, 'percentage': 70.0}, 'percentage': 70.0}], 'lat': 26.54088428197942, 'lng': -81.77874022567467, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.55604954799173, 'lng': -81.76727608643783, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 2.0, 'percentage': 90.0}, 'percentage': 90.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 26.572728922175656, 'lng': -81.7588433973622, 'average_percentage': 79.0, 'final_rank': 4}, {'data': [{'keyword': 'Building lockouts', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}, {'keyword': 'Building key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car digital and remote key reprogramming', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Car key copying', 'location_rank': {'rank': 3.0, 'percentage': 85.0}, 'percentage': 85.0}, {'keyword': 'Coded key copying', 'location_rank': {'rank': 5.0, 'percentage': 75.0}, 'percentage': 75.0}], 'lat': 26.59044256930399, 'lng': -81.7536847515591, 'average_percentage': 78.0, 'final_rank': 4}]
+
+        function calculateKeywordAverages() {
+            const keywords = {};
+
+            locationData.forEach((location) => {
+                location.data.forEach((item) => {
+                    if (!keywords[item.keyword]) {
+                        keywords[item.keyword] = {
+                            totalRank: 0,
+                            totalFinalRank: 0,
+                            totalPercentage: 0,
+                            locations: [],
+                            count: 0
+                        };
+                    }
+
+                    keywords[item.keyword].totalRank += item.location_rank.rank;
+                    keywords[item.keyword].totalFinalRank += location.final_rank;
+                    keywords[item.keyword].totalPercentage += item.percentage;
+                    keywords[item.keyword].locations.push({
+                        lat: location.lat,
+                        lng: location.lng,
+                        rank: item.location_rank.rank,
+                        finalRank: location.final_rank,
+                        percentage: item.percentage
+                    });
+                    keywords[item.keyword].count++;
+                });
+            });
+
+            const keywordAverages = {};
+            for (const [keyword, data] of Object.entries(keywords)) {
+                keywordAverages[keyword] = {
+                    avgRank: data.totalRank / data.count,
+                    avgFinalRank: data.totalFinalRank / data.count,
+                    avgPercentage: data.totalPercentage / data.count,
+                    locations: data.locations,
+                    count: data.count
+                };
+            }
+
+            return keywordAverages;
+        }
+
+        function initMap() {
+            const mainCoordinates = {
+                lat: locationData[locationData.length - 1].lat,
+                lng: locationData[locationData.length - 1].lng
+            };
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 17,
+                center: mainCoordinates,
+                styles: [
+                    {
+                        featureType: "administrative",
+                        elementType: "geometry",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "poi",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "road",
+                        elementType: "labels.icon",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "transit",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
+            });
+
+            // Create markers for each location
+            locationData.forEach((location, index) => {
+                // Determine marker color based on rank (better rank = greener)
+                let markerColor = "#ef4444"; // Default red for poor rank
+
+                if (location.final_rank <= 10) {
+                    markerColor = "#10b981"; // Green for good rank
+                } else if (location.final_rank <= 15) {
+                    markerColor = "#f59e0b"; // Yellow for medium rank
+                }
+
+                const iconType = 'custom'
+
+                let marker = {}
+                if (iconType == "custom") {
+                    marker = new google.maps.Marker({
+                        position: { lat: location.lat, lng: location.lng },
+                        map: map,
+                        animation: google.maps.Animation.BOUNCE,
+                        title: `Location ${index + 1}`,
+                        icon: {
+                            url:
+                                "data:image/svg+xml;charset=UTF-8," +
+                                encodeURIComponent(SGVIcons(location.final_rank)),
+                            scaledSize: new google.maps.Size(50, 50),
+                            anchor: new google.maps.Point(25, 50)
+                        }
+                    });
+                }
+                else {
+                    marker = new google.maps.Marker({
+                        position: { lat: location.lat, lng: location.lng },
+                        map: map,
+                        animation: google.maps.Animation.BOUNCE,
+                        title: `Location ${index + 1}`,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillColor: '#f97316', // Orange
+                            fillOpacity: 0.8,
+                            strokeColor: '#ffffff',
+                            strokeWeight: 2,
+                            scale: 10
+                        },
+                        label: {
+                            text: `${location.final_rank}`,
+                            color: 'white',
+                            fontSize: '10px'
+                        },
+                    });
+                }
+
+                // Create info window content with all keywords for this location
+                let keywordsContent = "";
+                location.data.forEach((item) => {
+                    keywordsContent += `
+                          <p style="margin: 0 0 3px;">
+                              <strong>${item.keyword}:</strong>
+                              Rank ${item.location_rank.rank},
+                              Keyword relevance: ${item.location_rank.percentage}%
+                          </p>
+                      `;
+                });
+                // Add info window for each marker
+                const infoContent = `
+                      <div style="padding: 6px; max-width: 180px; font-size: 11px;">
+                          <h3 style="margin: 0 0 4px; font-weight: bold;">Location number ${index + 1
+                    }</h3>
+                          <div style="margin-bottom: 3px;">
+                              ${keywordsContent}
+                          </div>
+                          <p style="margin: 0 0 3px;"><strong>Avg Percentage:</strong> ${location.average_percentage
+                    }%</p>
+                          <p style="margin: 0 0 3px;"><strong>Final Rank:</strong> ${location.final_rank
+                    }</p>
+                          <p style="margin: 0;"><strong>Coordinates:</strong> ${location.lat.toFixed(
+                        6
+                    )}, ${location.lng.toFixed(6)}</p>
+                      </div>
+                  `;
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: infoContent
+                });
+
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+
+            // Create grid overlay
+            const bounds = new google.maps.LatLngBounds();
+            locationData.forEach((location) => {
+                bounds.extend(new google.maps.LatLng(location.lat, location.lng));
+            });
+
+            // Expand bounds slightly to ensure all markers are visible
+            bounds.extend(
+                new google.maps.LatLng(
+                    bounds.getNorthEast().lat() + 0.003,
+                    bounds.getNorthEast().lng() + 0.003
+                )
+            );
+            bounds.extend(
+                new google.maps.LatLng(
+                    bounds.getSouthWest().lat() - 0.003,
+                    bounds.getSouthWest().lng() - 0.003
+                )
+            );
+            map.fitBounds(bounds);
+
+            // Draw grid lines connecting the points
+            const gridLines = [];
+
+            // Find unique latitudes and longitudes
+            const uniqueLats = [...new Set(locationData.map((loc) => loc.lat))];
+            const uniqueLngs = [...new Set(locationData.map((loc) => loc.lng))];
+
+            // Draw horizontal grid lines
+
+            // Draw circular grid lines to create a grid pattern
+            const center = {
+                lat: (bounds.getNorthEast().lat() + bounds.getSouthWest().lat()) / 2,
+                lng: (bounds.getNorthEast().lng() + bounds.getSouthWest().lng()) / 2
+            };
+
+            const radiusStep = 0.008; // Approximately 500 meters
+            const numCircles = 10;
+
+            for (let i = 1; i <= numCircles; i++) {
+                const radius = i * radiusStep;
+                const circle = new google.maps.Circle({
+                    strokeColor: "#f97316",
+                    strokeOpacity: 0.3,
+                    strokeWeight: 1,
+                    fillOpacity: 0,
+                    map: map,
+                    center: center,
+                    radius: radius * 111000 // Convert degrees to meters (approx)
+                });
+            }
+
+            // Add a legend to the map
+            const legend = document.createElement("div");
+            legend.style.backgroundColor = "white";
+            legend.style.padding = "6px";
+            legend.style.margin = "8px";
+            legend.style.border = "1px solid #e5e7eb";
+            legend.style.borderRadius = "4px";
+            legend.style.fontSize = "9px";
+            legend.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+            legend.innerHTML =
+                '<div style="font-weight:600;margin-bottom:4px;color:#1f2937;">Legend</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:4px;"></div>Good Rank (≤10)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#f59e0b;border-radius:50%;margin-right:4px;"></div>Medium (11-15)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#ef4444;border-radius:50%;margin-right:4px;"></div>Poor Rank (>15)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:16px;height:2px;background:#f97316;margin-right:4px;"></div>Grid Line</div>' +
+                '<div style="display:flex;align-items:center;"><div style="width:12px;height:12px;border:1px solid #f97316;border-radius:50%;margin-right:4px;"></div>Radius</div>';
+
+            map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            Chart.register(ChartDataLabels);
+
+            // Calculate keyword averages
+            const keywordAverages = calculateKeywordAverages();
+
+            // Collect all relevance data
+            const relevanceData = {
+                high: 0,
+                medium: 0,
+                low: 0
+            };
+
+            // Count keywords by relevance category based on their average rank
+            Object.values(keywordAverages).forEach((data) => {
+                if (data.avgRank <= 7) {
+                    relevanceData.low++; // Low relevance (good)
+                } else if (data.avgRank <= 15) {
+                    relevanceData.medium++; // Medium relevance
+                } else {
+                    relevanceData.high++; // High relevance (poor)
+                }
+            });
+
+            const rankDistCtx = document
+                .getElementById("rankDistributionChart")
+                .getContext("2d");
+
+            // Count occurrences of each final rank
+            const rankCounts = {};
+            locationData.forEach((location) => {
+                const rank = location.final_rank;
+                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
+            });
+
+            const rankLabels = Object.keys(rankCounts).sort((a, b) => a - b);
+            const rankValues = rankLabels.slice(0, 13).map((rank) => rankCounts[rank]);
+
+            // Determine colors based on rank value
+            const rankColors = rankLabels.map((rank) => {
+                if (rank <= 10) return "#10b981"; // Green for good ranks
+                if (rank <= 15) return "#f59e0b"; // Yellow for medium ranks
+                return "#ef4444"; // Red for poor ranks
+            });
+
+            const rankDistChart = new Chart(rankDistCtx, {
+                type: "pie",
+                data: {
+                    labels: rankLabels.map((rank) => `Rank ${rank}`),
+                    datasets: [
+                        {
+                            data: rankValues,
+                            backgroundColor: rankColors,
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            font: {
+                                weight: "bold",
+                                size: 9
+                            },
+                            formatter: (value, context) => {
+                                return value > 0 ? value : "";
+                            }
+                        },
+                        legend: {
+                            position: "right",
+                            labels: {
+                                boxWidth: 8,
+                                padding: 6,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 9
+                            },
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || "";
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce(
+                                        (a, b) => a + b,
+                                        0
+                                    );
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Overall Performance Chart - Bar chart showing general metrics
+            const overallCtx = document
+                .getElementById("overallPerformanceChart")
+                .getContext("2d");
+
+            // Calculate overall averages across all keywords
+            let totalRank = 0;
+            let totalFinalRank = 0;
+            let totalPercentage = 0;
+            let totalCount = 0;
+
+            // Collect all keyword data points
+            locationData.forEach((location) => {
+                location.data.forEach((item) => {
+                    totalRank += item.location_rank.rank;
+                    totalFinalRank += location.final_rank;
+                    totalPercentage += item.percentage;
+                    totalCount++;
+                });
+            });
+
+            // Calculate averages
+            const overallAvgRank = totalRank / totalCount;
+            const overallAvgFinalRank = totalFinalRank / totalCount;
+            const overallAvgPercentage = totalPercentage / totalCount;
+
+            // Update summary stats
+            document.getElementById("avg-keyword-rank").textContent =
+                overallAvgRank.toFixed(1);
+            document.getElementById("avg-final-rank").textContent =
+                overallAvgFinalRank.toFixed(1);
+            document.getElementById("avg-percentage").textContent =
+                overallAvgPercentage.toFixed(1) + "%";
+
+                const overallChart = new Chart(overallCtx, {
+    type: "bar",
+    data: {
+        labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
+        datasets: [
+            {
+                label: "Overall Performance",
+                data: [
+                    overallAvgRank,
+                    overallAvgFinalRank,
+                    overallAvgPercentage
+                ],
+                backgroundColor: [
+                    "#f97316", // orange
+                    "#fb923c", // lighter orange
+                    "#fdba74" // even lighter orange
+                ],
+                borderColor: "#ffffff",
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    font: {
+                        size: 16 // Increased font size for better readability
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: 14 // Increased font size for x-axis labels
+                    }
+                }
+            }
+        },
+        plugins: {
+            datalabels: {
+                color: "#ffffff",
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                borderRadius: 3,
+                font: {
+                    weight: "bold",
+                    size: 14 // Increased size for the labels inside the bars
+                },
+                padding: 5,
+                formatter: (value) => {
+                    return value.toFixed(1);
+                }
+            },
+            legend: {
+                display: false,
+            },
+            tooltip: {
+                bodyFont: {
+                    size: 14 // Increased tooltip font size for better readability
+                }
+            }
+        }
+    }
+});
+
+        }
+
+        // Populate Keyword Performance Table
+        function populateKeywordTable() {
+            const tableBody = document.getElementById("keywordTableBody");
+            const keywordAverages = calculateKeywordAverages();
+
+            // Add a row for each keyword with its average metrics
+            for (const [keyword, data] of Object.entries(keywordAverages)) {
+                const row = document.createElement("tr");
+
+                // Determine performance status
+                let performanceStatus = "poor";
+                let performanceClass = "performance-poor";
+
+                if (data.avgRank <= 7) {
+                    performanceStatus = "good";
+                    performanceClass = "performance-good";
+                } else if (data.avgRank <= 15) {
+                    performanceStatus = "medium";
+                    performanceClass = "performance-medium";
+                }
+
+                row.innerHTML = `
+                      <td class="keyword-cell" title="${keyword}">
+                          <span class="badge badge-orange">${keyword}</span>
+                      </td>
+                      <td>${data.avgRank.toFixed(1)}</td>
+                      <td>${data.avgFinalRank.toFixed(1)}</td>
+                      <td>${data.avgPercentage.toFixed(1)}%</td>
+                      <td>${data.count}</td>
+                      <td><span class="performance-indicator ${performanceClass}"></span>${performanceStatus}</td>
+                  `;
+
+                tableBody.appendChild(row);
+            }
+
+            // Add an overall average row
+            const overallRow = document.createElement("tr");
+            overallRow.style.backgroundColor = "#fff7ed"; // Light orange background
+            overallRow.style.fontWeight = "bold";
+
+            // Calculate overall averages
+            let totalRank = 0;
+            let totalFinalRank = 0;
+            let totalPercentage = 0;
+            let totalCount = 0;
+
+            Object.values(keywordAverages).forEach((data) => {
+                totalRank += data.avgRank * data.count;
+                totalFinalRank += data.avgFinalRank * data.count;
+                totalPercentage += data.avgPercentage * data.count;
+                totalCount += data.count;
+            });
+
+            const avgRank = totalRank / totalCount;
+            const avgFinalRank = totalFinalRank / totalCount;
+            const avgPercentage = totalPercentage / totalCount;
+
+            // Determine overall performance status
+            let overallPerformanceStatus = "poor";
+            let overallPerformanceClass = "performance-poor";
+
+            if (avgRank <= 7) {
+                overallPerformanceStatus = "good";
+                overallPerformanceClass = "performance-good";
+            } else if (avgRank <= 15) {
+                overallPerformanceStatus = "medium";
+                overallPerformanceClass = "performance-medium";
+            }
+
+            overallRow.innerHTML = `
+                  <td>
+                      <span class="badge badge-orange">Overall Average</span>
+                  </td>
+                  <td>${avgRank.toFixed(1)}</td>
+                  <td>${avgFinalRank.toFixed(1)}</td>
+                  <td>${avgPercentage.toFixed(1)}%</td>
+                  <td>${totalCount}</td>
+                  <td><span class="performance-indicator ${overallPerformanceClass}"></span>${overallPerformanceStatus}</td>
+              `;
+
+            tableBody.appendChild(overallRow);
+        }
+
+        // Initialize everything when the page loads
+        window.onload = function () {
+            initMap();
+            initCharts();
+            populateKeywordTable();
+
+            document.getElementById("rankNumber").innerHTML = `${seoData.avg_rank_value.toFixed(2)}`;
+
+            let finalPercentage = "metric-pill-green"
+
+            if (seoData.avg_rank_value >= 8 && seoData.avg_rank_value <= 14) {
+                finalPercentage = "metric-pill-yellow"
+            }
+            else if (seoData.avg_rank_value >= 15) {
+                finalPercentage = "metric-pill-red"
+            }
+            document.getElementById("rankNumber").classList.add(finalPercentage)
+
+            const ctx = document.getElementById("doughnutChart").getContext("2d");
+            new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Low", "Medium", "High"],
+                datasets: [
+                {
+                    label: "Average Percentage",
+                    data: [
+                        seoData.low_relevance,
+                        seoData.medium_relevance,
+                        seoData.high_relevance
+                    ],
+                    backgroundColor: [
+                    "#FF5733",
+                    "#FFC300",
+                    "#4CAF50",
+                    "#2196F3",
+                    "#9C27B0"
+                    ],
+                    borderColor: ["#D84315", "#FF8F00", "#2E7D32", "#1565C0", "#6A1B9A"],
+                    borderWidth: 2
+                }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "0%",
+                plugins: {
+                    datalabels: {
+                            color: "#ffffff",
+                            font: {
+                                weight: "bold",
+                                size: 20
+                            },
+                            formatter: (value) => {
+                                return value > 0 ? value : "";
+                            }
+                        },
+                    legend: {
+                        position: "right",
+                        labels: {
+                                boxWidth: 30,
+                                padding: 6,
+                                font: {
+                                    size: 17
+                                }
+                            }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16,
+                        },
+                        callbacks: {
+                                label: function (context) {
+                                    const label = context.label || "";
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce(
+                                        (a, b) => a + b,
+                                        0
+                                    );
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                    }
+                }
+            }
+            });
+
+        };
+    </script>
+
+</body>
+
+</html>

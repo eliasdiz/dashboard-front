@@ -1,13 +1,17 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import type Chart from "chart.js/auto";
 import PerformanceChart from "./PerformanceChart";
 import GoogleReviewCard from "./GoogleReviewCard";
 import ReactMarkdown from "react-markdown";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { PerformanceData } from "@/types/types";
+import GoogleLoader from "../google-loader";
+import Heatmap from "./Heatmap";
+import { useSearchParams } from "next/navigation";
+import { useHeatmapManifest } from "@/hooks/useHeatmapManifest";
 
 type Reviewer = {
   displayName: string;
@@ -65,6 +69,7 @@ interface ApiResponse {
   sheetData: SheetData[];
   keywords: Keyword[];
   performance: PerformanceData;
+  performancePastMonth: PerformanceData;
   businessDetails: BusinessDetails;
   reviews: {
     positive_reviews_count: number;
@@ -72,6 +77,7 @@ interface ApiResponse {
     reviews: Review[];
   };
   businessInsightsSummary: string;
+  businessInsightsSummaryPastMonth: string;
 }
 
 interface QueryParams {
@@ -83,63 +89,117 @@ interface QueryParams {
   end_year: number;
 }
 
-
 const GoogleMyBusinessDashboard: React.FC = () => {
   // State for storing fetched data
   const [posts, setPosts] = useState<Post[]>([]);
   const [sheetData, setSheetData] = useState<SheetData[]>([]);
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [location_id, setLocationId] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [performance, setPerformance] = useState<any>({
     WEBSITE_CLICKS: {},
     CALL_CLICKS: {},
     BUSINESS_CONVERSATIONS: {},
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [performancePastMonth] = useState<any>({
+    WEBSITE_CLICKS: {},
+    CALL_CLICKS: {},
+    BUSINESS_CONVERSATIONS: {},
+  });
   const [insightsSummary, setInsightsSummary] = useState<string | null>(null);
+  const [insightsSummaryPastMonth] = useState<
+    string | null
+  >(null);
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
-  };
-
   // Chart instances refs for cleanup
   const chartInstances = useRef<Chart[]>([]);
+  const query = useSearchParams()
+  const services = businessDetails?.services || [];
+
+  const manifest = useHeatmapManifest();
+  const heatmapFile = useMemo(
+    () => manifest?.[location_id],
+    [manifest, location_id]
+  );
 
   // API configuration
   const API_URL = "https://gs45rpq0-5010.use2.devtunnels.ms/fetch-data";
 
+  const randomServiceMap = useMemo(() => {
+    const cacheKey = `post_service_map_${query.get("account_id")}_${query.get(
+      "location_id"
+    )}`;
+    const stored = localStorage.getItem(cacheKey);
+    const existingMap: Record<string, string> = stored
+      ? JSON.parse(stored)
+      : {};
+
+    const updatedMap = { ...existingMap };
+
+    posts.forEach((post) => {
+      const key = post.createTime;
+      if (!updatedMap[key]) {
+        if (services.length > 0) {
+          const randomService =
+            services[Math.floor(Math.random() * services.length)];
+          updatedMap[key] = randomService;
+        } else {
+          updatedMap[key] = "N/A";
+        }
+      }
+    });
+
+    localStorage.setItem(cacheKey, JSON.stringify(updatedMap));
+
+    return posts.map((post) => updatedMap[post.createTime] || "N/A");
+  }, [posts, services, query])
+
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
+      const params: QueryParams = {
+        account_id: query.get("account_id") || "116395807109318287954",
+        location_id: query.get("location_id") || "10374497510417847507",
+        start_month: 2,
+        start_year: 2025,
+        end_month: 3,
+        end_year: 2025,
+      };
+
+      setLocationId(params.location_id);
+
+      const cacheKey = `gmb_data_${params.account_id}_${params.location_id}`;
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setPosts(parsed.posts || []);
+        setSheetData(parsed.sheetData || []);
+        setPerformance(parsed.performance || {});
+        setKeywords(parsed.keywords || []);
+        setReviews(parsed.reviews?.reviews || []);
+        // setPositive(parsed.reviews?.positive_reviews_count || 0);
+        setInsightsSummary(parsed.businessInsightsSummary || null);
+        setBusinessDetails(parsed.businessDetails || null);
+        setLoading(false);
+        return;
+      }
+
+      console.log(sheetData)
+
       try {
-        setLoading(true);
-
-        // Query parameters matching the Flask app
-        const params: QueryParams = {
-          account_id: "116395807109318287954",
-          location_id: "10374497510417847507",
-          start_month: 2,
-          start_year: 2025,
-          end_month: 3,
-          end_year: 2025,
-        };
-
-        // Convert params to URL query string
         const queryString = new URLSearchParams(
-          Object.entries(params).map(([key, value]) => [key, value.toString()])
+          Object.entries(params).map(([k, v]) => [k, v.toString()])
         ).toString();
 
-        // Make the API request
         const response = await fetch(`${API_URL}?${queryString}`);
 
         if (!response.ok) {
@@ -148,28 +208,33 @@ const GoogleMyBusinessDashboard: React.FC = () => {
 
         const data: ApiResponse = await response.json();
 
-        // Update state with the fetched data
-        setPosts(data?.posts || []);
-        setSheetData(data?.sheetData || []);
+        // Save to localStorage
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+
+        // Update state
+        setPosts(data.posts || []);
+        setSheetData(data.sheetData || []);
         setPerformance(
-          data?.performance || {
+          data.performance || {
             WEBSITE_CLICKS: {},
             CALL_CLICKS: {},
             BUSINESS_CONVERSATIONS: {},
           }
         );
-        setKeywords(data?.keywords || []);
-        setReviews(data?.reviews.reviews || []);
-        setInsightsSummary(data?.businessInsightsSummary || null);
-        setBusinessDetails(data?.businessDetails || null);
+        setKeywords(data.keywords || []);
+        setReviews(data.reviews.reviews || []);
+        // setPositive(data.reviews.positive_reviews_count || 0);
+        setInsightsSummary(data.businessInsightsSummary || null);
+        setBusinessDetails(data.businessDetails || null);
 
         setLoading(false);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "An unknown error occurred"
         );
-        setLoading(false);
         console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -183,7 +248,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         }
       });
     };
-  }, []);
+  }, [query]);
 
   // Effect to create charts after data is loaded
   useEffect(() => {
@@ -201,10 +266,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen w-full bg-white">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#4285F4]"></div>
-          <p className="text-xl font-medium text-gray-700">Loading data...</p>
-        </div>
+        <GoogleLoader />
       </div>
     );
   }
@@ -215,7 +277,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         <div className="max-w-md p-8 bg-white rounded-lg shadow-lg border border-red-200">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-50">
             <svg
-              className="w-8 h-8 text-red-500"
+              className="w-8 h-8 text-destructive"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -305,7 +367,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
 
                 <div className="space-y-2 text-gray-700">
                   <p className="text-lg flex items-start">
-                    <svg
+                    {businessDetails.gmb_details.address && <svg
                       className="w-5 h-5 mr-2 mt-1 text-gray-500"
                       fill="none"
                       stroke="currentColor"
@@ -324,10 +386,10 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         strokeWidth="2"
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       ></path>
-                    </svg>
+                    </svg>}
                     {businessDetails.gmb_details.address}
                   </p>
-                  <p className="text-lg flex items-start">
+                  {businessDetails.gmb_details.phones && <p className="text-lg flex items-start">
                     <svg
                       className="w-5 h-5 mr-2 mt-1 text-gray-500"
                       fill="none"
@@ -343,7 +405,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                       ></path>
                     </svg>
                     {businessDetails.gmb_details.phones}
-                  </p>
+                  </p>}
                 </div>
               </div>
             </div>
@@ -384,7 +446,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       </section>
 
       {/* Posts Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+      {posts.length > 0 && (<section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
         <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
@@ -421,7 +483,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-700 transition-colors flex items-center"
                       >
-                        <span>View Post</span>
+                        <span>Link URL</span>
                         <svg
                           className="w-4 h-4 ml-1"
                           fill="none"
@@ -437,9 +499,9 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                           ></path>
                         </svg>
                       </a>
-                    </td>
+                    </td>              
                     <td className="px-6 py-4 text-gray-700">
-                      {businessDetails?.services[index] || "N/A"}
+                      {businessDetails?.services[index] || randomServiceMap[index]}
                     </td>
                   </tr>
                 ))}
@@ -447,10 +509,10 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             </table>
           </div>
         </div>
-      </section>
+      </section>)}
 
       {/* Post Preview Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+      {posts.length > 0 && (<section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
         <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
@@ -467,7 +529,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                 className="bg-white z-10 rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]"
               >
                 {post.googleUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={post.googleUrl || "/placeholder.svg"}
                     alt="Post image"
@@ -481,26 +543,26 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                   </div>
                 )}
                 <div className="p-6 z-10 bg-white">
-                  <p className="text-gray-700 leading-relaxed">
+                  <span className="text-gray-700 leading-relaxed">
                     {post.summary.split("\n").map((line, i) => (
                       <p key={i} className="mb-2">
                         {line}
                       </p>
                     ))}
-                  </p>
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </section>)}
 
       {/* Heatmaps Section */}
-      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+      {heatmapFile && <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
-        <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12">
+        <div className="mx-auto pt-16 md:pt-24 z-10">
+          <div className="max-w-6xl mx-auto bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12">
             <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
               Heatmaps
             </h2>
@@ -513,18 +575,11 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             </p>
 
             <div className="rounded-xl overflow-hidden shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://storage.googleapis.com/chimney_sweep/heatmap_meditech.jpeg"
-                alt="Heatmap visualization"
-                className="w-full h-auto"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-              />
+              <Heatmap locationId={location_id} file={heatmapFile} />
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* Citations Section */}
       {sheetData.length > 0 && (
@@ -561,11 +616,10 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                 <tbody className="divide-y divide-gray-200">
                   {sheetData
                     .slice()
-                    .sort(
-                      (a, b) =>
-                        String(a["Top Domains"] || "").localeCompare(
-                          String(b["Top Domains"] || "")
-                        )
+                    .sort((a, b) =>
+                      String(a["Top Domains"] || "").localeCompare(
+                        String(b["Top Domains"] || "")
+                      )
                     )
                     .map((data, index) => (
                       <tr
@@ -577,13 +631,19 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 break-words">
                           <a
-                            href={typeof data["Created Live Links"] === "string" ? data["Created Live Links"] : undefined}
+                            href={
+                              typeof data["Created Live Links"] === "string"
+                                ? data["Created Live Links"]
+                                : undefined
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 transition-colors flex items-center"
                           >
                             <span className="truncate max-w-[180px] md:max-w-[250px]">
-                              {typeof data["Created Live Links"] === "string" ? new URL(data["Created Live Links"]).hostname : ""}
+                              {typeof data["Created Live Links"] === "string"
+                                ? new URL(data["Created Live Links"]).hostname
+                                : ""}
                             </span>
                             <svg
                               className="w-5 h-5 ml-2"
@@ -629,42 +689,17 @@ const GoogleMyBusinessDashboard: React.FC = () => {
           <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
             <div className="bg-[#EA4335] px-6 py-5 rounded-lg shadow-lg mb-12">
               <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-                Keyword Impressions
+                Keywords
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {keywords.map((data, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-4/6 max-w-6xl mx-auto">
+              {services.map((data, index) => (
                 <div
                   key={index}
-                  className="z-10 bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
+                  className="bg-white p-4 shadow-md rounded-lg border border-gray-200"
                 >
-                  <p className="text-lg font-semibold text-gray-800 mb-2">
-                    {data.searchKeyword}
-                  </p>
-                  <div className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-[#34A853] mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      ></path>
-                    </svg>
-                    <p className="text-gray-600">{data.value} impressions</p>
-                  </div>
+                  <p className="text-lg font-semibold text-gray-800">{data}</p>
                 </div>
               ))}
             </div>
@@ -687,54 +722,43 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             <PerformanceChart
               performanceData={performance}
               insightsSummary={insightsSummary ?? undefined}
+              performanceDataPastMonth={performancePastMonth}
+              insightsSummaryPastMonth={insightsSummaryPastMonth ?? undefined}
             />
           </div>
         </div>
       </section>
 
       {/* Reviews Section */}
+      {reviews.length > 0 && (
       <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
-        <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12">
+        <div className="mx-auto pt-16 md:pt-24 z-10">
+          <div className="bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12 max-w-6xl mx-auto">
             <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
               Reviews
             </h2>
           </div>
 
-          <div className="w-full max-w-2xl mx-auto relative">
+          <div className="w-full mx-auto relative">
             <div className="overflow-hidden">
-              <div
-                className="flex transition-transform duration-300 justify-center items-center"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-              >
-                {reviews.map((review, index) => (
-                  <div key={index} className="min-w-full p-4">
-                    <div className="z-10 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                      <GoogleReviewCard review={review} />
-                    </div>
+                {reviews.slice(0, 4).map((review, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 mb-10 md:w-4/6 max-w-6xl mx-auto"
+                  >
+                    <GoogleReviewCard key={index} review={review} />
                   </div>
                 ))}
-              </div>
             </div>
-            <button
-              onClick={prevSlide}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md"
-            >
-              <ChevronRight size={24} />
-            </button>
           </div>
         </div>
       </section>
+      )}
 
       {/* AI Report Section */}
+      {insightsSummary && (
       <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
         <DecorativeTriangles />
 
@@ -745,15 +769,15 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             </h2>
           </div>
 
-          {insightsSummary && (
+          
             <div className="bg-white p-8 md:p-12 rounded-xl shadow-lg">
               <div className="prose prose-lg max-w-none text-gray-700">
                 <ReactMarkdown>{insightsSummary}</ReactMarkdown>
               </div>
             </div>
-          )}
         </div>
       </section>
+      )}
 
       {/* Thank You Section */}
       <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] flex items-center justify-center overflow-hidden">
