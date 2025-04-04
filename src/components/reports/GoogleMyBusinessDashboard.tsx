@@ -8,6 +8,7 @@ import GoogleReviewCard from "./GoogleReviewCard";
 import ReactMarkdown from "react-markdown";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { PerformanceData } from "@/types/types";
+import GoogleLoader from "../google-loader";
 
 type Reviewer = {
   displayName: string;
@@ -65,6 +66,7 @@ interface ApiResponse {
   sheetData: SheetData[];
   keywords: Keyword[];
   performance: PerformanceData;
+  performancePastMonth: PerformanceData;
   businessDetails: BusinessDetails;
   reviews: {
     positive_reviews_count: number;
@@ -72,6 +74,7 @@ interface ApiResponse {
     reviews: Review[];
   };
   businessInsightsSummary: string;
+  businessInsightsSummaryPastMonth: string;
 }
 
 interface QueryParams {
@@ -96,7 +99,14 @@ const GoogleMyBusinessDashboard: React.FC = () => {
     CALL_CLICKS: {},
     BUSINESS_CONVERSATIONS: {},
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [performancePastMonth, setPerformancePastMonth] = useState<any>({
+    WEBSITE_CLICKS: {},
+    CALL_CLICKS: {},
+    BUSINESS_CONVERSATIONS: {},
+  });
   const [insightsSummary, setInsightsSummary] = useState<string | null>(null);
+  const [insightsSummaryPastMonth, setInsightsSummaryPastMonth] = useState<string | null>(null);
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -158,9 +168,17 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             BUSINESS_CONVERSATIONS: {},
           }
         );
+        setPerformancePastMonth(
+          data?.performancePastMonth || {
+            WEBSITE_CLICKS: {},
+            CALL_CLICKS: {},
+            BUSINESS_CONVERSATIONS: {},
+          }
+        );
         setKeywords(data?.keywords || []);
         setReviews(data?.reviews.reviews || []);
         setInsightsSummary(data?.businessInsightsSummary || null);
+        setInsightsSummaryPastMonth(data?.businessInsightsSummaryPastMonth || null);
         setBusinessDetails(data?.businessDetails || null);
 
         setLoading(false);
@@ -201,12 +219,9 @@ const GoogleMyBusinessDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen w-full bg-white">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#4285F4]"></div>
-          <p className="text-xl font-medium text-gray-700">Loading data...</p>
-        </div>
+        <GoogleLoader />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -215,7 +230,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         <div className="max-w-md p-8 bg-white rounded-lg shadow-lg border border-red-200">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-50">
             <svg
-              className="w-8 h-8 text-red-500"
+              className="w-8 h-8 text-destructive"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -637,7 +652,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
               {keywords.map((data, index) => (
                 <div
                   key={index}
-                  className="z-10 bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
+                  className="z-10 flex justify-between items-center bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
                 >
                   <p className="text-lg font-semibold text-gray-800 mb-2">
                     {data.searchKeyword}
@@ -663,7 +678,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                       ></path>
                     </svg>
-                    <p className="text-gray-600">{data.value} impressions</p>
+                    <p className="text-gray-600">{data.value}</p>
                   </div>
                 </div>
               ))}
@@ -687,6 +702,8 @@ const GoogleMyBusinessDashboard: React.FC = () => {
             <PerformanceChart
               performanceData={performance}
               insightsSummary={insightsSummary ?? undefined}
+              performanceDataPastMonth={performancePastMonth}
+              insightsSummaryPastMonth={insightsSummaryPastMonth ?? undefined}
             />
           </div>
         </div>

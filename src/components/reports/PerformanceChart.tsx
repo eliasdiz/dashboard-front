@@ -13,212 +13,132 @@ interface PerformanceDataKey {
 
 interface PerformanceChartsProps {
   performanceData: PerformanceDataKey;
-  charts?: Array<{
-    type: "website" | "call" | "directions";
-    title: string;
-  }>;
   insightsSummary?: string;
+  performanceDataPastMonth: PerformanceDataKey;
+  insightsSummaryPastMonth?: string;
+  charts?: Array<{ type: "website" | "call" | "directions"; title: string }>;
 }
 
 const PerformanceCharts: React.FC<PerformanceChartsProps> = ({
   performanceData,
   insightsSummary,
+  performanceDataPastMonth,
+  insightsSummaryPastMonth,
   charts = [
-    { type: "interactions", title: "Overall " },
+    { type: "interactions", title: "Overall" },
     { type: "website", title: "Website Clicks" },
     { type: "call", title: "Call Clicks" },
     { type: "directions", title: "Directions Requests" },
   ],
 }) => {
-  // Extract and sort dates
-  const dates = useMemo(() => {
-    return Object.keys(performanceData).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
-  }, [performanceData]);
+  // Extraer y ordenar fechas
+  const dates = useMemo(() => Object.keys(performanceData).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()), [performanceData]);
+  const pastMonthDates = useMemo(() => Object.keys(performanceDataPastMonth).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()), [performanceDataPastMonth]);
 
-  const notes = useMemo(() => {
-    return (
-      insightsSummary
-        ?.split("\n")
-        .filter((note) => note.trim().length > 0)
-        .slice(2) || []
-    );
-  }, [insightsSummary]);
+  // Calcular totales para cada período
+  const calculateTotals = (data: PerformanceDataKey, dateList: string[]) => ({
+    websiteClicks: dateList.reduce((sum, date) => sum + (data[date]?.WEBSITE_CLICKS || 0), 0),
+    callClicks: dateList.reduce((sum, date) => sum + (data[date]?.CALL_CLICKS || 0), 0),
+    directionRequests: dateList.reduce((sum, date) => sum + (data[date]?.BUSINESS_DIRECTION_REQUESTS || 0), 0),
+    interactionTotal: dateList.reduce((sum, date) => {
+      const { WEBSITE_CLICKS = 0, CALL_CLICKS = 0, BUSINESS_DIRECTION_REQUESTS = 0 } = data[date] || {};
+      return sum + WEBSITE_CLICKS + CALL_CLICKS + BUSINESS_DIRECTION_REQUESTS;
+    }, 0),
+  });
 
-  // Calculate totals for each metric
-  const totals = useMemo(() => {
-    return {
-      websiteClicks: dates.reduce(
-        (sum, date) => sum + (performanceData[date].WEBSITE_CLICKS || 0),
-        0
-      ),
-      callClicks: dates.reduce(
-        (sum, date) => sum + (performanceData[date].CALL_CLICKS || 0),
-        0
-      ),
-      directionRequests: dates.reduce(
-        (sum, date) =>
-          sum + (performanceData[date].BUSINESS_DIRECTION_REQUESTS || 0),
-        0
-      ),
-      interactionTotal: dates.reduce((sum, date) => {
-        const {
-          WEBSITE_CLICKS = 0,
-          CALL_CLICKS = 0,
-          BUSINESS_DIRECTION_REQUESTS = 0,
-        } = performanceData[date];
-        return sum + WEBSITE_CLICKS + CALL_CLICKS + BUSINESS_DIRECTION_REQUESTS;
-      }, 0),
-    };
-  }, [performanceData, dates]);
+  const totals = calculateTotals(performanceData, dates);
+  const pastTotals = calculateTotals(performanceDataPastMonth, pastMonthDates);
 
-  // Prepare chart data for different metrics
+  // Extraer notas de insightsSummary
+  const notes = useMemo(() => insightsSummary?.split("\n").filter((note) => note.trim().length > 0).slice(2) || [], [insightsSummary]);
+  const notesPastMonth = useMemo(() => insightsSummaryPastMonth?.split("\n").filter((note) => note.trim().length > 0).slice(2) || [], [insightsSummaryPastMonth]);
+
+  // Preparar datos para gráficos comparativos
   const prepareChartData = (type: string) => {
-    const headers: string[] = ["Date"];
+    const headers = ["Date", "Last Month", "This Month"];
     let dataKey: keyof DailyMetrics;
 
     switch (type) {
-      case "website":
-        headers.push("Website Clicks");
-        dataKey = "WEBSITE_CLICKS";
-        return [
-          headers,
-          ...dates.map((date) => [
-            new Date(date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            performanceData[date][dataKey] || 0,
-          ]),
-        ];
-      case "call":
-        headers.push("Call Clicks");
-        dataKey = "CALL_CLICKS";
-        return [
-          headers,
-          ...dates.map((date) => [
-            new Date(date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            performanceData[date][dataKey] || 0,
-          ]),
-        ];
-      case "directions":
-        headers.push("Directions Requests");
-        dataKey = "BUSINESS_DIRECTION_REQUESTS";
-        return [
-          headers,
-          ...dates.map((date) => [
-            new Date(date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            performanceData[date][dataKey] || 0,
-          ]),
-        ];
+      case "website": dataKey = "WEBSITE_CLICKS"; break;
+      case "call": dataKey = "CALL_CLICKS"; break;
+      case "directions": dataKey = "BUSINESS_DIRECTION_REQUESTS"; break;
       case "interactions":
-        headers.push("Total Interactions");
         return [
           headers,
-          ...dates.map((date) => {
-            const {
-              WEBSITE_CLICKS = 0,
-              CALL_CLICKS = 0,
-              BUSINESS_DIRECTION_REQUESTS = 0,
-            } = performanceData[date];
-            const total =
-              WEBSITE_CLICKS + CALL_CLICKS + BUSINESS_DIRECTION_REQUESTS;
-            return [
-              new Date(date).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              }),
-              total,
-            ];
-          }),
+          ...dates.map((date, index) => [
+            new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+            pastMonthDates[index] ? (performanceDataPastMonth[pastMonthDates[index]]?.WEBSITE_CLICKS || 0) + 
+            (performanceDataPastMonth[pastMonthDates[index]]?.CALL_CLICKS || 0) + 
+            (performanceDataPastMonth[pastMonthDates[index]]?.BUSINESS_DIRECTION_REQUESTS || 0) : 0,
+            (performanceData[date]?.WEBSITE_CLICKS || 0) + 
+            (performanceData[date]?.CALL_CLICKS || 0) + 
+            (performanceData[date]?.BUSINESS_DIRECTION_REQUESTS || 0),
+          ]),
         ];
-      default:
-        throw new Error("Invalid chart type");
+      default: throw new Error("Invalid chart type");
     }
+
+    return [
+      headers,
+      ...dates.map((date, index) => [
+        new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        pastMonthDates[index] ? performanceDataPastMonth[pastMonthDates[index]]?.[dataKey] || 0 : 0,
+        performanceData[date]?.[dataKey] || 0,
+      ]),
+    ];
   };
 
-  // Color mapping for different chart types
-  const getChartColor = (type: string) => {
-    switch (type) {
-      case "website":
-        return "#4285F4";
-      case "call":
-        return "#EA4335";
-      case "directions":
-        return "#34A853";
-      case "interactions":
-        return "#FBBC05";
-      default:
-        return "#000000";
-    }
-  };
-
-  // Common chart options
-  const getChartOptions = (title: string, type: string) => ({
-    title: title,
-    hAxis: {
-      title: "Date",
-      gridlines: { color: "transparent" },
-      showTextEvery: Math.max(1, Math.floor(dates.length / 7)),
-    },
-    vAxis: {
-      gridlines: { color: "transparent" },
-    },
-    curveType: "none",
-    pointSize: 5,
-    colors: [getChartColor(type)],
-    explorer: { actions: ["dragToZoom", "rightClickToReset"] },
+  // Opciones de gráficos
+  const getChartOptions = (title: string) => ({
+    title,
+    hAxis: { title: "Date", showTextEvery: Math.max(1, Math.floor(dates.length / 7)) },
+    vAxis: { minValue: 0 },
+    curveType: "function",
     legend: { position: "bottom" },
-    series: { 0: { lineWidth: 2 } },
+    series: {
+      0: { color: "#A0A0A0", lineWidth: 2 }, // Mes pasado (gris)
+      1: { color: "#4285F4", lineWidth: 2 }, // Mes actual (azul)
+    },
   });
+
   return (
     <div className="flex flex-col items-center">
-      {/* Totals Section */}
+      {/* Totales Comparativos */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
-        <div className="bg-[#4285F4] border border-[#4285F4] text-white shadow-md shadow-gray-400 px-4 py-3 text-center rounded-lg">
-          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{totals.interactionTotal}</div>
-          <div className="text-sm sm:text-base">Total Interactions</div>
-        </div>
-        <div className="bg-[#34A853] border border-[#34A853] text-white shadow-md shadow-gray-400 px-4 py-3 text-center rounded-lg">
-          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{totals.websiteClicks}</div>
-          <div className="text-sm sm:text-base">Website Clicks</div>
-        </div>
-        <div className="bg-[#EA4335] border border-[#EA4335] text-white shadow-md shadow-gray-400 px-4 py-3 text-center rounded-lg">
-          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{totals.callClicks}</div>
-          <div className="text-sm sm:text-base">GBP CALLS</div>
-        </div>
-        <div className="bg-[#FBBC05] border border-[#FBBC05] text-black shadow-md shadow-gray-400 px-4 py-3 text-center rounded-lg">
-          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{totals.directionRequests}</div>
-          <div className="text-sm sm:text-base">Directions Requests</div>
-        </div>
+        {[
+          { label: "Total Interactions", past: pastTotals.interactionTotal, current: totals.interactionTotal, color: "#FBBC05" },
+          { label: "Website Clicks", past: pastTotals.websiteClicks, current: totals.websiteClicks, color: "#34A853" },
+          { label: "Call Clicks", past: pastTotals.callClicks, current: totals.callClicks, color: "#EA4335" },
+          { label: "Directions Requests", past: pastTotals.directionRequests, current: totals.directionRequests, color: "#4285F4" },
+        ].map((item, index) => (
+          <div key={index} className="bg-white border border-gray-300 shadow-md px-4 py-3 text-center rounded-lg">
+            <div className="text-sm sm:text-base text-gray-500">{item.label}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600">
+              <span className="text-gray-400">{item.past}</span> → <span style={{ color: item.color }}>{item.current}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-[1rem] items-center justify-center mb-12 px-4 w-full">
+      {/* Comparación de gráficos con notas */}
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-6 w-full px-4">
         {charts.map((chart, index) => (
-          <div key={index} className="w-full flex flex-col justify-center max-w-4xl mb-8">
-            <div className="w-full mx-auto">
-              <Chart
-                chartType="LineChart"
-                width="100%"
-                height="auto"
-                className="min-h-[300px] md:min-h-[400px] lg:min-h-[500px]"
-                data={prepareChartData(chart.type)}
-                options={getChartOptions(chart.title, chart.type)}
-              />
+          <div key={index} className="w-full">
+            <Chart chartType="LineChart" width="100%" height="400px" data={prepareChartData(chart.type)} options={getChartOptions(chart.title)} />
+            
+            {/* Notas comparativas */}
+            <div className="flex flex-col md:flex-row mt-4 gap-4">
+              {notesPastMonth[index] && (
+                <div className="flex-1 p-4 bg-gray-200 border-l-4 border-gray-500 text-gray-700 italic rounded shadow-md">
+                  📌 <span className="font-medium">Last Month:</span> {notesPastMonth[index]}
+                </div>
+              )}
+              {notes[index] && (
+                <div className="flex-1 p-4 bg-gray-100 border-l-4 border-blue-500 text-gray-700 italic rounded shadow-md">
+                  💡 <span className="font-medium">This Month:</span> {notes[index]}
+                </div>
+              )}
             </div>
-            {notes[index] && (
-              <div className="w-full my-4 p-4 bg-gray-100 border-l-4 border-blue-400 text-gray-700 text-base md:text-lg italic rounded shadow-md">
-                💬 <span className="font-medium">Note:</span> {notes[index]}
-              </div>
-            )}
           </div>
         ))}
       </div>
