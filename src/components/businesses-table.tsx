@@ -56,6 +56,15 @@ export function BusinessesTable() {
       business.website?.toLowerCase().includes(searchTerm?.toLowerCase())
   );
 
+  const handleReport = (business: BusinessFormValues) => {
+    window.open(
+      `/reports/?account_id=${
+        JSON.parse(localStorage.getItem("user") || "").user.userId || ""
+      }&location_id=${business.locationId}`,
+      "_blank"
+    );
+  };
+
   // Sort businesss based on sort field and direction
   const sortedBusinesses = [...filteredBusinesses].sort((a, b) => {
     const aValue = a[sortField]?.toLowerCase();
@@ -254,7 +263,9 @@ export function BusinessesTable() {
                               phones: [{ number: "business.phones" }],
                               services: [{ name: "business.services" }],
                               keywords: [{ text: "business.keywords" }],
-                              targetLocations: [{ name: "business.targetLocations" }],
+                              targetLocations: [
+                                { name: "business.targetLocations" },
+                              ],
                               tags: [{ name: "business.tags" }],
                               website: "https://business.website",
                               coordinates: {
@@ -280,6 +291,7 @@ export function BusinessesTable() {
                           <Button
                             variant="outline"
                             className="border-secondary text-secondary hover:bg-secondary"
+                            onClick={() => handleReport(business)}
                           >
                             View
                           </Button>
@@ -288,7 +300,7 @@ export function BusinessesTable() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center">
+                      <TableCell colSpan={7} className="h-24 text-center">
                         No businesses found.
                       </TableCell>
                     </TableRow>

@@ -129,7 +129,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
   );
 
   // API configuration
-  const API_URL = "https://gs45rpq0-5010.use2.devtunnels.ms/fetch-data";
+  const API_URL = "https://reports-service-cp9v.onrender.com/fetch-data";
 
   const randomServiceMap = useMemo(() => {
     const cacheKey = `post_service_map_${query.get("account_id")}_${query.get(
@@ -166,8 +166,8 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       setLoading(true);
 
       const params: QueryParams = {
-        account_id: query.get("account_id") || "116395807109318287954",
-        location_id: query.get("location_id") || "10374497510417847507",
+        account_id: query.get("account_id") || "116395807109318287954",  // Eliminar X Cuando funcione
+        location_id: query.get("location_id") || "10374497510417847507", // Eliminar X Cuando funcione
         start_month: 2,
         start_year: 2025,
         end_month: 3,
@@ -191,9 +191,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         setBusinessDetails(parsed.businessDetails || null);
         setLoading(false);
         return;
-      }
-
-      console.log(sheetData)
+      }      
 
       try {
         const queryString = new URLSearchParams(
@@ -206,7 +204,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
           throw new Error(`API request failed with status: ${response.status}`);
         }
 
-        const data: ApiResponse = await response.json();
+        const data: ApiResponse = await response.json(); // Eliminar cuando se apruebe el reporte
 
         // Save to localStorage
         localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -294,7 +292,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
           <h2 className="mb-4 text-xl font-semibold text-center text-gray-800">
             Error Loading Data
           </h2>
-          <p className="text-gray-600 text-center">{error}</p>
+          <p className="text-gray-600 text-center">{'Business not found for given location ID'}</p>
         </div>
       </div>
     );
