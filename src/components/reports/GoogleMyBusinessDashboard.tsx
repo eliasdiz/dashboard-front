@@ -292,7 +292,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
           <h2 className="mb-4 text-xl font-semibold text-center text-gray-800">
             Error Loading Data
           </h2>
-          <p className="text-gray-600 text-center">{'Business not found for given location ID'}</p>
+          <p className="text-gray-600 text-center">{error}</p>
         </div>
       </div>
     );

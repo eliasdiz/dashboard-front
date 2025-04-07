@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO Analysis Dashboard</title>
+    <title>Heat map for - Southern Cross Media LLC</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -64,7 +64,7 @@
         background: white;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
       }
 
       .title {
@@ -119,6 +119,7 @@
             padding: 8px;
             border: 1px solid var(--border);
             align-self: center;
+            height: 100%;
         }
 
         .card-title {
@@ -179,6 +180,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
+            height: 93%;
         }
 
         .data-table th,
@@ -246,6 +248,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            width: 100%;
+            height: 100%;
         }
 
         .metric-pill {
@@ -343,6 +347,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
+
+        @media (width <= 1500px) {
+            
+            .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+        }
+        }
     </style>
 </head>
 
@@ -411,10 +426,10 @@
                         </div>
                       </div>
                 </div>
-
+                
                 <div class="card">
                     <div class="card-title">Rank Distribution</div>
-                    <div class="chart-container">
+                    <div class="chart-container" style="max-height: 90%; min-height: 90%;">
                         <canvas id="rankDistributionChart" width="357" height="100"
                             style="display: block; box-sizing: border-box; height: 100px; width: 357px;"></canvas>
                     </div>
@@ -422,16 +437,16 @@
             </div>
 
             <!-- Overall Performance -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-title">Overall Performance</div>
                 <div class="chart-container">
                     <canvas id="overallPerformanceChart" width="738" height="100"
                         style="display: block; box-sizing: border-box; height: 100px; width: 738px;"></canvas>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Keyword Performance -->
-            <div class="card" style="align-self: self-start;">
+            <div class="card" style="align-self: self-start; min-height:calc(100vh / 2);">
                 <div class="card-title">Keyword Performance Summary</div>
                 <div class="overflow-x-auto">
                     <table class="data-table">
@@ -776,7 +791,7 @@ ${number}+
 
         let locationData = [{'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.51572149940282, 'lng': -81.28492919641863, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.533083562659694, 'lng': -81.27872764640223, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.551186773495214, 'lng': -81.25615528342372, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.474866361844825, 'lng': -81.32485789100949, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.486004592158295, 'lng': -81.30847632992854, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.499811388634278, 'lng': -81.29498262038014, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.63795301234749, 'lng': -81.4520710775824, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.625859842476792, 'lng': -81.46771390434452, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.611618464368405, 'lng': -81.48080501816, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.498555421486945, 'lng': -81.27175670275744, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.51523479567087, 'lng': -81.26317333045998, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.532948442799203, 'lng': -81.25792250512045, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.62230294406165, 'lng': -81.44168394081132, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.609766108216515, 'lng': -81.4566986115459, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.59483102752511, 'lng': -81.46853289618825, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.5956385765413, 'lng': -81.4909678115193, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.57837989127375, 'lng': -81.49790991936084, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.5603389095181, 'lng': -81.50143162988145, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.569641939768346, 'lng': -81.32128968716556, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.58587114061969, 'lng': -81.3319568490989, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.597916894909083, 'lng': -81.34829988934466, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.604326306892823, 'lng': -81.36834759605163, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.604326306892823, 'lng': -81.38968191991832, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.597916894909083, 'lng': -81.40972962662529, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.58587114061969, 'lng': -81.42607266687105, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.569641939768346, 'lng': -81.43673982880439, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.57810914594574, 'lng': -81.47670229773462, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.560285059275, 'lng': -81.48087235992584, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.54208848771543, 'lng': -81.48087235992584, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.52426440104469, 'lng': -81.47670229773462, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.507542519465318, 'lng': -81.46853289618825, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.492607438773913, 'lng': -81.4566986115459, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.490755082622023, 'lng': -81.48080501816, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.476513704513636, 'lng': -81.46771390434452, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.464420534642937, 'lng': -81.4520710775824, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.490440985824453, 'lng': -81.33512715899367, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.50193653328475, 'lng': -81.31930762296055, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.51652665446718, 'lng': -81.30723970580851, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.651323251512334, 'lng': -81.33320580703813, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.65668315917898, 'lng': -81.35313081357235, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.659008127906286, 'lng': -81.37380045406054, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.44336541908414, 'lng': -81.37380045406054, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.44569038781145, 'lng': -81.35313081357235, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.451050295478094, 'lng': -81.33320580703813, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.45482347148912, 'lng': -81.43432655351879, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.4479986050858, 'lng': -81.41499080980358, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.444142274413394, 'lng': -81.39462010057899, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.658231272577034, 'lng': -81.39462010057899, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.654374941904628, 'lng': -81.41499080980358, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.647550075501307, 'lng': -81.43432655351879, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.627507185145603, 'lng': -81.32485789100949, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.635520848838837, 'lng': -81.34345664058758, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.64008186557867, 'lng': -81.36351114366981, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 14.0, 'percentage': 30.0}, 'percentage': 30.0}], 'lat': 28.459290947299266, 'lng': -81.3145986406185, 'average_percentage': 30.0, 'final_rank': 14}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.470175274725783, 'lng': -81.29784460861337, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.483390155474634, 'lng': -81.28342569401954, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.560203964285936, 'lng': -81.4602752185903, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.542169582704492, 'lng': -81.4602752185903, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.524701784383335, 'lng': -81.4551693249954, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.480070602928777, 'lng': -81.44168394081132, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.470445271462424, 'lng': -81.42410358636849, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.46412550657602, 'lng': -81.40467728999394, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.618983391515794, 'lng': -81.28342569401954, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.632198272264645, 'lng': -81.29784460861337, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.643082599691162, 'lng': -81.3145986406185, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.533294598399145, 'lng': -81.29968167915489, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.551186773495214, 'lng': -81.27663186251726, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.569289984330734, 'lng': -81.27872764640223, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.50889813533305, 'lng': -81.44527835987833, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.495751636945233, 'lng': -81.43122380895382, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.48608833206302, 'lng': -81.41388877134547, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.542034637472327, 'lng': -81.50143162988145, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.523993655716676, 'lng': -81.49790991936084, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.506734970449127, 'lng': -81.4909678115193, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.46137004018655, 'lng': -81.38420036654371, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}], 'lat': 28.46229168141176, 'lng': -81.36351114366981, 'average_percentage': 60.0, 'final_rank': 8}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.46685269815159, 'lng': -81.34345664058758, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.498047240097605, 'lng': -81.38968191991832, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.498047240097605, 'lng': -81.36834759605163, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.504456652081345, 'lng': -81.34829988934466, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.516502406370737, 'lng': -81.3319568490989, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.551186773495214, 'lng': -81.39949133707852, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.535610066357258, 'lng': -81.38925304753175, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.535610066357258, 'lng': -81.3687764684382, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.551186773495214, 'lng': -81.3380615997979, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.58665204758761, 'lng': -81.28492919641863, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.60256215835615, 'lng': -81.29498262038014, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.616368954832133, 'lng': -81.30847632992854, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.62299053350801, 'lng': -81.37387181782711, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.62185814531912, 'lng': -81.39436247122003, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.61628521492741, 'lng': -81.41388877134547, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.551186773495214, 'lng': -81.4404444952656, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.532731607222082, 'lng': -81.43673982880439, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.516502406370737, 'lng': -81.42607266687105, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.504456652081345, 'lng': -81.40972962662529, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.569425104191225, 'lng': -81.25792250512045, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.587138751319557, 'lng': -81.26317333045998, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.603818125503484, 'lng': -81.27175670275744, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.641003506803877, 'lng': -81.38420036654371, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.638248040414407, 'lng': -81.40467728999394, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.631928275528004, 'lng': -81.42410358636849, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.60043701370568, 'lng': -81.31930762296055, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.611932561165975, 'lng': -81.33512715899367, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.619611227379536, 'lng': -81.3537043142787, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 8.0, 'percentage': 60.0}, 'percentage': 60.0}], 'lat': 28.551186773495214, 'lng': -81.37901475798498, 'average_percentage': 60.0, 'final_rank': 8}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 9.0, 'percentage': 55.0}, 'percentage': 55.0}], 'lat': 28.551186773495214, 'lng': -81.35853817889144, 'average_percentage': 55.0, 'final_rank': 9}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.56676348063317, 'lng': -81.3687764684382, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.56676348063317, 'lng': -81.38925304753175, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.569173205613588, 'lng': -81.34354828262975, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.582340187771127, 'lng': -81.35853817889144, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.587159637731965, 'lng': -81.37901475798498, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.582340187771127, 'lng': -81.39949133707852, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.515213909258463, 'lng': -81.37901475798498, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.5200333592193, 'lng': -81.35853817889144, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 13.0, 'percentage': 35.0}, 'percentage': 35.0}], 'lat': 28.53320034137684, 'lng': -81.34354828262975, 'average_percentage': 35.0, 'final_rank': 13}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.551186773495214, 'lng': -81.31758502070436, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.569173205613588, 'lng': -81.4144812333402, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.551186773495214, 'lng': -81.41996791617206, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 7.0, 'percentage': 65.0}, 'percentage': 65.0}], 'lat': 28.53320034137684, 'lng': -81.4144812333402, 'average_percentage': 65.0, 'final_rank': 7}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.5200333592193, 'lng': -81.39949133707852, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.532731607222082, 'lng': -81.32128968716556, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.551186773495214, 'lng': -81.29710844161082, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.569078948591283, 'lng': -81.29968167915489, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.585846892523247, 'lng': -81.30723970580851, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.48051540167131, 'lng': -81.39436247122003, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 10.0, 'percentage': 50.0}, 'percentage': 50.0}], 'lat': 28.47938301348242, 'lng': -81.37387181782711, 'average_percentage': 50.0, 'final_rank': 10}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.48276231961089, 'lng': -81.3537043142787, 'average_percentage': 45.0, 'final_rank': 11}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.606621910045195, 'lng': -81.43122380895382, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 12.0, 'percentage': 40.0}, 'percentage': 40.0}], 'lat': 28.593475411657376, 'lng': -81.44527835987833, 'average_percentage': 40.0, 'final_rank': 12}, {'data': [{'keyword': 'top SEO services in Orlando', 'location_rank': {'rank': 11.0, 'percentage': 45.0}, 'percentage': 45.0}], 'lat': 28.577671762607093, 'lng': -81.4551693249954, 'average_percentage': 45.0, 'final_rank': 11}]
 
-        function calculateKeywordAverages() {
+function calculateKeywordAverages() {
             const keywords = {};
 
             locationData.forEach((location) => {
@@ -868,6 +883,7 @@ ${number}+
                     marker = new google.maps.Marker({
                         position: { lat: location.lat, lng: location.lng },
                         map: map,
+                        animation: google.maps.Animation.BOUNCE,
                         title: `Location ${index + 1}`,
                         icon: {
                             url:
@@ -882,6 +898,7 @@ ${number}+
                     marker = new google.maps.Marker({
                         position: { lat: location.lat, lng: location.lng },
                         map: map,
+                        animation: google.maps.Animation.BOUNCE,
                         title: `Location ${index + 1}`,
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
@@ -1046,7 +1063,7 @@ ${number}+
             });
 
             const rankLabels = Object.keys(rankCounts).sort((a, b) => a - b);
-            const rankValues = rankLabels.slice(0, 13).map((rank) => rankCounts[rank]);
+            const rankValues = rankLabels.map((rank) => rankCounts[rank]);
 
             // Determine colors based on rank value
             const rankColors = rankLabels.map((rank) => {
@@ -1076,7 +1093,7 @@ ${number}+
                             color: "#ffffff",
                             font: {
                                 weight: "bold",
-                                size: 9
+                                size: 16
                             },
                             formatter: (value, context) => {
                                 return value > 0 ? value : "";
@@ -1094,7 +1111,7 @@ ${number}+
                         },
                         tooltip: {
                             bodyFont: {
-                                size: 9
+                                size: 12
                             },
                             callbacks: {
                                 label: function (context) {
@@ -1112,11 +1129,6 @@ ${number}+
                     }
                 }
             });
-
-            // Overall Performance Chart - Bar chart showing general metrics
-            const overallCtx = document
-                .getElementById("overallPerformanceChart")
-                .getContext("2d");
 
             // Calculate overall averages across all keywords
             let totalRank = 0;
@@ -1147,76 +1159,86 @@ ${number}+
             document.getElementById("avg-percentage").textContent =
                 overallAvgPercentage.toFixed(1) + "%";
 
-                const overallChart = new Chart(overallCtx, {
-    type: "bar",
-    data: {
-        labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
-        datasets: [
-            {
-                label: "Overall Performance",
-                data: [
-                    overallAvgRank,
-                    overallAvgFinalRank,
-                    overallAvgPercentage
-                ],
-                backgroundColor: [
-                    "#f97316", // orange
-                    "#fb923c", // lighter orange
-                    "#fdba74" // even lighter orange
-                ],
-                borderColor: "#ffffff",
-                borderWidth: 1
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    font: {
-                        size: 16 // Increased font size for better readability
-                    }
-                }
-            },
-            x: {
-                ticks: {
-                    font: {
-                        size: 14 // Increased font size for x-axis labels
-                    }
-                }
-            }
-        },
-        plugins: {
-            datalabels: {
-                color: "#ffffff",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                borderRadius: 3,
-                font: {
-                    weight: "bold",
-                    size: 14 // Increased size for the labels inside the bars
+            //populateKeywordsPerformantChart(overallAvgRank, overallAvgFinalRank, overallAvgPercentage)
+        }
+
+        function populateKeywordsPerformantChart (
+            overallAvgRank,
+            overallAvgFinalRank,
+            overallAvgPercentage
+        ) {
+            const overallCtx = document
+                .getElementById("overallPerformanceChart")
+                .getContext("2d");
+
+            const overallChart = new Chart(overallCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
+                    datasets: [
+                        {
+                            label: "Overall Performance",
+                            data: [
+                                overallAvgRank,
+                                overallAvgFinalRank,
+                                overallAvgPercentage
+                            ],
+                            backgroundColor: [
+                                "#f97316", // orange
+                                "#fb923c", // lighter orange
+                                "#fdba74" // even lighter orange
+                            ],
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                padding: 5,
-                formatter: (value) => {
-                    return value.toFixed(1);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 16 // Increased font size for better readability
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14 // Increased font size for x-axis labels
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            backgroundColor: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: 3,
+                            font: {
+                                weight: "bold",
+                                size: 14 // Increased size for the labels inside the bars
+                            },
+                            padding: 5,
+                            formatter: (value) => {
+                                return value.toFixed(1);
+                            }
+                        },
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 14 // Increased tooltip font size for better readability
+                            }
+                        }
+                    }
                 }
-            },
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                bodyFont: {
-                    size: 14 // Increased tooltip font size for better readability
-                }
-            }
+            });
         }
-    }
-});
-
-        }
-
         // Populate Keyword Performance Table
         function populateKeywordTable() {
             const tableBody = document.getElementById("keywordTableBody");

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO Analysis Dashboard</title>
+    <title>Heat map for - {{business_name}}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -64,7 +64,7 @@
         background: white;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
       }
 
       .title {
@@ -119,6 +119,7 @@
             padding: 8px;
             border: 1px solid var(--border);
             align-self: center;
+            height: 100%;
         }
 
         .card-title {
@@ -179,6 +180,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
+            height: 93%;
         }
 
         .data-table th,
@@ -246,6 +248,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            width: 100%;
+            height: 100%;
         }
 
         .metric-pill {
@@ -343,6 +347,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
+
+        @media (width <= 1500px) {
+            
+            .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+        }
+        }
     </style>
 </head>
 
@@ -411,10 +426,10 @@
                         </div>
                       </div>
                 </div>
-
+                
                 <div class="card">
                     <div class="card-title">Rank Distribution</div>
-                    <div class="chart-container">
+                    <div class="chart-container" style="max-height: 90%; min-height: 90%;">
                         <canvas id="rankDistributionChart" width="357" height="100"
                             style="display: block; box-sizing: border-box; height: 100px; width: 357px;"></canvas>
                     </div>
@@ -422,16 +437,16 @@
             </div>
 
             <!-- Overall Performance -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-title">Overall Performance</div>
                 <div class="chart-container">
                     <canvas id="overallPerformanceChart" width="738" height="100"
                         style="display: block; box-sizing: border-box; height: 100px; width: 738px;"></canvas>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Keyword Performance -->
-            <div class="card" style="align-self: self-start;">
+            <div class="card" style="align-self: self-start; min-height:calc(100vh / 2);">
                 <div class="card-title">Keyword Performance Summary</div>
                 <div class="overflow-x-auto">
                     <table class="data-table">
@@ -776,7 +791,7 @@ ${number}+
 
         let locationData = [{'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.428685233308656, 'lng': -71.25887386617885, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.42592976691919, 'lng': -71.28320741380297, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.41961000203278, 'lng': -71.3062924592269, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.26254808834961, 'lng': -71.18835482761058, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.273686318663074, 'lng': -71.16888796298662, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.28749311513906, 'lng': -71.15285284791084, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.41518891165038, 'lng': -71.18835482761058, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.423202575343616, 'lng': -71.21045646605778, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.42776359208345, 'lng': -71.23428803465332, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.37433377409239, 'lng': -71.14090596187849, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.390243884860936, 'lng': -71.15285284791084, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.40405068133692, 'lng': -71.16888796298662, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.425634738852274, 'lng': -71.33952734829778, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.41354156898157, 'lng': -71.35811634536647, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.39930019087319, 'lng': -71.3736730398209, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.365790872450525, 'lng': -71.3687976129482, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.34796678577978, 'lng': -71.37375306473626, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32977021422021, 'lng': -71.37375306473626, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.39430363654998, 'lng': -71.31475370467696, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.38115713816216, 'lng': -71.33145529000488, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.365353489111875, 'lng': -71.34320911969077, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.24905176669134, 'lng': -71.25887386617885, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.24997340791654, 'lng': -71.23428803465332, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.25453442465638, 'lng': -71.21045646605778, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.41067226001279, 'lng': -71.2466000383895, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.4095398718239, 'lng': -71.27094990185402, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.403966941432195, 'lng': -71.29415378573728, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.40998467056644, 'lng': -71.32718389797859, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3974478347213, 'lng': -71.34502643210091, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3825127540299, 'lng': -71.35908958615049, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35710683069601, 'lng': -71.10881282979877, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.37482047782434, 'lng': -71.1150525956882, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.391499852008266, 'lng': -71.12525256049658, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.31194612754947, 'lng': -71.3687976129482, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.2952242459701, 'lng': -71.35908958615049, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.280289165278695, 'lng': -71.34502643210091, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.2784368091268, 'lng': -71.3736730398209, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.26419543101842, 'lng': -71.35811634536647, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.25210226114772, 'lng': -71.33952734829778, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.38811874021046, 'lng': -71.18175922196583, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.39961428767076, 'lng': -71.20055820973316, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.40729295388432, 'lng': -71.22263418681771, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.383320303046084, 'lng': -71.38574989388562, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.366061617778534, 'lng': -71.39399947845746, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.34802063602289, 'lng': -71.39818446800827, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.34788569079072, 'lng': -71.34927665738789, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.329851309209275, 'lng': -71.34927665738789, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.31238351088812, 'lng': -71.34320911969077, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.40666511802058, 'lng': -71.13911928980737, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.41987999876943, 'lng': -71.1562538630654, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.43076432619595, 'lng': -71.17616334979489, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.26819712817609, 'lng': -71.27094990185402, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.267064739987205, 'lng': -71.2466000383895, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.27044404611567, 'lng': -71.22263418681771, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.43900497801712, 'lng': -71.19827499031173, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.44436488568376, 'lng': -71.22195267297681, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.44668985441107, 'lng': -71.24651523396972, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.231047145588924, 'lng': -71.24651523396972, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.23337211431623, 'lng': -71.22195267297681, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.23873202198288, 'lng': -71.19827499031173, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.356854932118374, 'lng': -71.21056536796402, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.37002191427591, 'lng': -71.22837846158869, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.374841364236744, 'lng': -71.2527116, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.37002191427591, 'lng': -71.2770447384113, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.24250519799391, 'lng': -71.31844082021561, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.235680331590586, 'lng': -71.29546338214072, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.231824000918174, 'lng': -71.27125605313161, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.28623714799173, 'lng': -71.12525256049658, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.30291652217565, 'lng': -71.1150525956882, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32063016930398, 'lng': -71.10881282979877, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.285728966602385, 'lng': -71.26538781542612, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.285728966602385, 'lng': -71.24003538457387, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.292138378586124, 'lng': -71.21621189238304, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.30418413287552, 'lng': -71.19679080360913, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.3257110152339, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32041333372686, 'lng': -71.32130861181699, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.30418413287552, 'lng': -71.30863239639086, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.292138378586124, 'lng': -71.28921130761695, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.267752329433556, 'lng': -71.32718389797859, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.25812699796721, 'lng': -71.3062924592269, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.251807233080804, 'lng': -71.28320741380297, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.296579861837834, 'lng': -71.33145529000488, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.283433363450015, 'lng': -71.31475370467696, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.2737700585678, 'lng': -71.29415378573728, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.356854932118374, 'lng': -71.29485783203597, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.3013778768226, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32088206788162, 'lng': -71.29485783203597, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.307715085724084, 'lng': -71.2770447384113, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.278122712329235, 'lng': -71.20055820973316, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.289618259789535, 'lng': -71.18175922196583, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.304208380971964, 'lng': -71.16741843305498, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.44591299908182, 'lng': -71.27125605313161, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.44205666840941, 'lng': -71.29546338214072, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.435231802006086, 'lng': -71.31844082021561, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.2770447384113, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32329179286204, 'lng': -71.26487816920564, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32329179286204, 'lng': -71.24054503079435, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.2040453231774, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.39200803339761, 'lng': -71.26538781542612, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.38559862141387, 'lng': -71.28921130761695, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.373552867124474, 'lng': -71.30863239639086, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35732366627313, 'lng': -71.32130861181699, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3034032259076, 'lng': -71.14090596187849, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32076528916448, 'lng': -71.13353641180744, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.10671276953218, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.2527116, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.22837846158869, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35444520713796, 'lng': -71.24054503079435, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35444520713796, 'lng': -71.26487816920564, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35732366627313, 'lng': -71.18411458818301, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.373552867124474, 'lng': -71.19679080360913, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.38559862141387, 'lng': -71.21621189238304, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.39200803339761, 'lng': -71.24003538457387, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32041333372686, 'lng': -71.18411458818301, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.1553790463548, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.35676067509606, 'lng': -71.1584369275096, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.37352861902803, 'lng': -71.16741843305498, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.246972673804045, 'lng': -71.17616334979489, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.25785700123056, 'lng': -71.1562538630654, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.27107188197942, 'lng': -71.13911928980737, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.30289563576325, 'lng': -71.2527116, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.307715085724084, 'lng': -71.22837846158869, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32088206788162, 'lng': -71.21056536796402, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.17971218476609, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.329716363977106, 'lng': -71.39818446800827, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.31167538222146, 'lng': -71.39399947845746, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.29441669695391, 'lng': -71.38574989388562, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.32097632490393, 'lng': -71.1584369275096, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.3388685, 'lng': -71.13104590794349, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Chimney Services', 'location_rank': {'rank': 21, 'percentage': 0}, 'percentage': 0.0}], 'lat': 42.356971710835516, 'lng': -71.13353641180744, 'average_percentage': 0.0, 'final_rank': 20}]
 
-        function calculateKeywordAverages() {
+function calculateKeywordAverages() {
             const keywords = {};
 
             locationData.forEach((location) => {
@@ -868,6 +883,7 @@ ${number}+
                     marker = new google.maps.Marker({
                         position: { lat: location.lat, lng: location.lng },
                         map: map,
+                        animation: google.maps.Animation.BOUNCE,
                         title: `Location ${index + 1}`,
                         icon: {
                             url:
@@ -882,6 +898,7 @@ ${number}+
                     marker = new google.maps.Marker({
                         position: { lat: location.lat, lng: location.lng },
                         map: map,
+                        animation: google.maps.Animation.BOUNCE,
                         title: `Location ${index + 1}`,
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
@@ -1046,7 +1063,7 @@ ${number}+
             });
 
             const rankLabels = Object.keys(rankCounts).sort((a, b) => a - b);
-            const rankValues = rankLabels.slice(0, 13).map((rank) => rankCounts[rank]);
+            const rankValues = rankLabels.map((rank) => rankCounts[rank]);
 
             // Determine colors based on rank value
             const rankColors = rankLabels.map((rank) => {
@@ -1076,7 +1093,7 @@ ${number}+
                             color: "#ffffff",
                             font: {
                                 weight: "bold",
-                                size: 9
+                                size: 16
                             },
                             formatter: (value, context) => {
                                 return value > 0 ? value : "";
@@ -1094,7 +1111,7 @@ ${number}+
                         },
                         tooltip: {
                             bodyFont: {
-                                size: 9
+                                size: 12
                             },
                             callbacks: {
                                 label: function (context) {
@@ -1112,11 +1129,6 @@ ${number}+
                     }
                 }
             });
-
-            // Overall Performance Chart - Bar chart showing general metrics
-            const overallCtx = document
-                .getElementById("overallPerformanceChart")
-                .getContext("2d");
 
             // Calculate overall averages across all keywords
             let totalRank = 0;
@@ -1147,76 +1159,86 @@ ${number}+
             document.getElementById("avg-percentage").textContent =
                 overallAvgPercentage.toFixed(1) + "%";
 
-                const overallChart = new Chart(overallCtx, {
-    type: "bar",
-    data: {
-        labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
-        datasets: [
-            {
-                label: "Overall Performance",
-                data: [
-                    overallAvgRank,
-                    overallAvgFinalRank,
-                    overallAvgPercentage
-                ],
-                backgroundColor: [
-                    "#f97316", // orange
-                    "#fb923c", // lighter orange
-                    "#fdba74" // even lighter orange
-                ],
-                borderColor: "#ffffff",
-                borderWidth: 1
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    font: {
-                        size: 16 // Increased font size for better readability
-                    }
-                }
-            },
-            x: {
-                ticks: {
-                    font: {
-                        size: 14 // Increased font size for x-axis labels
-                    }
-                }
-            }
-        },
-        plugins: {
-            datalabels: {
-                color: "#ffffff",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                borderRadius: 3,
-                font: {
-                    weight: "bold",
-                    size: 14 // Increased size for the labels inside the bars
+            //populateKeywordsPerformantChart(overallAvgRank, overallAvgFinalRank, overallAvgPercentage)
+        }
+
+        function populateKeywordsPerformantChart (
+            overallAvgRank,
+            overallAvgFinalRank,
+            overallAvgPercentage
+        ) {
+            const overallCtx = document
+                .getElementById("overallPerformanceChart")
+                .getContext("2d");
+
+            const overallChart = new Chart(overallCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
+                    datasets: [
+                        {
+                            label: "Overall Performance",
+                            data: [
+                                overallAvgRank,
+                                overallAvgFinalRank,
+                                overallAvgPercentage
+                            ],
+                            backgroundColor: [
+                                "#f97316", // orange
+                                "#fb923c", // lighter orange
+                                "#fdba74" // even lighter orange
+                            ],
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                padding: 5,
-                formatter: (value) => {
-                    return value.toFixed(1);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 16 // Increased font size for better readability
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14 // Increased font size for x-axis labels
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            backgroundColor: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: 3,
+                            font: {
+                                weight: "bold",
+                                size: 14 // Increased size for the labels inside the bars
+                            },
+                            padding: 5,
+                            formatter: (value) => {
+                                return value.toFixed(1);
+                            }
+                        },
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 14 // Increased tooltip font size for better readability
+                            }
+                        }
+                    }
                 }
-            },
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                bodyFont: {
-                    size: 14 // Increased tooltip font size for better readability
-                }
-            }
+            });
         }
-    }
-});
-
-        }
-
         // Populate Keyword Performance Table
         function populateKeywordTable() {
             const tableBody = document.getElementById("keywordTableBody");

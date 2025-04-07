@@ -5,7 +5,7 @@ import React, { Suspense } from "react";
 const page = () => {
   return (
     <Suspense>
-      <GoogleMyBusinessDashboard />;
+      <GoogleMyBusinessDashboard />
     </Suspense>
   );
 };

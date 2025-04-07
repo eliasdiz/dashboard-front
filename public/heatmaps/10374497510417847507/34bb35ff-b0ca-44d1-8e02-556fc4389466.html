@@ -119,6 +119,7 @@
             padding: 8px;
             border: 1px solid var(--border);
             align-self: center;
+            height: 100%;
         }
 
         .card-title {
@@ -179,6 +180,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
+            height: 93%;
         }
 
         .data-table th,
@@ -246,6 +248,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            width: 100%;
+            height: 100%;
         }
 
         .metric-pill {
@@ -343,6 +347,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
+
+        @media (width <= 1500px) {
+            
+            .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+        }
+        }
     </style>
 </head>
 
@@ -411,10 +426,10 @@
                         </div>
                       </div>
                 </div>
-
+                
                 <div class="card">
                     <div class="card-title">Rank Distribution</div>
-                    <div class="chart-container">
+                    <div class="chart-container" style="max-height: 90%; min-height: 90%;">
                         <canvas id="rankDistributionChart" width="357" height="100"
                             style="display: block; box-sizing: border-box; height: 100px; width: 357px;"></canvas>
                     </div>
@@ -422,16 +437,16 @@
             </div>
 
             <!-- Overall Performance -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-title">Overall Performance</div>
                 <div class="chart-container">
                     <canvas id="overallPerformanceChart" width="738" height="100"
                         style="display: block; box-sizing: border-box; height: 100px; width: 738px;"></canvas>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Keyword Performance -->
-            <div class="card" style="align-self: self-start;">
+            <div class="card" style="align-self: self-start; min-height:calc(100vh / 2);">
                 <div class="card-title">Keyword Performance Summary</div>
                 <div class="overflow-x-auto">
                     <table class="data-table">
@@ -1048,7 +1063,7 @@ ${number}+
             });
 
             const rankLabels = Object.keys(rankCounts).sort((a, b) => a - b);
-            const rankValues = rankLabels.slice(0, 13).map((rank) => rankCounts[rank]);
+            const rankValues = rankLabels.map((rank) => rankCounts[rank]);
 
             // Determine colors based on rank value
             const rankColors = rankLabels.map((rank) => {
@@ -1078,7 +1093,7 @@ ${number}+
                             color: "#ffffff",
                             font: {
                                 weight: "bold",
-                                size: 9
+                                size: 16
                             },
                             formatter: (value, context) => {
                                 return value > 0 ? value : "";
@@ -1096,7 +1111,7 @@ ${number}+
                         },
                         tooltip: {
                             bodyFont: {
-                                size: 9
+                                size: 12
                             },
                             callbacks: {
                                 label: function (context) {
@@ -1114,11 +1129,6 @@ ${number}+
                     }
                 }
             });
-
-            // Overall Performance Chart - Bar chart showing general metrics
-            const overallCtx = document
-                .getElementById("overallPerformanceChart")
-                .getContext("2d");
 
             // Calculate overall averages across all keywords
             let totalRank = 0;
@@ -1149,76 +1159,86 @@ ${number}+
             document.getElementById("avg-percentage").textContent =
                 overallAvgPercentage.toFixed(1) + "%";
 
-                const overallChart = new Chart(overallCtx, {
-    type: "bar",
-    data: {
-        labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
-        datasets: [
-            {
-                label: "Overall Performance",
-                data: [
-                    overallAvgRank,
-                    overallAvgFinalRank,
-                    overallAvgPercentage
-                ],
-                backgroundColor: [
-                    "#f97316", // orange
-                    "#fb923c", // lighter orange
-                    "#fdba74" // even lighter orange
-                ],
-                borderColor: "#ffffff",
-                borderWidth: 1
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    font: {
-                        size: 16 // Increased font size for better readability
-                    }
-                }
-            },
-            x: {
-                ticks: {
-                    font: {
-                        size: 14 // Increased font size for x-axis labels
-                    }
-                }
-            }
-        },
-        plugins: {
-            datalabels: {
-                color: "#ffffff",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                borderRadius: 3,
-                font: {
-                    weight: "bold",
-                    size: 14 // Increased size for the labels inside the bars
+            //populateKeywordsPerformantChart(overallAvgRank, overallAvgFinalRank, overallAvgPercentage)
+        }
+
+        function populateKeywordsPerformantChart (
+            overallAvgRank,
+            overallAvgFinalRank,
+            overallAvgPercentage
+        ) {
+            const overallCtx = document
+                .getElementById("overallPerformanceChart")
+                .getContext("2d");
+
+            const overallChart = new Chart(overallCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
+                    datasets: [
+                        {
+                            label: "Overall Performance",
+                            data: [
+                                overallAvgRank,
+                                overallAvgFinalRank,
+                                overallAvgPercentage
+                            ],
+                            backgroundColor: [
+                                "#f97316", // orange
+                                "#fb923c", // lighter orange
+                                "#fdba74" // even lighter orange
+                            ],
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                padding: 5,
-                formatter: (value) => {
-                    return value.toFixed(1);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 16 // Increased font size for better readability
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14 // Increased font size for x-axis labels
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            backgroundColor: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: 3,
+                            font: {
+                                weight: "bold",
+                                size: 14 // Increased size for the labels inside the bars
+                            },
+                            padding: 5,
+                            formatter: (value) => {
+                                return value.toFixed(1);
+                            }
+                        },
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 14 // Increased tooltip font size for better readability
+                            }
+                        }
+                    }
                 }
-            },
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                bodyFont: {
-                    size: 14 // Increased tooltip font size for better readability
-                }
-            }
+            });
         }
-    }
-});
-
-        }
-
         // Populate Keyword Performance Table
         function populateKeywordTable() {
             const tableBody = document.getElementById("keywordTableBody");

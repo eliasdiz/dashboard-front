@@ -1,0 +1,1419 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat map for - USA HVAC Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6av-FESCOQG9F-G4oZ0k9KVweacH3KIU"></script>
+    <style>
+        :root {
+            --primary: #f97316;
+            --secondary: #f97316;
+            --accent: #f59e0b;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            font-size: 11px;
+        }
+
+        .average-rank-card {
+            /* position: absolute; */
+            width: auto;
+            height: auto;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            overflow: auto;
+            z-index: 10;
+      }
+
+      .rank-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #4caf50;
+        background: #e8f5e9;
+        padding: 10px 20px;
+        border-radius: 8px;
+        display: inline-block;
+        transform: translateY(-10px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .chart-container {
+        display: flex;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+      }
+
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 55% 45%;
+            grid-template-rows: auto auto 1fr;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            grid-column: 1 / 3;
+            background-color: white;
+            padding: 6px 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .map-container {
+            grid-column: 1;
+            grid-row: 2;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-container {
+            grid-column: 2;
+            grid-row: 2;
+            padding: 6px;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 6px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            border: 1px solid var(--border);
+            align-self: center;
+            height: 100%;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-title::before {
+            content: "";
+            display: block;
+            width: 3px;
+            height: 12px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+
+        #map {
+            height: calc(100vh - 100px);
+            width: 100%;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-wrap: pretty;
+        }
+
+        .badge-orange {
+            background-color: #ffedd5;
+            color: #c2410c;
+            padding-left: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            height: 93%;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 4px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .summary-stat {
+            flex: 1;
+            background-color: white;
+            border-radius: 0.375rem;
+            padding: 6px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-stat::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+
+        .summary-stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .summary-stat-label {
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-top: 0.125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .metric-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 6px;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            gap: 3px;
+        }
+
+        .metric-pill-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .metric-pill-yellow {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .metric-pill-green {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .metric-pill-orange {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        .keyword-cell {
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .performance-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .performance-good {
+            background-color: #10b981;
+        }
+
+        .performance-medium {
+            background-color: #f59e0b;
+        }
+
+        .performance-poor {
+            background-color: #ef4444;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        @media (width <= 1500px) {
+            
+            .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+        }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">USA HVAC Pro</h1>
+            <p class="text-xs text-gray-500">
+                27.4383871, -82.5325876
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="metric-pill metric-pill-red">
+                <span class="inline-block w-2 h-2 rounded-full bg-red-600"></span>
+                <span data-field="low_relevance" data-text="Low count: ">Low: 37</span>
+            </div>
+            <div class="metric-pill metric-pill-yellow">
+                <span class="inline-block w-2 h-2 rounded-full bg-yellow-600"></span>
+                <span data-field="medium_relevance" data-text="Med count: ">Med: 22</span>
+            </div>
+            <div class="metric-pill metric-pill-green">
+                <span class="inline-block w-2 h-2 rounded-full bg-green-600"></span>
+                <span data-field="high_relevance" data-text="High count: ">High: 5</span>
+            </div>
+            <div class="metric-pill metric-pill-orange">
+                <span class="inline-block w-2 h-2 rounded-full bg-orange-600"></span>
+                <span data-field="avg_rank_value" data-text="Avg: ">Avg: 5.421875</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Map Section (Left Side) -->
+        <div class="map-container">
+            <div id="map" style="position: relative; overflow: hidden;"></div>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div id="avg-keyword-rank" class="summary-stat-value text-orange-700">5.4</div>
+                    <div class="summary-stat-label">Avg Keyword Rank</div>
+                </div>
+                <div class="summary-stat">
+                    <div id="avg-final-rank" class="summary-stat-value text-orange-800">5.4</div>
+                    <div class="summary-stat-label">Avg Final Rank</div>
+                </div>
+                <div class="summary-stat">
+                    <div id="avg-percentage" class="summary-stat-value text-orange-700">72.9%</div>
+                    <div class="summary-stat-label">Avg Percentage</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Section (Right Side) -->
+        <div class="data-container">
+            <div class="grid-2">
+                <!-- Relevance Distribution -->
+                <div class="card">
+                    <div class="card-title">Relevance Distribution</div>
+                    <div class="average-rank-card">
+                        <div>
+                            <div class="title">Average Rank</div>
+                            <div class="rank-number" id="rankNumber"></div>
+                        </div>
+                        <div class="chart-container">
+                          <canvas id="doughnutChart"></canvas>
+                        </div>
+                      </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Rank Distribution</div>
+                    <div class="chart-container" style="max-height: 90%; min-height: 90%;">
+                        <canvas id="rankDistributionChart" width="357" height="100"
+                            style="display: block; box-sizing: border-box; height: 100px; width: 357px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Performance -->
+            <!-- <div class="card">
+                <div class="card-title">Overall Performance</div>
+                <div class="chart-container">
+                    <canvas id="overallPerformanceChart" width="738" height="100"
+                        style="display: block; box-sizing: border-box; height: 100px; width: 738px;"></canvas>
+                </div>
+            </div> -->
+
+            <!-- Keyword Performance -->
+            <div class="card" style="align-self: self-start; min-height:calc(100vh / 2);">
+                <div class="card-title">Keyword Performance Summary</div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>Avg Rank</th>
+                                <th>Avg Final</th>
+                                <th>Avg %</th>
+                                <th>Locations</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const colors = {
+            blue: {
+                fill: "#4285F4", // Vibrant blue
+                stroke: "#000", // Deep navy blue for contrast
+                // stroke: "#1E3A8A", // Deep navy blue for contrast
+                circleFill: "#1E3A8A", // Softer blue
+                circleStroke: "#1E3A8A",
+                textFill: "white" // White text for high visibility
+            },
+            lightGreen: {
+                fill: "#66BB6A", // Soft green
+                stroke: "#000", // Deep forest green
+                // stroke: "#2E7D32", // Deep forest green
+                circleFill: "#2E7D32", // Pale green for contrast
+                circleStroke: "#2E7D32",
+                textFill: "white"
+            },
+            darkGreen: {
+                fill: "#2E7D32", // Deep green
+                stroke: "#000", // Almost white green
+                // stroke: "#1B5E20", // Almost white green
+                circleFill: "#1B5E20", // Medium green for contrast
+                circleStroke: "#1B5E20",
+                textFill: "white"
+            },
+            lilaGreen: {
+                fill: "#4A8F4A", // Muted deep green
+                stroke: "#000", // Darker forest green
+                // stroke: "#2E5732", // Darker forest green
+                circleFill: "#2E5732", // Soft pastel green
+                circleStroke: "#2E5732",
+                textFill: "white"
+            },
+            neonGreen: {
+                fill: "#00E676", // Vibrant neon green
+                stroke: "#000", // Darker neon contrast
+                // stroke: "#00A152", // Darker neon contrast
+                circleFill: "#00A152", // Lighter neon for balance
+                circleStroke: "#00A152",
+                textFill: "white"
+            },
+            yellow: {
+                fill: "#FDD835", // Bright golden yellow
+                stroke: "#000", // Deep mustard yellow
+                // stroke: "#F9A825", // Deep mustard yellow
+                circleFill: "#F9A825", // Soft pastel yellow
+                circleStroke: "#F9A825",
+                textFill: "white"
+            },
+            darkYellow: {
+                fill: "#FB8C00", // Vivid orange
+                stroke: "#000", // Burnt orange
+                // stroke: "#000", // Burnt orange
+                circleFill: "#FB8C00", // Light warm orange
+                circleStroke: "#FF8C00",
+                textFill: "white"
+            },
+            red: {
+                fill: "#C62828", // Softer red for reduced harshness
+                stroke: "#000", // Muted deep red
+                // stroke: "#8E1C1C", // Muted deep red
+                circleFill: "#8E1C1C", // Soft coral red
+                circleStroke: "#8E1C1C",
+                textFill: "white"
+            },
+            darkRed: {
+                fill: "#B71C1C", // Intense dark red
+                stroke: "#000", // Almost white-red
+                // stroke: "#7F0000", // Almost white-red
+                circleFill: "#7F0000", // Muted red tone
+                circleStroke: "#7F0000",
+                textFill: "white"
+            },
+            darkYellow_: {
+                fill: "#F9A825", // Rich dark golden yellow
+                stroke: "#000", // Deep amber
+                // stroke: "#BF9000", // Deep amber
+                circleFill: "#F9A825", // Warm muted yellow
+                circleStroke: "#BF9000",
+                textFill: "white"
+            },
+            darkOrange: {
+                fill: "#E65100", // Deep orange
+                stroke: "#000", // Black for contrast
+                circleFill: "#E65100", // Strong warm orange
+                circleStroke: "#FF5722", // Bright reddish-orange
+                textFill: "white"
+                }
+
+        };
+
+        const mapStarIcon = (number, color = colors.blue) => {
+            return ``;
+        };
+
+        const mapXIcon = (number, color = colors.red) => {
+            const XIcon = `
+  
+  <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="xShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Smooth, Rounded "X" with Extended Axes -->
+  <path d="M15 15 L125 125 M125 15 L15 125"
+        stroke="#E74C3C"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#xShadow)"/>
+
+  <!-- Well-Balanced Ci7cle -->
+  <circle cx="70" cy="75" r="40" fill="#C0392B" stroke="#A93226" stroke-width="9" filter="url(#xShadow)"/>
+
+  <!-- Clearly Visible, Well-Positioned Number -->
+  <text x="70" y="78" text-anchor="middle" dominant-baseline="middle" fill="#FFF"
+        font-family="Arial, sans-serif" font-weight="bold" font-size="50">
+${number}
+  </text>
+</svg>
+  `;
+
+            const XIconPlus = `
+      <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="xShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Smooth, Rounded "X" with Extended Axes -->
+  <path d="M15 15 L125 125 M125 15 L15 125"
+        stroke="#E74C3C"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#xShadow)"/>
+
+  <!-- Well-Balanced Circle -->
+  <circle cx="70" cy="72" r="49" fill="#C0392B" stroke="#A93226" stroke-width="10" filter="url(#xShadow)"/>
+
+  <!-- Clearly Visible, Well-Positioned Number -->
+  <text x="75" y="78" text-anchor="middle" dominant-baseline="middle" fill="#FFF"
+        font-family="Arial, sans-serif" font-weight="bold" font-size="50">
+${number}+
+  </text>
+</svg>
+  `;
+
+            return number >= 20 ? XIconPlus : XIcon;
+        };
+
+        const mapFlagIcon = (number, color = colors.red) => {
+            return `
+  <svg width="160" height="120" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="flagShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3" />
+        </filter>
+    </defs>
+
+    <rect x="20" y="10" width="14" height="160" fill="#7F0000" rx="7" ry="7"/>
+    <path d="M34 10
+            Q150 5 130 45
+            Q110 80 34 70
+            Z"
+          fill="#B71C1C"
+          stroke="#7F0000"
+          stroke-width="5"
+          filter="url(#flagShadow)"/>
+
+    <rect x="45" y="15.5" width="60" height="50" rx="8" ry="8" fill="#C62828" stroke="#7F0000" stroke-width="3" opacity="0.9"/>
+
+    <text x="75" y="45" text-anchor="middle" dominant-baseline="middle" fill="#FFF" font-family="Arial, sans-serif" font-weight="bold" font-size="50">${number}</text>
+</svg>
+
+  `;
+        };
+
+        const mapMarkIcon = (number, color = colors.lilaGreen) => {
+            const twoDigit = `
+
+      <svg width="73" height="109.5" viewBox="0 0 73 109.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="markerShadow" x="-20%" y="-10%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.25" />
+          </filter>
+          <filter id="circleShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+          </filter>
+        </defs>
+
+        <!-- Map Marker Shape -->
+        <path d="M36.5 109.5
+                C25 90, 7 67, 7 43
+                C7 20 22 7 36.5 7
+                C51 7 66 20 66 43
+                C66 67 48 90 36.5 109.5
+                Z"
+              fill="${color.fill}"
+              filter="url(#markerShadow)" />
+              
+        <!-- Elegant outline -->
+        <path d="M36.5 107.5
+                C26 89, 9 66, 9 43
+                C9 22 24 9 36.5 9
+                C49 9 64 22 64 43
+                C64 66 47 89, 36.5 107.5
+                Z"
+              stroke="${color.stroke}" stroke-width="3" fill="none"/>
+
+        <!-- Adjusted Circle for Multi-Digit Numbers -->
+        <circle cx="36.5" cy="38" r="24" fill="${color.circleFill}" filter="url(#circleShadow)" stroke="${color.circleStroke}" stroke-width="2.5" />
+
+        <!-- Number inside (supports 10-99) -->
+        <text x="50%" y="40" text-anchor="middle" dominant-baseline="middle" fill="${color.textFill}" font-family="Arial, sans-serif" font-weight="bold" font-size="35">${number}</text>
+      </svg>
+  `;
+
+            const oneDigit = `
+  <svg width="73" height="109.5" viewBox="0 0 73 109.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="markerShadow" x="-20%" y="-10%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.25" />
+      </filter>
+      <filter id="circleShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+      </filter>
+    </defs>
+
+    <!-- Map Marker Shape -->
+    <path d="M36.5 109.5
+            C25 90, 7 67, 7 43
+            C7 20 22 7 36.5 7
+            C51 7 66 20 66 43
+            C66 67 48 90 36.5 109.5
+            Z"
+          fill="${color.fill}"
+          filter="url(#markerShadow)" />
+
+    <!-- Elegant outline -->
+    <path d="M36.5 107.5
+            C26 89, 9 66, 9 43
+            C9 22 24 9 36.5 9
+            C49 9 64 22 64 43
+            C64 66 47 89, 36.5 107.5
+            Z"
+          stroke="${color.stroke}" stroke-width="3" fill="none"/>
+
+    <!-- Circle for number -->
+    <circle cx="36.5" cy="38" r="22" fill="${color.circleFill}" filter="url(#circleShadow)" stroke="${color.circleStroke}" stroke-width="2.5" />
+
+    <!-- Number inside -->
+    <text x="50%" y="42" text-anchor="middle" dominant-baseline="middle" fill="${color.textFill}" font-family="Arial, sans-serif" font-weight="bold" font-size="40">${number}</text>
+  </svg>
+`;
+
+            return number > 9 ? twoDigit : oneDigit;
+        };
+
+        const SGVIcons = (rankType) => {
+            switch (rankType) {
+                case 1: {
+                    return mapMarkIcon(rankType, colors.neonGreen);
+                }
+                case 2: {
+                    return mapMarkIcon(rankType, colors.neonGreen);
+                }
+                case 3: {
+                    return mapMarkIcon(rankType, colors.lightGreen);
+                }
+                case 4: {
+                    return mapMarkIcon(rankType, colors.lilaGreen);
+                }
+                case 5:
+                case 6:
+                case 7:
+                case 8: {
+                    return mapMarkIcon(rankType, colors.yellow);
+                }
+                case 9:
+                case 10: {
+                    return mapMarkIcon(rankType, colors.darkYellow);
+                }
+                case 11:
+                case 12: {
+                    return mapMarkIcon(rankType, colors.darkOrange);
+                }
+                case 13:
+                case 14:
+                case 15: {
+                    return mapMarkIcon(rankType, colors.red);
+                }
+
+                case 16:
+                case 17:
+                case 18:
+                case 19: {
+                    return mapFlagIcon(rankType, colors.darkRed);
+                }
+
+                default:
+                    return mapXIcon(rankType, colors.darkRed);
+            }
+        };
+
+        const seoData = {'high_relevance': 0.0, 'medium_relevance': 0.0, 'low_relevance': 130.0, 'avg_rank_value': 20.0, 'average_rank_percentage': 0.0, 'main_coordinates': [27.4383871, -82.5325876]}
+
+        for (const k in seoData) {
+
+            const element = document?.querySelector(`[data-field='${k}']`)
+            if (element) {
+                element.innerHTML = element.dataset.text + seoData[k].toFixed(2)
+            }
+        }
+
+        let locationData = [{'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.5325876, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [], 'lat': 27.4383871, 'lng': -82.51232135427762, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.453963807137956, 'lng': -82.52245447713881, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.453963807137956, 'lng': -82.54272072286119, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.55285384572238, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.422810392862043, 'lng': -82.54272072286119, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.422810392862043, 'lng': -82.52245447713881, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.49205510855525, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.456373532118374, 'lng': -82.49748543273016, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.469540514275913, 'lng': -82.51232135427762, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.47435996423675, 'lng': -82.5325876, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.469540514275913, 'lng': -82.55285384572238, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.456373532118374, 'lng': -82.56768976726984, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.57312009144475, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.420400667881626, 'lng': -82.56768976726984, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.407233685724087, 'lng': -82.55285384572238, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.40241423576325, 'lng': -82.5325876, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.407233685724087, 'lng': -82.51232135427762, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.420400667881626, 'lng': -82.49748543273016, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.47178886283287, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.45684226627313, 'lng': -82.47545547533095, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.473071467124477, 'lng': -82.48601306524446, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.48511722141387, 'lng': -82.50218823141643, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49152663339761, 'lng': -82.52203001008648, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49152663339761, 'lng': -82.54314518991352, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.48511722141387, 'lng': -82.56298696858357, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.473071467124477, 'lng': -82.57916213475553, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.45684226627313, 'lng': -82.58971972466905, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.59338633716713, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.41993193372687, 'lng': -82.58971972466905, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.403702732875523, 'lng': -82.57916213475553, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.39165697858613, 'lng': -82.56298696858357, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.38524756660239, 'lng': -82.54314518991352, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.38524756660239, 'lng': -82.52203001008648, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.39165697858613, 'lng': -82.50218823141643, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.403702732875523, 'lng': -82.48601306524446, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.41993193372687, 'lng': -82.47545547533095, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.45152261711048, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.45627927509607, 'lng': -82.45406942261603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.473047219028032, 'lng': -82.46154981397628, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.487637340210465, 'lng': -82.47349377069109, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49913288767076, 'lng': -82.48915081003328, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.506811553884322, 'lng': -82.50753714263843, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.510190860012795, 'lng': -82.52749748760873, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.509058471823906, 'lng': -82.5477776630607, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.503485541432195, 'lng': -82.56710339098544, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49382223654998, 'lng': -82.58426036482234, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.480675738162162, 'lng': -82.59817054880634, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.46487208911188, 'lng': -82.6079599149196, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.447404290790722, 'lng': -82.61301336128649, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.429369909209278, 'lng': -82.61301336128649, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.41190211088812, 'lng': -82.6079599149196, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.396098461837838, 'lng': -82.59817054880634, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.38295196345002, 'lng': -82.58426036482234, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.373288658567805, 'lng': -82.56710339098544, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.367715728176094, 'lng': -82.5477776630607, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.366583339987205, 'lng': -82.52749748760873, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.369962646115678, 'lng': -82.50753714263843, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.37764131232924, 'lng': -82.48915081003328, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.389136859789534, 'lng': -82.47349377069109, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.403726980971967, 'lng': -82.46154981397628, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.42049492490393, 'lng': -82.45406942261603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.4312563713881, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.45649031083552, 'lng': -82.43333062759075, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.473852374092395, 'lng': -82.43946847590603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.489762484860936, 'lng': -82.44941863210273, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.50356928133692, 'lng': -82.4627737356171, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.51470751165039, 'lng': -82.4789870269421, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.522721175343623, 'lng': -82.49739473202587, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.527282192083455, 'lng': -82.51724323725949, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.528203833308662, 'lng': -82.5377199425066, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.525448366919193, 'lng': -82.55798652904846, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.51912860203279, 'lng': -82.57721328045082, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.509503270566437, 'lng': -82.59461305125224, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4969664347213, 'lng': -82.60947349279171, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.482031354029896, 'lng': -82.62118621684658, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.465309472450524, 'lng': -82.62927170311785, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.447485385779785, 'lng': -82.63339893084758, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.429288814220214, 'lng': -82.63339893084758, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.411464727549475, 'lng': -82.62927170311785, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.394742845970104, 'lng': -82.62118621684658, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.3798077652787, 'lng': -82.60947349279171, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.367270929433563, 'lng': -82.59461305125224, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.35764559796721, 'lng': -82.57721328045082, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.351325833080807, 'lng': -82.55798652904846, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.348570366691337, 'lng': -82.5377199425066, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.349492007916545, 'lng': -82.51724323725949, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.354053024656377, 'lng': -82.49739473202587, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.36206668834961, 'lng': -82.4789870269421, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.37320491866308, 'lng': -82.4627737356171, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.387011715139064, 'lng': -82.44941863210273, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.402921825907605, 'lng': -82.43946847590603, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.42028388916448, 'lng': -82.43333062759075, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.4383871, 'lng': -82.41099012566573, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.45662543069601, 'lng': -82.41273919463805, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.474339077824343, 'lng': -82.41793608402519, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49101845200827, 'lng': -82.42643128878143, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.50618371802058, 'lng': -82.43798041733312, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.51939859876943, 'lng': -82.45225122227927, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.530282926195948, 'lng': -82.46883315854437, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.53852357801712, 'lng': -82.48724919401275, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.543883485683764, 'lng': -82.50696953287392, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.546208454411072, 'lng': -82.52742685688364, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.54543159908182, 'lng': -82.54803264607666, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.541575268409414, 'lng': -82.56819410941479, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.534750402006093, 'lng': -82.58733123830567, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.525153338852277, 'lng': -82.60489349239397, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.51306016898158, 'lng': -82.62037563760511, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.49881879087319, 'lng': -82.63333228080963, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.482838903046087, 'lng': -82.64339068297262, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.465580217778538, 'lng': -82.65026148217717, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.447539236022887, 'lng': -82.65374701803978, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.429234963977112, 'lng': -82.65374701803978, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.411193982221462, 'lng': -82.65026148217717, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.393935296953913, 'lng': -82.64339068297262, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.37795540912681, 'lng': -82.63333228080963, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.36371403101842, 'lng': -82.62037563760511, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.351620861147723, 'lng': -82.60489349239397, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.342023797993907, 'lng': -82.58733123830567, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.335198931590586, 'lng': -82.56819410941479, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.33134260091818, 'lng': -82.54803264607666, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.330565745588927, 'lng': -82.52742685688364, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.332890714316235, 'lng': -82.50696953287392, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.33825062198288, 'lng': -82.48724919401275, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.34649127380405, 'lng': -82.46883315854437, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.35737560123057, 'lng': -82.45225122227927, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.37059048197942, 'lng': -82.43798041733312, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.38575574799173, 'lng': -82.42643128878143, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.402435122175657, 'lng': -82.41793608402519, 'average_percentage': 0.0, 'final_rank': 20}, {'data': [{'keyword': 'Air Conditioning Repair, AC Maintenance, AC Replacement, AC Installation, Heating Repair, Heating Replacement, Heating Installation', 'location_rank': {'rank': 21.0, 'percentage': 0.0}, 'percentage': 0.0}], 'lat': 27.42014876930399, 'lng': -82.41273919463805, 'average_percentage': 0.0, 'final_rank': 20}]
+
+        function calculateKeywordAverages() {
+            const keywords = {};
+
+            locationData.forEach((location) => {
+                location.data.forEach((item) => {
+                    if (!keywords[item.keyword]) {
+                        keywords[item.keyword] = {
+                            totalRank: 0,
+                            totalFinalRank: 0,
+                            totalPercentage: 0,
+                            locations: [],
+                            count: 0
+                        };
+                    }
+
+                    keywords[item.keyword].totalRank += item.location_rank.rank;
+                    keywords[item.keyword].totalFinalRank += location.final_rank;
+                    keywords[item.keyword].totalPercentage += item.percentage;
+                    keywords[item.keyword].locations.push({
+                        lat: location.lat,
+                        lng: location.lng,
+                        rank: item.location_rank.rank,
+                        finalRank: location.final_rank,
+                        percentage: item.percentage
+                    });
+                    keywords[item.keyword].count++;
+                });
+            });
+
+            const keywordAverages = {};
+            for (const [keyword, data] of Object.entries(keywords)) {
+                keywordAverages[keyword] = {
+                    avgRank: data.totalRank / data.count,
+                    avgFinalRank: data.totalFinalRank / data.count,
+                    avgPercentage: data.totalPercentage / data.count,
+                    locations: data.locations,
+                    count: data.count
+                };
+            }
+
+            return keywordAverages;
+        }
+
+        function initMap() {
+            const mainCoordinates = {
+                lat: locationData[locationData.length - 1].lat,
+                lng: locationData[locationData.length - 1].lng
+            };
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 17,
+                center: mainCoordinates,
+                styles: [
+                    {
+                        featureType: "administrative",
+                        elementType: "geometry",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "poi",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "road",
+                        elementType: "labels.icon",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "transit",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
+            });
+
+            // Create markers for each location
+            locationData.forEach((location, index) => {
+                // Determine marker color based on rank (better rank = greener)
+                let markerColor = "#ef4444"; // Default red for poor rank
+
+                if (location.final_rank <= 10) {
+                    markerColor = "#10b981"; // Green for good rank
+                } else if (location.final_rank <= 15) {
+                    markerColor = "#f59e0b"; // Yellow for medium rank
+                }
+
+                const iconType = 'custom'
+
+                let marker = {}
+                if (iconType == "custom") {
+                    marker = new google.maps.Marker({
+                        position: { lat: location.lat, lng: location.lng },
+                        map: map,
+                        animation: google.maps.Animation.BOUNCE,
+                        title: `Location ${index + 1}`,
+                        icon: {
+                            url:
+                                "data:image/svg+xml;charset=UTF-8," +
+                                encodeURIComponent(SGVIcons(location.final_rank)),
+                            scaledSize: new google.maps.Size(50, 50),
+                            anchor: new google.maps.Point(25, 50)
+                        }
+                    });
+                }
+                else {
+                    marker = new google.maps.Marker({
+                        position: { lat: location.lat, lng: location.lng },
+                        map: map,
+                        animation: google.maps.Animation.BOUNCE,
+                        title: `Location ${index + 1}`,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillColor: '#f97316', // Orange
+                            fillOpacity: 0.8,
+                            strokeColor: '#ffffff',
+                            strokeWeight: 2,
+                            scale: 10
+                        },
+                        label: {
+                            text: `${location.final_rank}`,
+                            color: 'white',
+                            fontSize: '10px'
+                        },
+                    });
+                }
+
+                // Create info window content with all keywords for this location
+                let keywordsContent = "";
+                location.data.forEach((item) => {
+                    keywordsContent += `
+                          <p style="margin: 0 0 3px;">
+                              <strong>${item.keyword}:</strong>
+                              Rank ${item.location_rank.rank},
+                              Keyword relevance: ${item.location_rank.percentage}%
+                          </p>
+                      `;
+                });
+                // Add info window for each marker
+                const infoContent = `
+                      <div style="padding: 6px; max-width: 180px; font-size: 11px;">
+                          <h3 style="margin: 0 0 4px; font-weight: bold;">Location number ${index + 1
+                    }</h3>
+                          <div style="margin-bottom: 3px;">
+                              ${keywordsContent}
+                          </div>
+                          <p style="margin: 0 0 3px;"><strong>Avg Percentage:</strong> ${location.average_percentage
+                    }%</p>
+                          <p style="margin: 0 0 3px;"><strong>Final Rank:</strong> ${location.final_rank
+                    }</p>
+                          <p style="margin: 0;"><strong>Coordinates:</strong> ${location.lat.toFixed(
+                        6
+                    )}, ${location.lng.toFixed(6)}</p>
+                      </div>
+                  `;
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: infoContent
+                });
+
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+
+            // Create grid overlay
+            const bounds = new google.maps.LatLngBounds();
+            locationData.forEach((location) => {
+                bounds.extend(new google.maps.LatLng(location.lat, location.lng));
+            });
+
+            // Expand bounds slightly to ensure all markers are visible
+            bounds.extend(
+                new google.maps.LatLng(
+                    bounds.getNorthEast().lat() + 0.003,
+                    bounds.getNorthEast().lng() + 0.003
+                )
+            );
+            bounds.extend(
+                new google.maps.LatLng(
+                    bounds.getSouthWest().lat() - 0.003,
+                    bounds.getSouthWest().lng() - 0.003
+                )
+            );
+            map.fitBounds(bounds);
+
+            // Draw grid lines connecting the points
+            const gridLines = [];
+
+            // Find unique latitudes and longitudes
+            const uniqueLats = [...new Set(locationData.map((loc) => loc.lat))];
+            const uniqueLngs = [...new Set(locationData.map((loc) => loc.lng))];
+
+            // Draw horizontal grid lines
+
+            // Draw circular grid lines to create a grid pattern
+            const center = {
+                lat: (bounds.getNorthEast().lat() + bounds.getSouthWest().lat()) / 2,
+                lng: (bounds.getNorthEast().lng() + bounds.getSouthWest().lng()) / 2
+            };
+
+            const radiusStep = 0.008; // Approximately 500 meters
+            const numCircles = 10;
+
+            for (let i = 1; i <= numCircles; i++) {
+                const radius = i * radiusStep;
+                const circle = new google.maps.Circle({
+                    strokeColor: "#f97316",
+                    strokeOpacity: 0.3,
+                    strokeWeight: 1,
+                    fillOpacity: 0,
+                    map: map,
+                    center: center,
+                    radius: radius * 111000 // Convert degrees to meters (approx)
+                });
+            }
+
+            // Add a legend to the map
+            const legend = document.createElement("div");
+            legend.style.backgroundColor = "white";
+            legend.style.padding = "6px";
+            legend.style.margin = "8px";
+            legend.style.border = "1px solid #e5e7eb";
+            legend.style.borderRadius = "4px";
+            legend.style.fontSize = "9px";
+            legend.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+            legend.innerHTML =
+                '<div style="font-weight:600;margin-bottom:4px;color:#1f2937;">Legend</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:4px;"></div>Good Rank (≤10)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#f59e0b;border-radius:50%;margin-right:4px;"></div>Medium (11-15)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:8px;height:8px;background:#ef4444;border-radius:50%;margin-right:4px;"></div>Poor Rank (>15)</div>' +
+                '<div style="display:flex;align-items:center;margin-bottom:3px;"><div style="width:16px;height:2px;background:#f97316;margin-right:4px;"></div>Grid Line</div>' +
+                '<div style="display:flex;align-items:center;"><div style="width:12px;height:12px;border:1px solid #f97316;border-radius:50%;margin-right:4px;"></div>Radius</div>';
+
+            map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            Chart.register(ChartDataLabels);
+
+            // Calculate keyword averages
+            const keywordAverages = calculateKeywordAverages();
+
+            // Collect all relevance data
+            const relevanceData = {
+                high: 0,
+                medium: 0,
+                low: 0
+            };
+
+            // Count keywords by relevance category based on their average rank
+            Object.values(keywordAverages).forEach((data) => {
+                if (data.avgRank <= 7) {
+                    relevanceData.low++; // Low relevance (good)
+                } else if (data.avgRank <= 15) {
+                    relevanceData.medium++; // Medium relevance
+                } else {
+                    relevanceData.high++; // High relevance (poor)
+                }
+            });
+
+            const rankDistCtx = document
+                .getElementById("rankDistributionChart")
+                .getContext("2d");
+
+            // Count occurrences of each final rank
+            const rankCounts = {};
+            locationData.forEach((location) => {
+                const rank = location.final_rank;
+                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
+            });
+
+            const rankLabels = Object.keys(rankCounts).sort((a, b) => a - b);
+            const rankValues = rankLabels.map((rank) => rankCounts[rank]);
+
+            // Determine colors based on rank value
+            const rankColors = rankLabels.map((rank) => {
+                if (rank <= 10) return "#10b981"; // Green for good ranks
+                if (rank <= 15) return "#f59e0b"; // Yellow for medium ranks
+                return "#ef4444"; // Red for poor ranks
+            });
+
+            const rankDistChart = new Chart(rankDistCtx, {
+                type: "pie",
+                data: {
+                    labels: rankLabels.map((rank) => `Rank ${rank}`),
+                    datasets: [
+                        {
+                            data: rankValues,
+                            backgroundColor: rankColors,
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            font: {
+                                weight: "bold",
+                                size: 16
+                            },
+                            formatter: (value, context) => {
+                                return value > 0 ? value : "";
+                            }
+                        },
+                        legend: {
+                            position: "right",
+                            labels: {
+                                boxWidth: 8,
+                                padding: 6,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || "";
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce(
+                                        (a, b) => a + b,
+                                        0
+                                    );
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Calculate overall averages across all keywords
+            let totalRank = 0;
+            let totalFinalRank = 0;
+            let totalPercentage = 0;
+            let totalCount = 0;
+
+            // Collect all keyword data points
+            locationData.forEach((location) => {
+                location.data.forEach((item) => {
+                    totalRank += item.location_rank.rank;
+                    totalFinalRank += location.final_rank;
+                    totalPercentage += item.percentage;
+                    totalCount++;
+                });
+            });
+
+            // Calculate averages
+            const overallAvgRank = totalRank / totalCount;
+            const overallAvgFinalRank = totalFinalRank / totalCount;
+            const overallAvgPercentage = totalPercentage / totalCount;
+
+            // Update summary stats
+            document.getElementById("avg-keyword-rank").textContent =
+                overallAvgRank.toFixed(1);
+            document.getElementById("avg-final-rank").textContent =
+                overallAvgFinalRank.toFixed(1);
+            document.getElementById("avg-percentage").textContent =
+                overallAvgPercentage.toFixed(1) + "%";
+
+            //populateKeywordsPerformantChart(overallAvgRank, overallAvgFinalRank, overallAvgPercentage)
+        }
+
+        function populateKeywordsPerformantChart (
+            overallAvgRank,
+            overallAvgFinalRank,
+            overallAvgPercentage
+        ) {
+            const overallCtx = document
+                .getElementById("overallPerformanceChart")
+                .getContext("2d");
+
+            const overallChart = new Chart(overallCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Keyword Rank", "Final Rank", "Percentage (%)"],
+                    datasets: [
+                        {
+                            label: "Overall Performance",
+                            data: [
+                                overallAvgRank,
+                                overallAvgFinalRank,
+                                overallAvgPercentage
+                            ],
+                            backgroundColor: [
+                                "#f97316", // orange
+                                "#fb923c", // lighter orange
+                                "#fdba74" // even lighter orange
+                            ],
+                            borderColor: "#ffffff",
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 16 // Increased font size for better readability
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14 // Increased font size for x-axis labels
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            color: "#ffffff",
+                            backgroundColor: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: 3,
+                            font: {
+                                weight: "bold",
+                                size: 14 // Increased size for the labels inside the bars
+                            },
+                            padding: 5,
+                            formatter: (value) => {
+                                return value.toFixed(1);
+                            }
+                        },
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 14 // Increased tooltip font size for better readability
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        // Populate Keyword Performance Table
+        function populateKeywordTable() {
+            const tableBody = document.getElementById("keywordTableBody");
+            const keywordAverages = calculateKeywordAverages();
+
+            // Add a row for each keyword with its average metrics
+            for (const [keyword, data] of Object.entries(keywordAverages)) {
+                const row = document.createElement("tr");
+
+                // Determine performance status
+                let performanceStatus = "poor";
+                let performanceClass = "performance-poor";
+
+                if (data.avgRank <= 7) {
+                    performanceStatus = "good";
+                    performanceClass = "performance-good";
+                } else if (data.avgRank <= 15) {
+                    performanceStatus = "medium";
+                    performanceClass = "performance-medium";
+                }
+
+                row.innerHTML = `
+                      <td class="keyword-cell" title="${keyword}">
+                          <span class="badge badge-orange">${keyword}</span>
+                      </td>
+                      <td>${data.avgRank.toFixed(1)}</td>
+                      <td>${data.avgFinalRank.toFixed(1)}</td>
+                      <td>${data.avgPercentage.toFixed(1)}%</td>
+                      <td>${data.count}</td>
+                      <td><span class="performance-indicator ${performanceClass}"></span>${performanceStatus}</td>
+                  `;
+
+                tableBody.appendChild(row);
+            }
+
+            // Add an overall average row
+            const overallRow = document.createElement("tr");
+            overallRow.style.backgroundColor = "#fff7ed"; // Light orange background
+            overallRow.style.fontWeight = "bold";
+
+            // Calculate overall averages
+            let totalRank = 0;
+            let totalFinalRank = 0;
+            let totalPercentage = 0;
+            let totalCount = 0;
+
+            Object.values(keywordAverages).forEach((data) => {
+                totalRank += data.avgRank * data.count;
+                totalFinalRank += data.avgFinalRank * data.count;
+                totalPercentage += data.avgPercentage * data.count;
+                totalCount += data.count;
+            });
+
+            const avgRank = totalRank / totalCount;
+            const avgFinalRank = totalFinalRank / totalCount;
+            const avgPercentage = totalPercentage / totalCount;
+
+            // Determine overall performance status
+            let overallPerformanceStatus = "poor";
+            let overallPerformanceClass = "performance-poor";
+
+            if (avgRank <= 7) {
+                overallPerformanceStatus = "good";
+                overallPerformanceClass = "performance-good";
+            } else if (avgRank <= 15) {
+                overallPerformanceStatus = "medium";
+                overallPerformanceClass = "performance-medium";
+            }
+
+            overallRow.innerHTML = `
+                  <td>
+                      <span class="badge badge-orange">Overall Average</span>
+                  </td>
+                  <td>${avgRank.toFixed(1)}</td>
+                  <td>${avgFinalRank.toFixed(1)}</td>
+                  <td>${avgPercentage.toFixed(1)}%</td>
+                  <td>${totalCount}</td>
+                  <td><span class="performance-indicator ${overallPerformanceClass}"></span>${overallPerformanceStatus}</td>
+              `;
+
+            tableBody.appendChild(overallRow);
+        }
+
+        // Initialize everything when the page loads
+        window.onload = function () {
+            initMap();
+            initCharts();
+            populateKeywordTable();
+
+            document.getElementById("rankNumber").innerHTML = `${seoData.avg_rank_value.toFixed(2)}`;
+
+            let finalPercentage = "metric-pill-green"
+
+            if (seoData.avg_rank_value >= 8 && seoData.avg_rank_value <= 14) {
+                finalPercentage = "metric-pill-yellow"
+            }
+            else if (seoData.avg_rank_value >= 15) {
+                finalPercentage = "metric-pill-red"
+            }
+            document.getElementById("rankNumber").classList.add(finalPercentage)
+
+            const ctx = document.getElementById("doughnutChart").getContext("2d");
+            new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Low", "Medium", "High"],
+                datasets: [
+                {
+                    label: "Average Percentage",
+                    data: [
+                        seoData.low_relevance,
+                        seoData.medium_relevance,
+                        seoData.high_relevance
+                    ],
+                    backgroundColor: [
+                    "#FF5733",
+                    "#FFC300",
+                    "#4CAF50",
+                    "#2196F3",
+                    "#9C27B0"
+                    ],
+                    borderColor: ["#D84315", "#FF8F00", "#2E7D32", "#1565C0", "#6A1B9A"],
+                    borderWidth: 2
+                }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "0%",
+                plugins: {
+                    datalabels: {
+                            color: "#ffffff",
+                            font: {
+                                weight: "bold",
+                                size: 20
+                            },
+                            formatter: (value) => {
+                                return value > 0 ? value : "";
+                            }
+                        },
+                    legend: {
+                        position: "right",
+                        labels: {
+                                boxWidth: 30,
+                                padding: 6,
+                                font: {
+                                    size: 17
+                                }
+                            }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16,
+                        },
+                        callbacks: {
+                                label: function (context) {
+                                    const label = context.label || "";
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce(
+                                        (a, b) => a + b,
+                                        0
+                                    );
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                    }
+                }
+            }
+            });
+
+        };
+    </script>
+
+</body>
+
+</html>
