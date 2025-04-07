@@ -28,7 +28,7 @@ import { useCart } from "@/context/CartContext"
 const businessFormSchema = z.object({
   name: z.string().min(2, { message: "Business name must be at least 2 characters." }),
   location: z.string().min(3, { message: "Location is required." }),
-  locationId: z.string().min(3, { message: "Location is required." }).optional(),
+  location_id: z.string().min(3, { message: "Location is required." }).optional(),
   country: z.string().min(1, { message: "Location is required." }),
   price: z.number().int().positive({ message: "Price must be a positive integer." }),
   phones: z
@@ -99,7 +99,7 @@ export type BusinessFormValues = z.infer<typeof businessFormSchema>
 const existingBusiness: BusinessFormValues = {
   name: "Acme Corporation",
   location: "123 Main St, Anytown, USA",
-  locationId: "230912830912830",
+  location_id: "230912830912830",
   country: "US",
   price: 150,
   phones: [{ number: "+1 (555) 123-4567" }],

@@ -1,4 +1,61 @@
-// Tipos compartidos para el sistema de gestión de usuarios
+export interface Login {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface UserBusiness {
+  id?: string;
+  businessName: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  userId: string;
+  token: {
+    client_id: string;
+    client_secret: string;
+    expiry: string;
+    refresh_token: string;
+    scopes: string[];
+    token: string;
+    token_uri: string;
+    universe_domain: string;
+  };
+}
+
+export interface Business {
+  id?: string;
+  location: string;
+  location_id: string;
+  name: string;
+  phone: string[];
+  services: string[];
+  social_tags: string[];
+  target_locations: string[];
+  user_params: {
+    amount_words: number;
+    keywords: string;
+  }
+  website: string;
+}
+
+export interface Review {
+  reviewId: string;
+  reviewer: {
+    profilePhotoUrl: string;
+    displayName: string;
+  };
+  starRating: "FIVE" | "FOUR" | "THREE" | "TWO" | "ONE";
+  comment: string;
+  createTime: string;
+  updateTime: string;
+  name: string;
+  reviewReply?: {
+    comment: string;
+    updateTime: string;
+  }
+}
 
 // Tipos de usuario
 export interface User {
@@ -11,7 +68,6 @@ export interface User {
   avatar?: string;
 }
 
-// Tipos de rol
 export interface Role {
   id: string;
   name: string;
@@ -20,7 +76,6 @@ export interface Role {
   permissions: Record<string, boolean>;
 }
 
-// Tipos de registro de actividad
 export interface ActivityLog {
   id: string;
   userId: string;
@@ -32,7 +87,6 @@ export interface ActivityLog {
   metadata?: string;
 }
 
-// Tipos para invitaciones de usuario
 export interface UserInvite {
   email: string;
   role: string;
@@ -46,7 +100,6 @@ export interface BulkUserInvite {
   message?: string;
 }
 
-// Tipos para permisos
 export interface Permission {
   id: string;
   name: string;
@@ -59,7 +112,6 @@ export interface PermissionCategory {
   permissions: Permission[];
 }
 
-// Props para componentes
 export interface UserListProps {
   users: User[];
   roles: Role[];

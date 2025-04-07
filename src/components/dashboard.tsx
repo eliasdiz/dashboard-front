@@ -59,7 +59,7 @@ import SettingsPage from "@/components/settings-section";
 import { UserManagement } from "@/components/user-management/user-management";
 import CartButton from "@/components/cart/cart-button";
 import CartModal from "@/components/cart/cart-modal";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 
 export function Dashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -78,8 +78,8 @@ export function Dashboard() {
     | "reports"
     | "settings"
   >("overview");
-    const auth = useUser()
-  
+  const { businessData, logout } = useAuth()
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-white">
@@ -256,7 +256,7 @@ export function Dashboard() {
             <div className="p-4">
               <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                 <User className="mr-2 h-4 w-4" />
-                {`${auth?.user?.user?.firstName} ${auth?.user?.user?.lastName}` || ""}                
+                {`${businessData?.firstName} ${businessData?.lastName}` || "N/A"}
               </Button>
             </div>
           </SidebarFooter>
@@ -290,11 +290,10 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "overview"
+                      className={`w-full justify-start ${activeTab === "overview"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("overview");
                         setIsMobileOpen(false);
@@ -305,11 +304,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "locations"
+                      className={`w-full justify-start ${activeTab === "locations"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("locations");
                         setIsMobileOpen(false);
@@ -320,11 +318,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "users"
+                      className={`w-full justify-start ${activeTab === "users"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("users");
                         setIsMobileOpen(false);
@@ -343,11 +340,10 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "posts"
+                      className={`w-full justify-start ${activeTab === "posts"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("posts");
                         setIsMobileOpen(false);
@@ -358,11 +354,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "keywords"
+                      className={`w-full justify-start ${activeTab === "keywords"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("keywords");
                         setIsMobileOpen(false);
@@ -373,11 +368,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "services"
+                      className={`w-full justify-start ${activeTab === "services"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("services");
                         setIsMobileOpen(false);
@@ -388,11 +382,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "social-media"
+                      className={`w-full justify-start ${activeTab === "social-media"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("social-media");
                         setIsMobileOpen(false);
@@ -403,11 +396,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "wordpress"
+                      className={`w-full justify-start ${activeTab === "wordpress"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("wordpress");
                         setIsMobileOpen(false);
@@ -426,11 +418,10 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "reviews"
+                      className={`w-full justify-start ${activeTab === "reviews"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("reviews");
                         setIsMobileOpen(false);
@@ -441,11 +432,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "citations"
+                      className={`w-full justify-start ${activeTab === "citations"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("citations");
                         setIsMobileOpen(false);
@@ -464,11 +454,10 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "heatmaps"
+                      className={`w-full justify-start ${activeTab === "heatmaps"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("heatmaps");
                         setIsMobileOpen(false);
@@ -479,11 +468,10 @@ export function Dashboard() {
                     </Button>
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "reports"
+                      className={`w-full justify-start ${activeTab === "reports"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("reports");
                         setIsMobileOpen(false);
@@ -502,11 +490,10 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
-                      className={`w-full justify-start ${
-                        activeTab === "settings"
+                      className={`w-full justify-start ${activeTab === "settings"
                           ? "bg-primary/10 text-primary"
                           : ""
-                      } hover:bg-primary/20 hover:text-primary`}
+                        } hover:bg-primary/20 hover:text-primary`}
                       onClick={() => {
                         setActiveTab("settings");
                         setIsMobileOpen(false);
@@ -521,7 +508,7 @@ export function Dashboard() {
               <div className="border-t p-4">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   <User className="mr-2 h-4 w-4" />
-                  {auth?.user?.user?.firstName}
+                  {businessData?.firstName}
                 </Button>
               </div>
             </div>
@@ -547,7 +534,7 @@ export function Dashboard() {
                     size="icon"
                     className="rounded-full bg-primary/80 text-white"
                   >
-                    {`${auth?.user?.user?.firstName[0].toLocaleUpperCase()}${auth?.user?.user?.lastName[0].toUpperCase()}` || ""}                
+                    {`${businessData?.firstName.toLocaleUpperCase()}${businessData?.lastName.toUpperCase()}` || ""}
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -555,7 +542,7 @@ export function Dashboard() {
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive" onClick={() => auth?.logout()}>
+                  <DropdownMenuItem className="text-destructive" onClick={() => logout()}>
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>

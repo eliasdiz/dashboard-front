@@ -22,21 +22,18 @@ import {
   BusinessFormDialog,
   BusinessFormValues,
 } from "@/components/business-form-dialog";
-import dotenv from "dotenv";
-import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { Button } from "./ui/button";
 import EditableBadgeButton from "./edit-tags";
 import GoogleLoader from "./google-loader";
-
-dotenv.config();
-
-// Example of pre-filled data for editing
+import { Business } from "@/types/types";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 
 export function BusinessesTable() {
-  const auth = useUser();
+  const { currentUser } = useAuth()
   const [searchTerm, setSearchTerm] = useState("");
-  const [businesses, setBusinesses] = useState<BusinessFormValues[] | []>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState<"name" | "website" | "location">(
     "name"
@@ -88,43 +85,26 @@ export function BusinessesTable() {
   };
 
   useEffect(() => {
-    const userId = auth?.user?.user?.userId;
-    if (!userId) return;
+    setLoading(true);
+    const businessesFromLocalStorage = localStorage.getItem("businesses");
 
-    const storedBusinesses = localStorage.getItem(`businesses_${userId}`);
-
-    if (storedBusinesses) {
-      setBusinesses(JSON.parse(storedBusinesses));
+    if (businessesFromLocalStorage) {
+      setBusinesses(JSON.parse(businessesFromLocalStorage));
+      setLoading(false);
     } else {
-      setLoading(true);
       axios
-        .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/locations?user_id=${userId}`
-        )
+        .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/business/businesses`)
         .then((response) => {
-          const formattedBusinesses = response.data?.locations?.map(
-            // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (business: BusinessFormValues) => ({
-              name: business.name,
-              location: business.location,
-              locationId: business.locationId,
-              country: business.country,
-              website: business.website,
-              cid: business.cid,
-              imagePrompt: business.imagePrompt,
-              isAdded: false,
-            })
-          );
+          const formattedBusinesses = response.data?.businesses || [];
           setBusinesses(formattedBusinesses);
-          localStorage.setItem(
-            `businesses_${userId}`,
-            JSON.stringify(formattedBusinesses)
-          );
+          localStorage.setItem("businesses", JSON.stringify(formattedBusinesses));
+          toast.success("Businesses fetched successfully");
         })
-        .catch((err) => console.error(err))
+        .catch(() => toast.error("Error fetching businesses"))
         .finally(() => setLoading(false));
     }
-  }, [auth?.user?.user?.userId]);
+  }, []);
+
 
   return (
     <>
@@ -206,7 +186,7 @@ export function BusinessesTable() {
                 <TableBody>
                   {sortedBusinesses.length > 0 ? (
                     sortedBusinesses.map((business, index) => (
-                      <TableRow key={`${business.locationId}-${index}`}>
+                      <TableRow key={`${business.location_id}-${index}`}>
                         <TableCell>{business.name.slice(0, 30)}</TableCell>
                         <TableCell>
                           <a
@@ -223,9 +203,9 @@ export function BusinessesTable() {
                             <ExternalLink className="ml-1 h-3 w-3" />
                           </a>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        {/*           <TableCell className="font-medium">
                           {business?.country}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell>
                           <EditableBadgeButton />
                         </TableCell>
@@ -234,13 +214,13 @@ export function BusinessesTable() {
                             setBusinesses((prevBusinesses) => {
                               const updatedBusinesses = prevBusinesses.map(
                                 (b) =>
-                                  b.locationId === business.locationId
+                                  b.location_id === business.location_id
                                     ? { ...b, isAdded: true }
                                     : b
                               );
 
                               // Guardar en localStorage
-                              const userId = auth?.user?.user?.userId;
+                              const userId = currentUser?.uid;
                               if (userId) {
                                 localStorage.setItem(
                                   `businesses_${userId}`,
@@ -258,7 +238,7 @@ export function BusinessesTable() {
                               name: "business.name",
                               location: "business.location",
                               country: "business.country",
-                              locationId: "business.locationId",
+                              location_id: "business.locationId",
                               price: 25,
                               phones: [{ number: "business.phones" }],
                               services: [{ name: "business.services" }],

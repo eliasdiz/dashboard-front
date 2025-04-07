@@ -681,6 +681,7 @@ export function SocialMediaManagement() {
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent>
+                <SelectItem value="linkedin">Google</SelectItem>
                   <SelectItem value="twitter">Twitter</SelectItem>
                   <SelectItem value="facebook">Facebook</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
