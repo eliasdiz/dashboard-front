@@ -88,39 +88,9 @@ export function MarketingReviews({
   const [viewMode, setViewMode] = useState<"carousel" | "grid" | "list">("carousel")
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false)
   const [loading, setLoading] = useState(false)
+
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Load businesses from localStorage on component mount
-  useEffect(() => {
-    const storedBusinesses = localStorage.getItem('businesses')
-    console.log("Stored Businesses:", storedBusinesses)
-    if (storedBusinesses) {
-      try {
-        const parsedBusinesses = JSON.parse(storedBusinesses)
-        setBusinesses(parsedBusinesses)
-        setFilteredBusinesses(parsedBusinesses)
-      } catch (error) {
-        toast.error("Error parsing business data")
-        console.error("Error parsing business data:", error)
-      }
-    }
-  }, [])
-
-  // Filter businesses based on search term
-  useEffect(() => {
-    if (businesses.length > 0 && businessSearchTerm) {
-      const term = businessSearchTerm.toLowerCase()
-      const filtered = businesses.filter(
-        (business) =>
-          business.name.toLowerCase().includes(term)/*  ||
-          business.location.toLowerCase().includes(term) ||
-          business.services.some((service) => service.toLowerCase().includes(term)) */
-      )
-      setFilteredBusinesses(filtered)
-    } else {
-      setFilteredBusinesses(businesses)
-    }
-  }, [businesses, businessSearchTerm])
 
   // Handle business selection
   const handleBusinessSelect = (businessId: string) => {
@@ -431,51 +401,6 @@ export function MarketingReviews({
     )
   }
 
-  // Apply filters
-  useEffect(() => {
-    if (reviews.length > 0) {
-      let result = [...reviews]
-
-      // Rating filter
-      if (ratingFilter !== "all") {
-        const ratingValue = parseInt(ratingFilter)
-        result = result.filter((review) => {
-          const reviewRating = review.starRating === "ONE" ? 1 :
-            review.starRating === "TWO" ? 2 :
-              review.starRating === "THREE" ? 3 :
-                review.starRating === "FOUR" ? 4 :
-                  review.starRating === "FIVE" ? 5 : 0
-          return reviewRating >= ratingValue
-        })
-      }
-
-      // Sentiment filter (would need to be implemented based on your sentiment data)
-      if (sentimentFilter !== "all") {
-        // Implement sentiment filtering logic here
-      }
-
-      setFilteredReviews(result)
-
-      // Reset active index when filters change
-      setActiveIndex(0)
-    }
-  }, [reviews, ratingFilter, sentimentFilter, keywordFilter])
-
-  // Autoplay functionality
-  useEffect(() => {
-    if (autoplay && !isAutoplayPaused && viewMode === "carousel" && filteredReviews.length > 1) {
-      autoplayRef.current = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex === filteredReviews.length - 1 ? 0 : prevIndex + 1))
-      }, autoplaySpeed)
-    }
-
-    return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current)
-      }
-    }
-  }, [autoplay, autoplaySpeed, filteredReviews.length, isAutoplayPaused, viewMode])
-
   // Render business selection UI
   const renderBusinessSelector = () => {
     return (
@@ -616,6 +541,80 @@ export function MarketingReviews({
       </div>
     )
   }
+
+  // Apply filters
+  useEffect(() => {
+    if (reviews.length > 0) {
+      let result = [...reviews]
+
+      // Rating filter
+      if (ratingFilter !== "all") {
+        const ratingValue = parseInt(ratingFilter)
+        result = result.filter((review) => {
+          const reviewRating = review.starRating === "ONE" ? 1 :
+            review.starRating === "TWO" ? 2 :
+              review.starRating === "THREE" ? 3 :
+                review.starRating === "FOUR" ? 4 :
+                  review.starRating === "FIVE" ? 5 : 0
+          return reviewRating >= ratingValue
+        })
+      }
+
+      // Sentiment filter (would need to be implemented based on your sentiment data)
+      if (sentimentFilter !== "all") {
+        // Implement sentiment filtering logic here
+      }
+
+      setFilteredReviews(result)
+
+      // Reset active index when filters change
+      setActiveIndex(0)
+    }
+  }, [reviews, ratingFilter, sentimentFilter, keywordFilter])
+
+  // Autoplay functionality
+  useEffect(() => {
+    if (autoplay && !isAutoplayPaused && viewMode === "carousel" && filteredReviews.length > 1) {
+      autoplayRef.current = setInterval(() => {
+        setActiveIndex((prevIndex) => (prevIndex === filteredReviews.length - 1 ? 0 : prevIndex + 1))
+      }, autoplaySpeed)
+    }
+
+    return () => {
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current)
+      }
+    }
+  }, [autoplay, autoplaySpeed, filteredReviews.length, isAutoplayPaused, viewMode])
+
+  useEffect(() => {
+    const storedBusinesses = localStorage.getItem('businesses')
+    if (storedBusinesses) {
+      try {
+        const parsedBusinesses = JSON.parse(storedBusinesses)
+        setBusinesses(parsedBusinesses)
+        setFilteredBusinesses(parsedBusinesses)
+      } catch (error) {
+        toast.error("Error parsing business data: " + error)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (businesses.length > 0 && businessSearchTerm) {
+      const term = businessSearchTerm.toLowerCase()
+      const filtered = businesses.filter(
+        (business) =>
+          business.name.toLowerCase().includes(term)/*  ||
+            business.location.toLowerCase().includes(term) ||
+            business.services.some((service) => service.toLowerCase().includes(term)) */
+      )
+      setFilteredBusinesses(filtered)
+    } else {
+      setFilteredBusinesses(businesses)
+    }
+  }, [businesses, businessSearchTerm])
+
 
   return (
     <div className={cn("w-full", className, darkMode ? "dark" : "")}>
