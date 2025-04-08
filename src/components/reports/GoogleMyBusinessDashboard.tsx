@@ -583,7 +583,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
               </p>
 
               <div className="rounded-xl overflow-hidden shadow-lg">
-                <Heatmap locationId={location_id} file={heatmapFile} />
+                <Heatmap location_id={location_id} file={heatmapFile} />
               </div>
             </div>
           </div>

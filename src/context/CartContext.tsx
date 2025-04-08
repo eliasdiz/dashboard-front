@@ -36,7 +36,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM":
       // Check if item already exists
-      const existingItemIndex = state.items.findIndex((item) => item.locationId === action.payload.locationId)
+      const existingItemIndex = state.items.findIndex((item) => item.location_id === action.payload.location_id)
 
       if (existingItemIndex > -1) {
         // Item already exists, don't add it again
@@ -59,7 +59,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       }
 
     case "REMOVE_ITEM":
-      const itemToRemove = state.items.find((item) => item.locationId === action.payload)
+      const itemToRemove = state.items.find((item) => item.location_id === action.payload)
       console.log(itemToRemove?.name)
       // toast({
       //   title: "Item removed",
@@ -67,7 +67,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       // })
       return {
         ...state,
-        items: state.items.filter((item) => item.locationId !== action.payload),
+        items: state.items.filter((item) => item.location_id !== action.payload),
       }
 
     case "CLEAR_CART":

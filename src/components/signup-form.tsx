@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
 export function SignupForm() {
-  const router = useRouter();
   const { signup, loading } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -33,7 +31,7 @@ export function SignupForm() {
     password: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -41,7 +39,8 @@ export function SignupForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     try {

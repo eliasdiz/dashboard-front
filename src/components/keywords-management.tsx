@@ -86,7 +86,7 @@ const coordinatesSchema = z.object({
 const businessFormSchema = z.object({
   name: z.string().min(2, "Business name must be at least 2 characters"),
   location: z.string().min(2, "Location must be at least 2 characters"),
-  locationId: z.string().min(1, "Location ID is required"),
+  location_id: z.string().min(1, "Location ID is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   phones: z.array(phoneSchema).optional(),
   services: z.array(serviceSchema).optional(),
@@ -145,7 +145,7 @@ export function KeywordsManagement({
     defaultValues: {
       name: "",
       location: "",
-      locationId: "",
+      location_id: "",
       price: 0,
       phones: [],
       services: [],
@@ -260,7 +260,7 @@ export function KeywordsManagement({
     form.reset({
       name: "",
       location: "",
-      locationId: "",
+      location_id: "",
       price: 0,
       phones: [],
       services: [],
@@ -296,15 +296,15 @@ export function KeywordsManagement({
     } else if (selectedKeyword) {
       // Update existing keyword
       const updatedKeywords = keywords.map((wk) =>
-        wk.locationId === selectedKeyword.locationId
-          ? { ...data, id: selectedKeyword.locationId }
+        wk.location_id === selectedKeyword.location_id
+          ? { ...data, id: selectedKeyword.location_id }
           : wk
       );
       setKeywords(updatedKeywords);
       if (onUpdate)
-        onUpdate(selectedKeyword.locationId, {
+        onUpdate(selectedKeyword.location_id, {
           ...data,
-          locationId: selectedKeyword.locationId,
+          location_id: selectedKeyword.location_id,
         });
       // toast({
       //   title: "Keyword Updated",
@@ -318,10 +318,10 @@ export function KeywordsManagement({
   const handleDelete = () => {
     if (selectedKeyword) {
       const updatedKeywords = keywords.filter(
-        (wk) => wk.locationId !== selectedKeyword.locationId
+        (wk) => wk.location_id !== selectedKeyword.location_id
       );
       setKeywords(updatedKeywords);
-      if (onDelete) onDelete(selectedKeyword.locationId);
+      if (onDelete) onDelete(selectedKeyword.location_id);
       // toast({
       //   title: "Keyword Deleted",
       //   description: `${selectedKeyword.name} has been deleted.`,
@@ -344,7 +344,7 @@ export function KeywordsManagement({
         accountId={
           JSON.parse(localStorage.getItem("user") || "").user.userId || ""
         }
-        locationId={selectedKeyword?.locationId || ""}
+        location_id={selectedKeyword?.location_id || ""}
       />
 
       {/* Filters and Controls */}
@@ -404,7 +404,7 @@ export function KeywordsManagement({
         <AnimatePresence>
           {filteredKeywords.map((keyword) => (
             <motion.div
-              key={keyword.locationId}
+              key={keyword.location_id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -573,7 +573,7 @@ export function KeywordsManagement({
 
                       <FormField
                         control={form.control}
-                        name="locationId"
+                        name="location_id"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Location ID</FormLabel>

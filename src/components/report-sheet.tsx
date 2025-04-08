@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 interface ReportSheetProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
-  locationId: string;
+  location_id: string;
   accountId: string;
 }
 
@@ -34,7 +34,7 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
   isModalOpen,
   setIsModalOpen,
   accountId,
-  locationId
+  location_id
 }) => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -46,7 +46,7 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
     },
   });
 
-  console.log(locationId, 'locationId')
+  console.log(location_id, 'location_id')
 
   
 
@@ -54,7 +54,7 @@ const ReportSheet: React.FC<ReportSheetProps> = ({
 
   const handleDownload = () => {
     // console.log(form.getValues());
-    window.open(`/reports/?account_id=${accountId}&location_id=${locationId}`, '_blank')
+    window.open(`/reports/?account_id=${accountId}&location_id=${location_id}`, '_blank')
     setIsModalOpen(false)
   };
 

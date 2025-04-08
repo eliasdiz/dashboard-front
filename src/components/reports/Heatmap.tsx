@@ -1,10 +1,10 @@
 interface HeatmapViewerProps {
-  locationId: string;
+  location_id: string;
   file: string;
 }
 
-const Heatmap: React.FC<HeatmapViewerProps> = ({ locationId, file }) => {
-  const src = `/heatmaps/${locationId}/${file}`;
+const Heatmap: React.FC<HeatmapViewerProps> = ({ location_id, file }) => {
+  const src = `/heatmaps/${location_id}/${file}`;
 
   return (
     <div className="w-full h-[1000px] border rounded shadow overflow-hidden mx-auto mb-20 z-index-100">
