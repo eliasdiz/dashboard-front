@@ -57,7 +57,7 @@ export function BusinessesTable() {
     window.open(
       `/reports/?account_id=${
         JSON.parse(localStorage.getItem("user") || "").user.userId || ""
-      }&location_id=${business.locationId}`,
+      }&location_id=${business.location_id}`,
       "_blank"
     );
   };
@@ -238,7 +238,7 @@ export function BusinessesTable() {
                               name: "business.name",
                               location: "business.location",
                               country: "business.country",
-                              location_id: "business.locationId",
+                              location_id: "business.location_id",
                               price: 25,
                               phones: [{ number: "business.phones" }],
                               services: [{ name: "business.services" }],
@@ -271,7 +271,8 @@ export function BusinessesTable() {
                           <Button
                             variant="outline"
                             className="border-secondary text-secondary hover:bg-secondary"
-                            onClick={() => handleReport(business)}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onClick={() => handleReport(business as any)}
                           >
                             View
                           </Button>

@@ -109,9 +109,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
     BUSINESS_CONVERSATIONS: {},
   });
   const [insightsSummary, setInsightsSummary] = useState<string | null>(null);
-  const [insightsSummaryPastMonth] = useState<
-    string | null
-  >(null);
+  const [insightsSummaryPastMonth] = useState<string | null>(null);
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -119,7 +117,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
 
   // Chart instances refs for cleanup
   const chartInstances = useRef<Chart[]>([]);
-  const query = useSearchParams()
+  const query = useSearchParams();
   const services = businessDetails?.services || [];
 
   const manifest = useHeatmapManifest();
@@ -158,7 +156,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
     localStorage.setItem(cacheKey, JSON.stringify(updatedMap));
 
     return posts.map((post) => updatedMap[post.createTime] || "N/A");
-  }, [posts, services, query])
+  }, [posts, services, query]);
 
   // Fetch data on component mount
   useEffect(() => {
@@ -166,7 +164,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       setLoading(true);
 
       const params: QueryParams = {
-        account_id: query.get("account_id") || "116395807109318287954",  // Eliminar X Cuando funcione
+        account_id: query.get("account_id") || "116395807109318287954", // Eliminar X Cuando funcione
         location_id: query.get("location_id") || "10374497510417847507", // Eliminar X Cuando funcione
         start_month: 2,
         start_year: 2025,
@@ -188,10 +186,10 @@ const GoogleMyBusinessDashboard: React.FC = () => {
         setReviews(parsed.reviews?.reviews || []);
         // setPositive(parsed.reviews?.positive_reviews_count || 0);
         setInsightsSummary(parsed.businessInsightsSummary || null);
-        setBusinessDetails(parsed.businessDetails || null);
+        setBusinessDetails(parsed.businessDetails || []);
         setLoading(false);
         return;
-      }      
+      }
 
       try {
         const queryString = new URLSearchParams(
@@ -365,45 +363,49 @@ const GoogleMyBusinessDashboard: React.FC = () => {
 
                 <div className="space-y-2 text-gray-700">
                   <p className="text-lg flex items-start">
-                    {businessDetails.gmb_details.address && <svg
-                      className="w-5 h-5 mr-2 mt-1 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      ></path>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                    </svg>}
+                    {businessDetails.gmb_details.address && (
+                      <svg
+                        className="w-5 h-5 mr-2 mt-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        ></path>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        ></path>
+                      </svg>
+                    )}
                     {businessDetails.gmb_details.address}
                   </p>
-                  {businessDetails.gmb_details.phones && <p className="text-lg flex items-start">
-                    <svg
-                      className="w-5 h-5 mr-2 mt-1 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      ></path>
-                    </svg>
-                    {businessDetails.gmb_details.phones}
-                  </p>}
+                  {businessDetails.gmb_details.phones && (
+                    <p className="text-lg flex items-start">
+                      <svg
+                        className="w-5 h-5 mr-2 mt-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        ></path>
+                      </svg>
+                      {businessDetails.gmb_details.phones}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -444,240 +446,251 @@ const GoogleMyBusinessDashboard: React.FC = () => {
       </section>
 
       {/* Posts Section */}
-      {posts.length > 0 && (<section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
-        <DecorativeTriangles />
-
-        <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#EA4335] px-6 py-5 rounded-lg shadow-lg mb-12">
-            <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-              Posts
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-[#EA4335] text-white">
-                  <th className="px-6 py-4 text-lg font-semibold">Date</th>
-                  <th className="px-6 py-4 text-lg font-semibold">Post URL</th>
-                  <th className="px-6 py-4 text-lg font-semibold">
-                    Target Keyword
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {posts.map((post, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 text-gray-700">
-                      {post.createTime}
-                    </td>
-                    <td className="px-6 py-4">
-                      <a
-                        href={post.searchUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-700 transition-colors flex items-center"
-                      >
-                        <span>Link URL</span>
-                        <svg
-                          className="w-4 h-4 ml-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          ></path>
-                        </svg>
-                      </a>
-                    </td>              
-                    <td className="px-6 py-4 text-gray-700">
-                      {businessDetails?.services[index] || randomServiceMap[index]}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>)}
-
-      {/* Post Preview Section */}
-      {posts.length > 0 && (<section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
-        <DecorativeTriangles />
-
-        <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#4285F4] px-6 py-5 rounded-lg shadow-lg mb-12">
-            <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-              Post Preview
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.slice(0, 3).map((post, index) => (
-              <div
-                key={index}
-                className="bg-white z-10 rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]"
-              >
-                {post.googleUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={post.googleUrl || "/placeholder.svg"}
-                    alt="Post image"
-                    className="w-full h-48 object-cover"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-full h-48 flex items-center justify-center bg-gray-200">
-                    <p className="text-gray-500">No image available</p>
-                  </div>
-                )}
-                <div className="p-6 z-10 bg-white">
-                  <span className="text-gray-700 leading-relaxed">
-                    {post.summary.split("\n").map((line, i) => (
-                      <p key={i} className="mb-2">
-                        {line}
-                      </p>
-                    ))}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>)}
-
-      {/* Heatmaps Section */}
-      {heatmapFile && <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
-        <DecorativeTriangles />
-
-        <div className="mx-auto pt-16 md:pt-24 z-10">
-          <div className="max-w-6xl mx-auto bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12">
-            <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-              Heatmaps
-            </h2>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-lg">
-            <p className="text-lg text-gray-700 mb-8 text-center">
-              This heatmap is a combination of user interactions with your
-              Google Business Profile
-            </p>
-
-            <div className="rounded-xl overflow-hidden shadow-lg">
-              <Heatmap locationId={location_id} file={heatmapFile} />
-            </div>
-          </div>
-        </div>
-      </section>}
-
-      {/* Citations Section */}
-      {sheetData.length > 0 && (
+      {posts.length > 0 && (
         <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
           <DecorativeTriangles />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 z-10">
-            {/* Header */}
-            <div className="bg-[#34A853] px-6 py-5 rounded-lg shadow-lg mb-8 text-center">
-              <h2 className="text-3xl md:text-4xl text-white font-bold">
-                Citations
+          <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
+            <div className="bg-[#EA4335] px-6 py-5 rounded-lg shadow-lg mb-12">
+              <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
+                Posts
               </h2>
             </div>
 
-            {/* Responsive Table */}
-            <div className="overflow-auto rounded-xl shadow-lg bg-white">
-              <table className="w-full min-w-max border-collapse">
-                {/* Table Header */}
+            <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
+              <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-[#34A853] text-white">
-                    <th className="px-6 py-4 text-lg font-semibold text-left">
-                      Website
+                  <tr className="bg-[#EA4335] text-white">
+                    <th className="px-6 py-4 text-lg font-semibold">Date</th>
+                    <th className="px-6 py-4 text-lg font-semibold">
+                      Post URL
                     </th>
-                    <th className="px-6 py-4 text-lg font-semibold text-left">
-                      Link
-                    </th>
-                    <th className="px-6 py-4 text-lg font-semibold text-left">
-                      Status
+                    <th className="px-6 py-4 text-lg font-semibold">
+                      Target Keyword
                     </th>
                   </tr>
                 </thead>
-
-                {/* Table Body */}
                 <tbody className="divide-y divide-gray-200">
-                  {sheetData
-                    .slice()
-                    .sort((a, b) =>
-                      String(a["Top Domains"] || "").localeCompare(
-                        String(b["Top Domains"] || "")
-                      )
-                    )
-                    .map((data, index) => (
-                      <tr
-                        key={index}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 text-gray-700 break-words">
-                          {data["Top Domains"]}
-                        </td>
-                        <td className="px-6 py-4 break-words">
-                          <a
-                            href={
-                              typeof data["Created Live Links"] === "string"
-                                ? data["Created Live Links"]
-                                : undefined
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 transition-colors flex items-center"
-                          >
-                            <span className="truncate max-w-[180px] md:max-w-[250px]">
-                              {typeof data["Created Live Links"] === "string"
-                                ? new URL(data["Created Live Links"]).hostname
-                                : ""}
-                            </span>
-                            <svg
-                              className="w-5 h-5 ml-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                              />
-                            </svg>
-                          </a>
-                        </td>
-                        <td
-                          className={`px-6 py-4 font-medium ${
-                            data["Status"] === "Live"
-                              ? "text-green-600"
-                              : data["Status"] === "Pending"
-                              ? "text-yellow-500"
-                              : "text-gray-500"
-                          }`}
+                  {posts.map((post, index) => (
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-gray-700">
+                        {post.createTime}
+                      </td>
+                      <td className="px-6 py-4">
+                        <a
+                          href={post.searchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-700 transition-colors flex items-center"
                         >
-                          {data["Status"]}
-                        </td>
-                      </tr>
-                    ))}
+                          <span>Link URL</span>
+                          <svg
+                            className="w-4 h-4 ml-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            ></path>
+                          </svg>
+                        </a>
+                      </td>
+                      <td className="px-6 py-4 text-gray-700">
+                        {businessDetails?.services[index] ?? randomServiceMap[index]}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         </section>
       )}
+
+      {/* Post Preview Section */}
+      {posts.length > 0 && (
+        <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+          <DecorativeTriangles />
+
+          <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
+            <div className="bg-[#4285F4] px-6 py-5 rounded-lg shadow-lg mb-12">
+              <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
+                Post Preview
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.slice(0, 3).map((post, index) => (
+                <div
+                  key={index}
+                  className="bg-white z-10 rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]"
+                >
+                  {post.googleUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={post.googleUrl || "/placeholder.svg"}
+                      alt="Post image"
+                      className="w-full h-48 object-cover"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-48 flex items-center justify-center bg-gray-200">
+                      <p className="text-gray-500">No image available</p>
+                    </div>
+                  )}
+                  <div className="p-6 z-10 bg-white">
+                    <span className="text-gray-700 leading-relaxed">
+                      {post.summary.split("\n").map((line, i) => (
+                        <p key={i} className="mb-2">
+                          {line}
+                        </p>
+                      ))}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Heatmaps Section */}
+      {heatmapFile && (
+        <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+          <DecorativeTriangles />
+
+          <div className="mx-auto pt-16 md:pt-24 z-10">
+            <div className="max-w-6xl mx-auto bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12">
+              <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
+                Heatmaps
+              </h2>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <p className="text-lg text-gray-700 mb-8 text-center">
+                This heatmap is a combination of user interactions with your
+                Google Business Profile
+              </p>
+
+              <div className="rounded-xl overflow-hidden shadow-lg">
+                <Heatmap location_id={location_id} file={heatmapFile} />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Citations Section */}
+      {Array.isArray(sheetData) &&
+        sheetData.some((row) => Object.keys(row).length > 0) && (
+          <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+            <DecorativeTriangles />
+
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 z-10">
+              {/* Header */}
+              <div className="bg-[#34A853] px-6 py-5 rounded-lg shadow-lg mb-8 text-center">
+                <h2 className="text-3xl md:text-4xl text-white font-bold">
+                  Citations
+                </h2>
+              </div>
+
+              {/* Responsive Table */}
+              <div className="overflow-auto rounded-xl shadow-lg bg-white">
+                <table className="w-full min-w-max border-collapse">
+                  {/* Table Header */}
+                  <thead>
+                    <tr className="bg-[#34A853] text-white">
+                      <th className="px-6 py-4 text-lg font-semibold text-left">
+                        Website
+                      </th>
+                      <th className="px-6 py-4 text-lg font-semibold text-left">
+                        Link
+                      </th>
+                      <th className="px-6 py-4 text-lg font-semibold text-left">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+
+                  {/* Table Body */}
+                  <tbody className="divide-y divide-gray-200">
+                    {sheetData
+                      .slice()
+                      .sort((a, b) =>
+                        String(a["Top Domains"] || "").localeCompare(
+                          String(b["Top Domains"] || "")
+                        )
+                      )
+                      .map((data, index) => (
+                        <tr
+                          key={index}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 text-gray-700 break-words">
+                            {data["Top Domains"]}
+                          </td>
+                          <td className="px-6 py-4 break-words">
+                            <a
+                              href={
+                                typeof data["Created Live Links"] === "string"
+                                  ? data["Created Live Links"]
+                                  : undefined
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 transition-colors flex items-center"
+                            >
+                              <span className="truncate max-w-[180px] md:max-w-[250px]">
+                                {typeof data["Created Live Links"] ===
+                                  "string" &&
+                                data["Created Live Links"].startsWith("http")
+                                  ? new URL(data["Created Live Links"]).hostname
+                                  : data["Created Live Links"]}
+                              </span>
+                              <svg
+                                className="w-5 h-5 ml-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                            </a>
+                          </td>
+                          <td
+                            className={`px-6 py-4 font-medium ${
+                              data["Status"] === "Live"
+                                ? "text-green-600"
+                                : data["Status"] === "Pending"
+                                ? "text-yellow-500"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {data["Status"]}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
 
       {/* Keywords Section */}
       {keywords.length > 0 && (
@@ -729,18 +742,18 @@ const GoogleMyBusinessDashboard: React.FC = () => {
 
       {/* Reviews Section */}
       {reviews.length > 0 && (
-      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
-        <DecorativeTriangles />
+        <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+          <DecorativeTriangles />
 
-        <div className="mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12 max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-              Reviews
-            </h2>
-          </div>
+          <div className="mx-auto pt-16 md:pt-24 z-10">
+            <div className="bg-[#FBBC05] px-6 py-5 rounded-lg shadow-lg mb-12 max-w-6xl mx-auto">
+              <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
+                Reviews
+              </h2>
+            </div>
 
-          <div className="w-full mx-auto relative">
-            <div className="overflow-hidden">
+            <div className="w-full mx-auto relative">
+              <div className="overflow-hidden">
                 {reviews.slice(0, 4).map((review, index) => (
                   <div
                     key={index}
@@ -749,32 +762,31 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                     <GoogleReviewCard key={index} review={review} />
                   </div>
                 ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* AI Report Section */}
       {insightsSummary && (
-      <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
-        <DecorativeTriangles />
+        <section className="relative min-h-screen w-full px-4 md:px-8 md:py-16 py-[15rem] overflow-hidden">
+          <DecorativeTriangles />
 
-        <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
-          <div className="bg-[#34A853] px-6 py-5 rounded-lg shadow-lg mb-12">
-            <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
-              AI REPORT
-            </h2>
-          </div>
+          <div className="max-w-6xl mx-auto pt-16 md:pt-24 z-10">
+            <div className="bg-[#34A853] px-6 py-5 rounded-lg shadow-lg mb-12">
+              <h2 className="text-3xl md:text-4xl text-white font-bold text-center">
+                AI REPORT
+              </h2>
+            </div>
 
-          
             <div className="bg-white p-8 md:p-12 rounded-xl shadow-lg">
               <div className="prose prose-lg max-w-none text-gray-700">
                 <ReactMarkdown>{insightsSummary}</ReactMarkdown>
               </div>
             </div>
-        </div>
-      </section>
+          </div>
+        </section>
       )}
 
       {/* Thank You Section */}

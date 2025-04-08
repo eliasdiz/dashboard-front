@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 dotenv.config();
 
 export const metadata: Metadata = {
-  title: "Google Ran AI",
-  description: "Google Ran AI",
+  title: "Google Rank AI",
+  description: "Google Rank AI",
 };
 
 export default function RootLayout({
