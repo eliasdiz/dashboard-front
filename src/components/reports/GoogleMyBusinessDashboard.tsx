@@ -504,8 +504,7 @@ const GoogleMyBusinessDashboard: React.FC = () => {
                         </a>
                       </td>
                       <td className="px-6 py-4 text-gray-700">
-                        {businessDetails?.services?.[index] ??
-                          randomServiceMap[index]}
+                        {businessDetails?.services[index] ?? randomServiceMap[index]}
                       </td>
                     </tr>
                   ))}
