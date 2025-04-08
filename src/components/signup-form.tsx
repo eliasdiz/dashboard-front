@@ -1,10 +1,10 @@
 "use client";
 
-import type React from "react";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,15 +18,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 
 export function SignupForm() {
-  const router = useRouter()
-  const context = useUser()
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { signup, loading } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,7 +33,7 @@ export function SignupForm() {
     password: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -44,68 +41,39 @@ export function SignupForm() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    // Simulate signup request
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Form submitted:", formData);
-      // Handle signup logic here
-    }, 1500);
+    try {
+      // Preparamos los datos de negocio para Firebase
+      const businessData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        businessName: formData.businessName,
+        phone: formData.phone,
+      };
+
+      await signup(formData.email, formData.password, businessData);
+      toast.success("Account created successfully!");
+    } catch (error) {
+      toast.error("Failed to create account. Please try again.");
+      console.error("Signup error:", error);
+    }
   };
 
   const handleGoogleSignup = async () => {
-    setIsLoading(true);
-
-    await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/start-auth`, formData)
-    .then((response) => window.open(
-      response.data.auth_url,
-      "GoogleLogin",
-      "width=500,height=600", 
-    ))
-    // Simulate Google signup
-    setTimeout(() => {
-      setIsLoading(false);
-      // router.push("/dashboard");
-      // Handle Google signup logic here
-    }, 1500);
+    // Esta función se implementaría si se añade autenticación con Google
+    toast.info("Google signup not implemented yet");
   };
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const data = event.data;
-
-      if (data?.success && data.user) {
-        const { user } = data;
-        console.log("✅ User object received:", user);
-        context?.setUser(user)
-
-        // Redirigir usando el user
-        router.push('/dashboard');
-      } else {
-        const statusElement = document.getElementById("status");
-        if (statusElement) statusElement.textContent = "OAuth failed or was cancelled.";
-      }
-    };
-
-    window.addEventListener("message", handleMessage, { once: true });
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, [router, context]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <Card className="w-full max-w-md bg-primary">
         <CardHeader className="flex flex-col items-center">
-          {/* Logo de la empresa */}
           <Image
-            src="/googlerank_editable.svg" // Asegúrate de colocar tu logo en la carpeta public/
+            src="/googlerank_editable.svg"
             alt="Company Logo"
-            width={300} // Ajusta el tamaño según sea necesario
+            width={300}
             height={300}
             className="mb-2"
           />
@@ -133,7 +101,7 @@ export function SignupForm() {
                   placeholder="Enter your first name"
                   value={formData.firstName}
                   onChange={handleChange}
-                  disabled={isLoading}
+                  disabled={loading}
                   required
                 />
               </div>
@@ -148,7 +116,7 @@ export function SignupForm() {
                   placeholder="Enter your last name"
                   value={formData.lastName}
                   onChange={handleChange}
-                  disabled={isLoading}
+                  disabled={loading}
                   required
                 />
               </div>
@@ -164,7 +132,7 @@ export function SignupForm() {
                 placeholder="Enter your business name"
                 value={formData.businessName}
                 onChange={handleChange}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
@@ -180,7 +148,7 @@ export function SignupForm() {
                 placeholder="Enter your email address"
                 value={formData.email}
                 onChange={handleChange}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
@@ -196,7 +164,7 @@ export function SignupForm() {
                 placeholder="Enter your phone number"
                 value={formData.phone}
                 onChange={handleChange}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
@@ -212,18 +180,40 @@ export function SignupForm() {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
 
             <Button
-              variant="outline"
-              className="w-full bg-white text-primary hover:bg-primary/90"
-              onClick={handleGoogleSignup}
-              disabled={isLoading}
+              type="submit"
+              className="w-full bg-white text-primary hover:bg-gray-100"
+              disabled={loading}
             >
-              {isLoading ? (
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Sign up"
+              )}
+            </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-primary px-2 text-sm text-white">Or</span>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full bg-white text-primary hover:bg-primary/10"
+              onClick={handleGoogleSignup}
+              disabled={loading}
+              type="button"
+            >
+              {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -250,7 +240,7 @@ export function SignupForm() {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white">
             Already have an account?{" "}
             <Link
               href="/login"

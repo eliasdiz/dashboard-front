@@ -19,28 +19,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 import GoogleLoader from "./google-loader";
 
 export function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const auth = useUser()
+  const { login, loading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate login request
-    try {
-      auth?.login({ email, password, rememberMe })
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setIsLoading(false)
-    }
+    login(email, password)
   };
 
 
@@ -78,7 +68,7 @@ export function LoginForm() {
                 placeholder="Enter your email or username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
@@ -100,7 +90,7 @@ export function LoginForm() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                disabled={loading}
                 required
               />
             </div>
@@ -110,7 +100,7 @@ export function LoginForm() {
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                disabled={isLoading}
+                disabled={loading}
                 className="border-gray-300 bg-white data-[state=checked]:bg-white data-[state=checked]:text-primary"
               />
               <Label
@@ -124,9 +114,9 @@ export function LoginForm() {
             <Button
               type="submit"
               className="w-full bg-white hover:bg-gray-100 text-primary"
-              disabled={isLoading}
+              disabled={loading}
             >
-              { auth?.loading ? <GoogleLoader /> : "Sign in" }
+              {loading ? <GoogleLoader /> : "Sign in"}
             </Button>
           </form>
         </CardContent>

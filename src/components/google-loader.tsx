@@ -4,7 +4,7 @@ const colors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
 
 export default function GoogleLoader() {
   return (
-    <div className="flex items-center justify-center">
+    <div className="w-full min-h-screen flex items-center justify-center">
       <div className="relative flex space-x-2">
         {colors.map((color, index) => (
           <motion.div

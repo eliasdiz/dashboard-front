@@ -1,5 +1,5 @@
 "use client"
-
+import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -7,16 +7,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  ThumbsUp,
-  Meh,
-  ThumbsDown,
-  Filter,
   X,
   Sparkles,
-  BarChart3,
   MessageSquare,
   Calendar,
   RefreshCw,
+  Building,
+  Store,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,25 +23,28 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Progress } from "@/components/ui/progress"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import GoogleLoader from "./google-loader"
+import axios from "axios"
+import { Review } from "@/types/types"
+import { toast } from "react-toastify";
 
-// Types
-interface Review {
-  id: string
-  name: string
-  rating: number
-  comment: string
-  date: string
-  sentiment: "positive" | "neutral" | "negative"
-  keywords: string[]
-  avatar?: string
-  source?: string
-  verified?: boolean
+interface Business {
+  id: string;
+  name: string;
+  services: string[];
+  location: string;
+  phone: string[];
+  website: string;
+  location_id: string;
+  user_params: {
+    keywords: string;
+    amount_words: string;
+  };
+  social_tags: string[];
+  target_locations: string[];
 }
 
 interface MarketingReviewsProps {
-  reviews?: Review[]
   title?: string
   subtitle?: string
   className?: string
@@ -54,170 +54,6 @@ interface MarketingReviewsProps {
   showSummary?: boolean
   showStats?: boolean
   darkMode?: boolean
-}
-
-// Mock data for reviews
-const mockReviews: Review[] = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    rating: 5,
-    comment:
-      "Their SEO services completely transformed our online presence! We've seen a 200% increase in organic traffic within just 3 months. Highly recommend their keyword strategy approach.",
-    date: "2023-11-15",
-    sentiment: "positive",
-    keywords: ["SEO", "traffic", "keywords"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Google",
-    verified: true,
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    rating: 4,
-    comment:
-      "The social media marketing campaign they designed was very effective. Our engagement rates improved significantly, though I wish the reporting was a bit more detailed.",
-    date: "2023-11-10",
-    sentiment: "positive",
-    keywords: ["social media", "engagement", "reporting"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Facebook",
-    verified: true,
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    rating: 5,
-    comment:
-      "Their content marketing strategy was exactly what we needed! The blog posts and infographics they created drove tons of qualified leads to our site. The ROI has been incredible.",
-    date: "2023-11-05",
-    sentiment: "positive",
-    keywords: ["content", "leads", "ROI"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Trustpilot",
-    verified: true,
-  },
-  {
-    id: "4",
-    name: "David Wilson",
-    rating: 3,
-    comment:
-      "The PPC campaign had mixed results. While we did see some conversion improvements, the ad spend was higher than initially discussed. Their customer service was responsive when addressing our concerns.",
-    date: "2023-10-28",
-    sentiment: "neutral",
-    keywords: ["PPC", "conversions", "ad spend"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Yelp",
-    verified: false,
-  },
-  {
-    id: "5",
-    name: "Jessica Taylor",
-    rating: 2,
-    comment:
-      "Disappointed with their email marketing services. The open rates were below industry average and we didn't see the results promised. The campaign lacked creativity and personalization.",
-    date: "2023-10-20",
-    sentiment: "negative",
-    keywords: ["email", "open rates", "personalization"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "WordPress",
-    verified: true,
-  },
-  {
-    id: "6",
-    name: "Robert Brown",
-    rating: 5,
-    comment:
-      "The website redesign completely transformed our brand image! The UX improvements led to a 45% increase in time-on-site and a 30% decrease in bounce rate. Excellent work!",
-    date: "2023-10-15",
-    sentiment: "positive",
-    keywords: ["website", "UX", "bounce rate"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Google",
-    verified: true,
-  },
-  {
-    id: "7",
-    name: "Amanda Lee",
-    rating: 4,
-    comment:
-      "Their local SEO strategy helped our small business appear in the Google 3-pack within weeks! Phone calls and in-store visits have increased noticeably since we started working with them.",
-    date: "2023-10-10",
-    sentiment: "positive",
-    keywords: ["local SEO", "Google", "visits"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "WordPress",
-    verified: true,
-  },
-  {
-    id: "8",
-    name: "Thomas Garcia",
-    rating: 1,
-    comment:
-      "Very disappointed with their analytics reporting. The data was often inaccurate and the insights were generic at best. Wouldn't recommend their data services to anyone serious about marketing.",
-    date: "2023-10-05",
-    sentiment: "negative",
-    keywords: ["analytics", "data", "reporting"],
-    avatar: "/placeholder.svg?height=40&width=40",
-    source: "Trustpilot",
-    verified: false,
-  },
-]
-
-// Mock AI-generated summaries based on sentiment distribution
-const generateAISummary = (reviews: Review[]) => {
-  const positiveCount = reviews.filter((r) => r.sentiment === "positive").length
-
-  const totalReviews = reviews.length
-  const positivePercentage = Math.round((positiveCount / totalReviews) * 100)
-
-  // Extract common keywords from positive reviews
-  const positiveReviews = reviews.filter((r) => r.sentiment === "positive")
-  const allKeywords = positiveReviews.flatMap((r) => r.keywords)
-  const keywordCounts: Record<string, number> = {}
-
-  allKeywords.forEach((keyword) => {
-    keywordCounts[keyword] = (keywordCounts[keyword] || 0) + 1
-  })
-
-  // Find the most common keyword
-  let topKeyword = ""
-  let maxCount = 0
-
-  Object.entries(keywordCounts).forEach(([keyword, count]) => {
-    if (count > maxCount) {
-      maxCount = count
-      topKeyword = keyword
-    }
-  })
-
-  // Generate summary based on sentiment distribution
-  if (positivePercentage >= 80) {
-    return `Customers love our ${topKeyword || "marketing"} services! ${positivePercentage}% of reviews are overwhelmingly positive. ✨`
-  } else if (positivePercentage >= 60) {
-    return `Our ${topKeyword || "marketing"} services are highly rated with ${positivePercentage}% positive feedback. 🚀`
-  } else if (positivePercentage >= 40) {
-    return `Mixed feedback on our services with ${positivePercentage}% positive reviews. We're constantly improving! 📈`
-  } else {
-    return `We're working hard to improve our ${topKeyword || "marketing"} services based on your valuable feedback. 🔄`
-  }
-}
-
-// Calculate average rating
-const calculateAverageRating = (reviews: Review[]) => {
-  const sum = reviews.reduce((acc, review) => acc + review.rating, 0)
-  return (sum / reviews.length).toFixed(1)
-}
-
-// Rating distribution
-const calculateRatingDistribution = (reviews: Review[]) => {
-  const distribution = [0, 0, 0, 0, 0]
-
-  reviews.forEach((review) => {
-    distribution[review.rating - 1]++
-  })
-
-  return distribution.map((count) => (count / reviews.length) * 100)
 }
 
 // Format date
@@ -231,84 +67,96 @@ const formatDate = (dateString: string) => {
 }
 
 export function MarketingReviews({
-  reviews = mockReviews,
   title = "Customer Reviews",
   subtitle = "See what our clients say about our marketing services",
   className = "",
   autoplay = true,
   autoplaySpeed = 5000,
   showFilters = true,
-  showSummary = true,
-  showStats = true,
   darkMode = false,
 }: MarketingReviewsProps) {
+  const [businesses, setBusinesses] = useState<Business[]>([])
+  const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([])
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
   const [filteredReviews, setFilteredReviews] = useState<Review[]>(reviews)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [businessSearchTerm, setBusinessSearchTerm] = useState("")
   const [ratingFilter, setRatingFilter] = useState<string>("all")
   const [sentimentFilter, setSentimentFilter] = useState<string>("all")
   const [keywordFilter, setKeywordFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"carousel" | "grid" | "list">("carousel")
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Extract all unique keywords from reviews
-  const allKeywords = Array.from(new Set(reviews.flatMap((review) => review.keywords)))
-
-  // Apply filters
+  // Load businesses from localStorage on component mount
   useEffect(() => {
-    let result = [...reviews]
-
-    // Search term filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      result = result.filter(
-        (review) =>
-          review.comment.toLowerCase().includes(term) ||
-          review.name.toLowerCase().includes(term) ||
-          review.keywords.some((keyword) => keyword.toLowerCase().includes(term)),
-      )
-    }
-
-    // Rating filter
-    if (ratingFilter !== "all") {
-      const minRating = Number.parseInt(ratingFilter)
-      result = result.filter((review) => review.rating >= minRating)
-    }
-
-    // Sentiment filter
-    if (sentimentFilter !== "all") {
-      result = result.filter((review) => review.sentiment === sentimentFilter)
-    }
-
-    // Keyword filter
-    if (keywordFilter !== "all") {
-      result = result.filter((review) =>
-        review.keywords.some((keyword) => keyword.toLowerCase() === keywordFilter.toLowerCase()),
-      )
-    }
-
-    setFilteredReviews(result)
-
-    // Reset active index when filters change
-    setActiveIndex(0)
-  }, [reviews, searchTerm, ratingFilter, sentimentFilter, keywordFilter])
-
-  // Autoplay functionality
-  useEffect(() => {
-    if (autoplay && !isAutoplayPaused && viewMode === "carousel") {
-      autoplayRef.current = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex === filteredReviews.length - 1 ? 0 : prevIndex + 1))
-      }, autoplaySpeed)
-    }
-
-    return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current)
+    const storedBusinesses = localStorage.getItem('businesses')
+    console.log("Stored Businesses:", storedBusinesses)
+    if (storedBusinesses) {
+      try {
+        const parsedBusinesses = JSON.parse(storedBusinesses)
+        setBusinesses(parsedBusinesses)
+        setFilteredBusinesses(parsedBusinesses)
+      } catch (error) {
+        toast.error("Error parsing business data")
+        console.error("Error parsing business data:", error)
       }
     }
-  }, [autoplay, autoplaySpeed, filteredReviews.length, isAutoplayPaused, viewMode])
+  }, [])
+
+  // Filter businesses based on search term
+  useEffect(() => {
+    if (businesses.length > 0 && businessSearchTerm) {
+      const term = businessSearchTerm.toLowerCase()
+      const filtered = businesses.filter(
+        (business) =>
+          business.name.toLowerCase().includes(term)/*  ||
+          business.location.toLowerCase().includes(term) ||
+          business.services.some((service) => service.toLowerCase().includes(term)) */
+      )
+      setFilteredBusinesses(filtered)
+    } else {
+      setFilteredBusinesses(businesses)
+    }
+  }, [businesses, businessSearchTerm])
+
+  // Handle business selection
+  const handleBusinessSelect = (businessId: string) => {
+    const selected = businesses.find(business => business.id === businessId)
+    if (selected) {
+      setSelectedBusiness(selected)
+      fetchReviewsForBusiness(selected.id)
+    }
+  }
+
+  // Fetch reviews for selected business
+  const fetchReviewsForBusiness = (businessId: string) => {
+    setLoading(true)
+    setReviews([])
+    setFilteredReviews([])
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/reviews/${businessId}`
+      )
+      .then((response) => {
+        const formattedReviews = response.data?.reviews?.map(
+          (review: Review) => ({
+            ...review
+          })
+        )
+        setReviews(formattedReviews)
+        setFilteredReviews(formattedReviews)
+        localStorage.setItem(
+          `reviews_${businessId}`,
+          JSON.stringify(formattedReviews)
+        )
+      })
+      .catch((err: string) => toast.error("Error fetching reviews: " + err))
+      .finally(() => setLoading(false))
+  }
 
   // Handle next/prev navigation
   const handlePrev = () => {
@@ -327,8 +175,17 @@ export function MarketingReviews({
     setTimeout(() => setIsAutoplayPaused(false), 10000)
   }
 
-  // Render stars for rating
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: string) => {
+    enum StarRating {
+      ONE = 1,
+      TWO = 2,
+      THREE = 3,
+      FOUR = 4,
+      FIVE = 5,
+    }
+
+    const starValue = StarRating[rating as keyof typeof StarRating] || 0;
+
     return (
       <div className="flex">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -336,51 +193,13 @@ export function MarketingReviews({
             key={star}
             className={cn(
               "h-4 w-4 mr-0.5",
-              star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600",
+              star <= starValue ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"
             )}
           />
         ))}
       </div>
-    )
-  }
-
-  // Render sentiment icon
-  const renderSentimentIcon = (sentiment: string) => {
-    switch (sentiment) {
-      case "positive":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800"
-          >
-            <ThumbsUp className="h-3 w-3 mr-1" />
-            Positive
-          </Badge>
-        )
-      case "neutral":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800"
-          >
-            <Meh className="h-3 w-3 mr-1" />
-            Neutral
-          </Badge>
-        )
-      case "negative":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800"
-          >
-            <ThumbsDown className="h-3 w-3 mr-1" />
-            Negative
-          </Badge>
-        )
-      default:
-        return null
-    }
-  }
+    );
+  };
 
   // Render review card
   const renderReviewCard = (review: Review, index: number, isActive = false) => {
@@ -395,78 +214,60 @@ export function MarketingReviews({
         <CardContent className="p-5 h-full flex flex-col">
           <div className="flex justify-between items-start mb-3">
             <div className="flex items-center">
-              {review.avatar ? (
-                <div className="h-10 w-10 rounded-full overflow-hidden mr-3 border border-border">
-                  {/* eslint-disable @next/next/no-img-element */}
-                  <img
-                    src={review.avatar || "/placeholder.svg"}
-                    alt={review.name}
+              <div className="h-10 w-10 rounded-full overflow-hidden mr-3 border border-border">
+                {review.reviewer?.profilePhotoUrl ? (
+                  <Image
+                    src={review.reviewer.profilePhotoUrl}
+                    alt={review.reviewer.displayName}
+                    width={40}
+                    height={40}
                     className="h-full w-full object-cover"
-                  /> 
-                  {/* eslint-enable @next/next/no-img-element */}
-                </div>
-              ) : (
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary font-medium">
-                  {review.name.charAt(0)}
-                </div>
-              )}
+                  />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    {review.reviewer?.displayName?.charAt(0) || "?"}
+                  </div>
+                )}
+              </div>
+
               <div>
-                <p className="font-medium text-sm">{review.name}</p>
+                <p className="font-medium text-sm">{review.reviewer?.displayName}</p>
                 <div className="flex items-center">
-                  {renderStars(review.rating)}
-                  {review.verified && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Badge
-                            variant="outline"
-                            className="ml-2 h-5 px-1 text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800"
-                          >
-                            ✓
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Verified Review</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
+                  {renderStars(review.starRating)}
                 </div>
               </div>
             </div>
             <div className="flex flex-col items-end">
-              {renderSentimentIcon(review.sentiment)}
               <div className="text-xs text-muted-foreground mt-1 flex items-center">
                 <Calendar className="h-3 w-3 mr-1" />
-                {formatDate(review.date)}
+                {formatDate(review.createTime)}
               </div>
             </div>
           </div>
 
           <p className="text-sm mb-3 flex-grow">{review.comment}</p>
-
-          <div className="mt-auto">
-            <div className="flex flex-wrap gap-1 mt-2">
-              {review.keywords.map((keyword) => (
-                <Badge
-                  key={keyword}
-                  variant="secondary"
-                  className="text-xs cursor-pointer hover:bg-secondary/80"
-                  onClick={() => setKeywordFilter(keyword)}
-                >
-                  #{keyword}
-                </Badge>
-              ))}
-            </div>
-
-            {review.source && (
-              <div className="flex justify-end mt-2">
-                <Badge variant="outline" className="text-xs text-muted-foreground">
-                  via {review.source}
-                </Badge>
+          {review.reviewReply?.comment && (
+            <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 h-16 w-16 opacity-10">
+                <Sparkles className="h-full w-full text-primary" />
               </div>
-            )}
-          </div>
+              <div className="flex items-start">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium flex items-center">
+                    AI-Generated Insight
+                    <Badge variant="outline" className="ml-2 text-xs">
+                      <RefreshCw className="h-2.5 w-2.5 mr-1" />
+                      Updated today
+                    </Badge>
+                  </h3>
+                  <p className="text-sm mt-1">{review.reviewReply.comment}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -500,7 +301,6 @@ export function MarketingReviews({
                 <Button
                   variant="link"
                   onClick={() => {
-                    setSearchTerm("")
                     setRatingFilter("all")
                     setSentimentFilter("all")
                     setKeywordFilter("all")
@@ -566,7 +366,7 @@ export function MarketingReviews({
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review, index) => (
             <motion.div
-              key={review.id}
+              key={review.reviewId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -581,7 +381,6 @@ export function MarketingReviews({
             <Button
               variant="link"
               onClick={() => {
-                setSearchTerm("")
                 setRatingFilter("all")
                 setSentimentFilter("all")
                 setKeywordFilter("all")
@@ -603,7 +402,7 @@ export function MarketingReviews({
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review, index) => (
             <motion.div
-              key={review.id}
+              key={review.reviewId}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -618,7 +417,6 @@ export function MarketingReviews({
             <Button
               variant="link"
               onClick={() => {
-                setSearchTerm("")
                 setRatingFilter("all")
                 setSentimentFilter("all")
                 setKeywordFilter("all")
@@ -633,97 +431,189 @@ export function MarketingReviews({
     )
   }
 
-  // Render stats section
-  const renderStats = () => {
-    const averageRating = calculateAverageRating(reviews)
-    const distribution = calculateRatingDistribution(reviews)
+  // Apply filters
+  useEffect(() => {
+    if (reviews.length > 0) {
+      let result = [...reviews]
 
+      // Rating filter
+      if (ratingFilter !== "all") {
+        const ratingValue = parseInt(ratingFilter)
+        result = result.filter((review) => {
+          const reviewRating = review.starRating === "ONE" ? 1 :
+            review.starRating === "TWO" ? 2 :
+              review.starRating === "THREE" ? 3 :
+                review.starRating === "FOUR" ? 4 :
+                  review.starRating === "FIVE" ? 5 : 0
+          return reviewRating >= ratingValue
+        })
+      }
+
+      // Sentiment filter (would need to be implemented based on your sentiment data)
+      if (sentimentFilter !== "all") {
+        // Implement sentiment filtering logic here
+      }
+
+      setFilteredReviews(result)
+
+      // Reset active index when filters change
+      setActiveIndex(0)
+    }
+  }, [reviews, ratingFilter, sentimentFilter, keywordFilter])
+
+  // Autoplay functionality
+  useEffect(() => {
+    if (autoplay && !isAutoplayPaused && viewMode === "carousel" && filteredReviews.length > 1) {
+      autoplayRef.current = setInterval(() => {
+        setActiveIndex((prevIndex) => (prevIndex === filteredReviews.length - 1 ? 0 : prevIndex + 1))
+      }, autoplaySpeed)
+    }
+
+    return () => {
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current)
+      }
+    }
+  }, [autoplay, autoplaySpeed, filteredReviews.length, isAutoplayPaused, viewMode])
+
+  // Render business selection UI
+  const renderBusinessSelector = () => {
     return (
-      <Card className={cn("mb-6", darkMode ? "bg-card dark" : "bg-card")}>
-        <CardContent className="p-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Average Rating */}
-            <div className="flex flex-col items-center justify-center">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Average Rating</h3>
-              <div className="flex items-center">
-                <span className="text-4xl font-bold mr-2">{averageRating}</span>
-                <div className="flex flex-col">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={cn(
-                          "h-4 w-4",
-                          Number.parseFloat(averageRating) >= star
-                            ? "text-yellow-400 fill-yellow-400"
-                            : Number.parseFloat(averageRating) >= star - 0.5
-                              ? "text-yellow-400 fill-yellow-400 opacity-50"
-                              : "text-gray-300 dark:text-gray-600",
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3">Select a Business</h3>
+
+        {/* Business Search */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search for businesses..."
+              className="pl-9"
+              value={businessSearchTerm}
+              onChange={(e) => setBusinessSearchTerm(e.target.value)}
+            />
+            {businessSearchTerm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => setBusinessSearchTerm("")}
+              >
+                <X className="h-3 w-3" />
+                <span className="sr-only">Clear search</span>
+              </Button>
+            )}
+          </div>
+
+          {/* Business Dropdown Selector */}
+          <Select
+            value={selectedBusiness?.id || ""}
+            onValueChange={handleBusinessSelect}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select business" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredBusinesses.map(business => (
+                <SelectItem key={business.id} value={business.id}>
+                  {business.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Compact Business List */}
+        <div className="border rounded-md overflow-hidden">
+          <div className="max-h-[400px] overflow-y-auto">
+            <table className="w-full">
+              <thead className="bg-muted/50 sticky top-0">
+                <tr>
+                  <th className="text-left text-xs font-medium text-muted-foreground p-3">Business Name</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground p-3 hidden sm:table-cell">Location</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground p-3 w-20">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {filteredBusinesses.length > 0 ? (
+                  filteredBusinesses.map(business => (
+                    <tr
+                      key={business.id}
+                      className={cn(
+                        "hover:bg-muted/50 cursor-pointer transition-colors",
+                        selectedBusiness?.id === business.id ? "bg-primary/10" : ""
+                      )}
+                      onClick={() => handleBusinessSelect(business.id)}
+                    >
+                      <td className="p-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Store className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="font-medium line-clamp-1">{business.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-sm text-muted-foreground hidden sm:table-cell">{business.location}</td>
+                      <td className="p-3 text-right">
+                        <Button
+                          variant={selectedBusiness?.id === business.id ? "default" : "ghost"}
+                          size="sm"
+                          className="h-8"
+                        >
+                          {selectedBusiness?.id === business.id ? "Selected" : "Select"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="p-8 text-center">
+                      <div className="flex flex-col items-center justify-center py-4">
+                        <Building className="h-8 w-8 text-muted-foreground mb-3 opacity-20" />
+                        <p className="text-muted-foreground">No businesses found</p>
+                        {businessSearchTerm && (
+                          <Button
+                            variant="link"
+                            onClick={() => setBusinessSearchTerm("")}
+                            className="mt-1"
+                          >
+                            Clear search
+                          </Button>
                         )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-muted-foreground mt-1">Based on {reviews.length} reviews</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Rating Distribution */}
-            <div className="col-span-1 md:col-span-2">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">Rating Distribution</h3>
-              <div className="space-y-2">
-                {[5, 4, 3, 2, 1].map((rating, index) => (
-                  <div key={rating} className="flex items-center">
-                    <div className="w-8 text-sm text-right mr-2">{rating} ★</div>
-                    <Progress value={distribution[4 - index]} className="h-2 flex-grow" />
-                    <div className="w-12 text-xs text-muted-foreground text-right ml-2">
-                      {Math.round(distribution[4 - index])}%
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-
-          {/* Sentiment Distribution */}
-          <div className="mt-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Sentiment Analysis</h3>
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <div className="flex flex-col items-center">
-                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-2">
-                  <ThumbsUp className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <span className="text-sm font-medium">{reviews.filter((r) => r.sentiment === "positive").length}</span>
-                <span className="text-xs text-muted-foreground">Positive</span>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2">
-                  <Meh className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <span className="text-sm font-medium">{reviews.filter((r) => r.sentiment === "neutral").length}</span>
-                <span className="text-xs text-muted-foreground">Neutral</span>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-2">
-                  <ThumbsDown className="h-6 w-6 text-red-600 dark:text-red-400" />
-                </div>
-                <span className="text-sm font-medium">{reviews.filter((r) => r.sentiment === "negative").length}</span>
-                <span className="text-xs text-muted-foreground">Negative</span>
-              </div>
-
-              <div className="flex flex-col items-center ml-auto">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <BarChart3 className="h-6 w-6 text-primary" />
-                </div>
-                <span className="text-sm font-medium">{allKeywords.length}</span>
-                <span className="text-xs text-muted-foreground">Keywords</span>
-              </div>
-            </div>
+          <div className="bg-muted/20 p-2 text-xs text-muted-foreground flex justify-between items-center">
+            <span>{filteredBusinesses.length} businesses</span>
+            {filteredBusinesses.length < businesses.length && (
+              <span>Filtered from {businesses.length} total</span>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+    )
+  }
+
+  // Render no business selected message
+  const renderNoBusinessSelected = () => {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Store className="h-16 w-16 text-muted-foreground mb-4 opacity-20" />
+        <h3 className="text-xl font-medium mb-2">No Business Selected</h3>
+        <p className="text-muted-foreground mb-6 max-w-md">
+          Please select a business from above to view its customer reviews.
+        </p>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          <Building className="h-4 w-4" />
+          Select a Business
+        </Button>
+      </div>
     )
   }
 
@@ -736,169 +626,112 @@ export function MarketingReviews({
             <p className="text-muted-foreground">{subtitle}</p>
           </div>
 
-          {/* View Mode Selector */}
-          <Tabs
-            defaultValue="carousel"
-            className="w-auto"
-            onValueChange={(value) => setViewMode(value as "carousel" | "grid" | "list")}
-          >
-            <TabsList className="grid w-[180px] grid-cols-3">
-              <TabsTrigger value="carousel">Carousel</TabsTrigger>
-              <TabsTrigger value="grid">Grid</TabsTrigger>
-              <TabsTrigger value="list">List</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {/* View Mode Selector (only show if business is selected) */}
+          {selectedBusiness && (
+            <Tabs
+              defaultValue="carousel"
+              className="w-auto"
+              onValueChange={(value) => setViewMode(value as "carousel" | "grid" | "list")}
+            >
+              <TabsList className="grid w-[180px] grid-cols-3">
+                <TabsTrigger value="carousel">Carousel</TabsTrigger>
+                <TabsTrigger value="grid">Grid</TabsTrigger>
+                <TabsTrigger value="list">List</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
         </div>
-
-        {/* AI-generated Summary */}
-        {showSummary && (
-          <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 h-16 w-16 opacity-10">
-              <Sparkles className="h-full w-full text-primary" />
-            </div>
-            <div className="flex items-start">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                <Sparkles className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium flex items-center">
-                  AI-Generated Insight
-                  <Badge variant="outline" className="ml-2 text-xs">
-                    <RefreshCw className="h-2.5 w-2.5 mr-1" />
-                    Updated today
-                  </Badge>
-                </h3>
-                <p className="text-sm mt-1">{generateAISummary(reviews)}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Stats Section */}
-      {showStats && renderStats()}
+      {/* Business Selector Section */}
+      {renderBusinessSelector()}
 
-      {/* Filters */}
-      {showFilters && (
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search reviews..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                  onClick={() => setSearchTerm("")}
-                >
-                  <X className="h-3 w-3" />
-                  <span className="sr-only">Clear search</span>
-                </Button>
-              )}
-            </div>
+      <Separator className="my-6" />
 
-            <div className="flex gap-2">
-              <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Rating" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Ratings</SelectItem>
-                  <SelectItem value="5">5 Stars & Up</SelectItem>
-                  <SelectItem value="4">4 Stars & Up</SelectItem>
-                  <SelectItem value="3">3 Stars & Up</SelectItem>
-                  <SelectItem value="2">2 Stars & Up</SelectItem>
-                  <SelectItem value="1">1 Star & Up</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Sentiment" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sentiment</SelectItem>
-                  <SelectItem value="positive">Positive</SelectItem>
-                  <SelectItem value="neutral">Neutral</SelectItem>
-                  <SelectItem value="negative">Negative</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* If no business selected, show message */}
+      {!selectedBusiness ? (
+        renderNoBusinessSelected()
+      ) : (
+        <>
+          {/* Business Info Header */}
+          <div className="mb-6">
+            <h3 className="text-xl font-medium flex items-center">
+              <Store className="h-5 w-5 mr-2 text-primary" />
+              Reviews for {selectedBusiness.name}
+            </h3>
+            <p className="text-muted-foreground">{selectedBusiness.location}</p>
           </div>
 
-          {/* Keyword Filter */}
-          {allKeywords.length > 0 && (
-            <div>
-              <div className="flex items-center mb-2">
-                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm font-medium">Filter by keyword:</span>
-                {keywordFilter !== "all" && (
+          {/* Filters - only shown when a business is selected */}
+          {showFilters && selectedBusiness && (
+            <div className="mb-6 space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Select value={ratingFilter} onValueChange={setRatingFilter}>
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Rating" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Ratings</SelectItem>
+                    <SelectItem value="5">5 Stars & Up</SelectItem>
+                    <SelectItem value="4">4 Stars & Up</SelectItem>
+                    <SelectItem value="3">3 Stars & Up</SelectItem>
+                    <SelectItem value="2">2 Stars & Up</SelectItem>
+                    <SelectItem value="1">1 Star & Up</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Sentiment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sentiment</SelectItem>
+                    <SelectItem value="positive">Positive</SelectItem>
+                    <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectItem value="negative">Negative</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Active Filters Summary */}
+              {(ratingFilter !== "all" || sentimentFilter !== "all" || keywordFilter !== "all") && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <span>
+                    Showing {filteredReviews.length} of {reviews.length} reviews
+                  </span>
                   <Button
-                    variant="ghost"
+                    variant="link"
                     size="sm"
                     className="h-6 ml-2 text-xs"
-                    onClick={() => setKeywordFilter("all")}
+                    onClick={() => {
+                      setRatingFilter("all")
+                      setSentimentFilter("all")
+                      setKeywordFilter("all")
+                    }}
                   >
-                    Clear
+                    Clear all filters
                   </Button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {allKeywords.map((keyword) => (
-                  <Badge
-                    key={keyword}
-                    variant={keywordFilter === keyword ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => setKeywordFilter(keyword === keywordFilter ? "all" : keyword)}
-                  >
-                    #{keyword}
-                  </Badge>
-                ))}
-              </div>
+                </div>
+              )}
+
+              <Separator />
             </div>
           )}
 
-          {/* Active Filters Summary */}
-          {(searchTerm || ratingFilter !== "all" || sentimentFilter !== "all" || keywordFilter !== "all") && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <span>
-                Showing {filteredReviews.length} of {reviews.length} reviews
-              </span>
-              <Button
-                variant="link"
-                size="sm"
-                className="h-6 ml-2 text-xs"
-                onClick={() => {
-                  setSearchTerm("")
-                  setRatingFilter("all")
-                  setSentimentFilter("all")
-                  setKeywordFilter("all")
-                }}
-              >
-                Clear all filters
-              </Button>
+          {/* Reviews Display */}
+          {loading ? (
+            <GoogleLoader />
+          ) : (
+            <div className="mb-6">
+              {viewMode === "carousel" && renderCarouselView()}
+              {viewMode === "grid" && renderGridView()}
+              {viewMode === "list" && renderListView()}
             </div>
           )}
-
-          <Separator />
-        </div>
+        </>
       )}
-
-      {/* Reviews Display */}
-      <div className="mb-6">
-        {viewMode === "carousel" && renderCarouselView()}
-        {viewMode === "grid" && renderGridView()}
-        {viewMode === "list" && renderListView()}
-      </div>
     </div>
   )
 }
 
 export default MarketingReviews
-
