@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
@@ -9,7 +15,7 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
@@ -23,7 +29,11 @@ export interface AuthContextType {
   businessData: UserBusiness | null;
   loading: boolean;
   error: string | null;
-  signup: (email: string, password: string, businessData: Partial<UserBusiness>) => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    businessData: Partial<UserBusiness>
+  ) => Promise<void>;
   signupWithGoogle: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -46,7 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (user) {
         try {
           const businessResponse = await getUserById(user.uid);
-          setBusinessData(businessResponse as UserBusiness);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setBusinessData(businessResponse as any);
+          // setBusinessData(businessResponse as UserBusiness);
         } catch (err) {
           console.error("Error fetching business data:", err);
         }
@@ -60,30 +72,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return unsubscribe;
   }, []);
 
-/*   const handleAuthenticateAccount = async () => {
+  /*   const handleAuthenticateAccount = async () => {
     const response = await authenticateAccount();
     if (response) {
       window.location.href = response.auth_url;
     }
   } */
 
-  const signup = async (email: string, password: string, businessData: Partial<Business>) => {
+  const signup = async (
+    email: string,
+    password: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    businessData: Partial<any>
+  ) => {
     setError(null);
     setLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       await setDoc(doc(db, "users", user.uid), {
         ...businessData,
         email,
         createdAt: new Date().toISOString(),
-        userId: user.uid
+        userId: user.uid,
       });
 
       router.push("/dashboard");
-    } catch (err: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       if (err instanceof Error) {
         console.error("Google login error:", err.message);
         setError(err.message || "Error during Google signup");
@@ -114,23 +136,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (!docSnap.exists()) {
         // New user - create business profile
-        const displayName = user.displayName || '';
-        const nameParts = displayName.split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
+        const displayName = user.displayName || "";
+        const nameParts = displayName.split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
 
         await setDoc(docRef, {
           firstName,
           lastName,
           businessName: `${firstName}'s Business`,
           email: user.email,
-          phone: user.phoneNumber || '',
+          phone: user.phoneNumber || "",
           createdAt: new Date().toISOString(),
-          userId: user.uid
+          userId: user.uid,
         });
       }
 
       router.push("/dashboard");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Google signup error:", err);
       setError(err.message || "Error during Google signup");
@@ -148,6 +172,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       /*    handleAuthenticateAccount(); */
       toast.success("Login successful");
       router.push("/dashboard");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error("Login failed");
       throw err;
@@ -164,6 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await signInWithPopup(auth, provider);
       toast.success("Login successful");
       router.push("/dashboard");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error("Google login failed");
       console.error("Google login error:", err);
@@ -177,6 +203,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await signOut(auth);
       router.push("/login");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error signing out:", err);
       setError(err.message || "Error signing out");
@@ -193,7 +220,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signupWithGoogle,
     login,
     loginWithGoogle,
-    logout
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

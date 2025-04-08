@@ -37,7 +37,7 @@ export default function CartModal() {
               <AnimatePresence initial={false}>
                 <div className="space-y-4">
                   {state.items.map((item) => (
-                    <CartItemCard key={item.locationId} item={item} onRemove={removeItem} />
+                    <CartItemCard key={item.location_id} item={item} onRemove={removeItem} />
                   ))}
                 </div>
               </AnimatePresence>
@@ -105,7 +105,7 @@ function CartItemCard({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => onRemove(item.locationId || '')}
+            onClick={() => onRemove(item.location_id || '')}
             aria-label={`Remove ${item.name} from cart`}
           >
             <Trash2 className="h-4 w-4" />
