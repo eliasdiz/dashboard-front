@@ -31,7 +31,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
 export function BusinessesTable() {
-  const { currentUser } = useAuth()
+  const { businessData, currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,9 +55,7 @@ export function BusinessesTable() {
 
   const handleReport = (business: BusinessFormValues) => {
     window.open(
-      `/reports/?account_id=${
-        JSON.parse(localStorage.getItem("user") || "").user.userId || ""
-      }&location_id=${business.location_id}`,
+      `/reports/?account_id=${businessData?.sub}&location_id=${business.locationId}`,
       "_blank"
     );
   };
@@ -97,14 +95,16 @@ export function BusinessesTable() {
         .then((response) => {
           const formattedBusinesses = response.data?.businesses || [];
           setBusinesses(formattedBusinesses);
-          localStorage.setItem("businesses", JSON.stringify(formattedBusinesses));
+          localStorage.setItem(
+            "businesses",
+            JSON.stringify(formattedBusinesses)
+          );
           toast.success("Businesses fetched successfully");
         })
         .catch(() => toast.error("Error fetching businesses"))
         .finally(() => setLoading(false));
     }
   }, []);
-
 
   return (
     <>
@@ -187,15 +187,15 @@ export function BusinessesTable() {
                   {sortedBusinesses.length > 0 ? (
                     sortedBusinesses.map((business, index) => (
                       <TableRow key={`${business.location_id}-${index}`}>
-                        <TableCell>{business.name.slice(0, 30)}</TableCell>
+                        <TableCell>{business?.title?.slice(0, 30)}</TableCell>
                         <TableCell>
                           <a
-                            href={business.website}
+                            href={business?.websiteUri}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center text-primary hover:text-primary hover:underline"
                           >
-                            {business.website
+                            {business.websiteUri
                               ?.replace(/(^\w+:|^)\/\//, "")
                               ?.replace(/\/$/, "")
                               .slice(0, 30)}
@@ -203,9 +203,9 @@ export function BusinessesTable() {
                             <ExternalLink className="ml-1 h-3 w-3" />
                           </a>
                         </TableCell>
-                        {/*           <TableCell className="font-medium">
-                          {business?.country}
-                        </TableCell> */}
+                        <TableCell className="font-medium">
+                          {business?.storefrontAddress?.regionCode}
+                        </TableCell>
                         <TableCell>
                           <EditableBadgeButton />
                         </TableCell>

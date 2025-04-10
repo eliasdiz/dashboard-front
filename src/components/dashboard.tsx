@@ -534,7 +534,7 @@ export function Dashboard() {
                     size="icon"
                     className="rounded-full bg-primary/80 text-white"
                   >
-                    {`${businessData?.firstName.toLocaleUpperCase()}${businessData?.lastName.toUpperCase()}` || ""}
+                    {`${businessData?.firstName[0].toLocaleUpperCase()}${businessData?.lastName[0].toUpperCase()}`}
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
